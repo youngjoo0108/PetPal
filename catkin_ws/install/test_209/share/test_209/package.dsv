@@ -1,0 +1,6 @@
+source;share\test_209\hook\pythonpath.ps1
+source;share\test_209\hook\pythonpath.bat
+source;share\test_209\hook\pythonpath.dsv
+source;share\test_209\hook\ament_prefix_path.ps1
+source;share\test_209\hook\ament_prefix_path.bat
+source;share\test_209\hook\ament_prefix_path.dsv

@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_msgs\rosidl_typesupport_introspection_cpp\ssafy_msgs\msg\num__type_support.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_msgs\rosidl_typesupport_introspection_cpp\ssafy_msgs\msg\enviroment_status__type_support.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_msgs\rosidl_typesupport_introspection_cpp\ssafy_msgs\msg\turtlebot_status__type_support.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_msgs\rosidl_typesupport_introspection_cpp\ssafy_msgs\msg\b_box__type_support.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_msgs\rosidl_typesupport_introspection_cpp\ssafy_msgs\msg\object_info__type_support.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_msgs\rosidl_typesupport_introspection_cpp\ssafy_msgs\msg\hand_control__type_support.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_msgs\rosidl_typesupport_introspection_cpp\ssafy_msgs\msg\custom_object_info__type_support.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_msgs\rosidl_typesupport_introspection_cpp\ssafy_msgs\msg\num__rosidl_typesupport_introspection_cpp.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_msgs\rosidl_typesupport_introspection_cpp\ssafy_msgs\msg\enviroment_status__rosidl_typesupport_introspection_cpp.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_msgs\rosidl_typesupport_introspection_cpp\ssafy_msgs\msg\turtlebot_status__rosidl_typesupport_introspection_cpp.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_msgs\rosidl_typesupport_introspection_cpp\ssafy_msgs\msg\b_box__rosidl_typesupport_introspection_cpp.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_msgs\rosidl_typesupport_introspection_cpp\ssafy_msgs\msg\object_info__rosidl_typesupport_introspection_cpp.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_msgs\rosidl_typesupport_introspection_cpp\ssafy_msgs\msg\hand_control__rosidl_typesupport_introspection_cpp.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_msgs\rosidl_typesupport_introspection_cpp\ssafy_msgs\msg\custom_object_info__rosidl_typesupport_introspection_cpp.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_msgs\CMakeFiles\0c078222e96ad899b3047ac39035cffb\num__rosidl_typesupport_introspection_cpp.hpp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\src\ssafy_msgs\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{BB001CD1-CE43-3046-9A29-1498E809A429}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{E7923C54-9109-3432-8EA1-AA40FB551744}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{9CFD4DD4-A200-3A65-A3A2-1AB530A867B2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

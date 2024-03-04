@@ -1,0 +1,13 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from ssafy_msgs/msg\CustomObjectInfo.msg
+// generated code does not contain a copyright notice
+
+#include "geometry_msgs/msg/Vector3.idl"
+
+module ssafy_msgs {
+  module msg {
+    struct CustomObjectInfo {
+      sequence<geometry_msgs::msg::Vector3> position;
+    };
+  };
+};

@@ -1,0 +1,20 @@
+^C:\USERS\SSAFY\DESKTOP\S10P22A209\CATKIN_WS\BUILD\SSAFY_MSGS\CMAKEFILES\F930B480CFD26F613DC7B85858D6ADD7\NUM__TYPE_SUPPORT_C.CPP.RULE
+setlocal
+C:\Python37\python.exe C:/dev/ros2-eloquent/lib/rosidl_typesupport_connext_c/rosidl_typesupport_connext_c --generator-arguments-file C:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/build/ssafy_msgs/rosidl_typesupport_connext_c__arguments.json
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\SSAFY\DESKTOP\S10P22A209\CATKIN_WS\SRC\SSAFY_MSGS\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/src/ssafy_msgs -BC:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/build/ssafy_msgs --check-stamp-file C:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/build/ssafy_msgs/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

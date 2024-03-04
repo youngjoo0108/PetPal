@@ -1,0 +1,15 @@
+source;share\ssafy_msgs\hook\cmake_prefix_path.ps1
+source;share\ssafy_msgs\hook\cmake_prefix_path.bat
+source;share\ssafy_msgs\hook\cmake_prefix_path.dsv
+source;share\ssafy_msgs\hook\path_dll.ps1
+source;share\ssafy_msgs\hook\path_dll.bat
+source;share\ssafy_msgs\hook\path_dll.dsv
+source;share\ssafy_msgs\hook\path.ps1
+source;share\ssafy_msgs\hook\path.bat
+source;share\ssafy_msgs\hook\path.dsv
+source;share\ssafy_msgs\hook\pythonpath.ps1
+source;share\ssafy_msgs\hook\pythonpath.bat
+source;share\ssafy_msgs\hook\pythonpath.dsv
+source;share/ssafy_msgs/local_setup.bat
+source;share/ssafy_msgs/local_setup.dsv
+source;share/ssafy_msgs/local_setup.ps1

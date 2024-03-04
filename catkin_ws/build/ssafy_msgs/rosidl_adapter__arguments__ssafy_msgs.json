@@ -1,0 +1,12 @@
+{
+  "package_name": "ssafy_msgs",
+  "non_idl_tuples": [
+    "C:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/src/ssafy_msgs:msg/Num.msg",
+    "C:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/src/ssafy_msgs:msg/EnviromentStatus.msg",
+    "C:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/src/ssafy_msgs:msg/TurtlebotStatus.msg",
+    "C:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/src/ssafy_msgs:msg/BBox.msg",
+    "C:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/src/ssafy_msgs:msg/ObjectInfo.msg",
+    "C:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/src/ssafy_msgs:msg/HandControl.msg",
+    "C:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/src/ssafy_msgs:msg/CustomObjectInfo.msg"
+  ]
+}

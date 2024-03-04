@@ -1,0 +1,31 @@
+// generated from rosidl_generator_dds_idl/resource/idl.idl.em
+// with input from ssafy_msgs:msg\CustomObjectInfo.idl
+// generated code does not contain a copyright notice
+#include "geometry_msgs/msg/dds_connext/Vector3_.idl"
+
+#ifndef __ssafy_msgs__msg__custom_object_info__idl__
+#define __ssafy_msgs__msg__custom_object_info__idl__
+
+
+module ssafy_msgs {
+
+module msg {
+
+module dds_ {
+
+
+struct CustomObjectInfo_ {
+sequence<geometry_msgs::msg::dds_::Vector3_> position_;
+
+
+};
+
+
+};  // module dds_
+
+};  // module msg
+
+};  // module ssafy_msgs
+
+
+#endif  // __ssafy_msgs__msg__custom_object_info__idl__

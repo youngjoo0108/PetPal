@@ -1,0 +1,22 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from ssafy_msgs/msg\EnviromentStatus.msg
+// generated code does not contain a copyright notice
+
+
+module ssafy_msgs {
+  module msg {
+    struct EnviromentStatus {
+      uint8 month;
+
+      uint8 day;
+
+      uint8 hour;
+
+      uint8 minute;
+
+      uint8 temperature;
+
+      string weather;
+    };
+  };
+};

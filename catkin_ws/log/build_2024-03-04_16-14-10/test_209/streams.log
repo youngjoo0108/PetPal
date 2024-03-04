@@ -1,0 +1,50 @@
+[3.703s] Invoking command in 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\src\test_209': PYTHONPATH=C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\prefix_override;C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\Lib\site-packages;%PYTHONPATH% c:\python37\python.exe setup.py egg_info --egg-base ..\..\build\test_209 build --build-base C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\build install --record C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\install.log --install-scripts $base/lib/test_209 --single-version-externally-managed
+[4.437s] running egg_info
+[4.437s] writing ..\..\build\test_209\test_209.egg-info\PKG-INFO
+[4.437s] writing dependency_links to ..\..\build\test_209\test_209.egg-info\dependency_links.txt
+[4.437s] writing entry points to ..\..\build\test_209\test_209.egg-info\entry_points.txt
+[4.437s] writing requirements to ..\..\build\test_209\test_209.egg-info\requires.txt
+[4.437s] writing top-level names to ..\..\build\test_209\test_209.egg-info\top_level.txt
+[4.484s] reading manifest file '..\..\build\test_209\test_209.egg-info\SOURCES.txt'
+[4.500s] writing manifest file '..\..\build\test_209\test_209.egg-info\SOURCES.txt'
+[4.500s] running build
+[4.500s] running build_py
+[4.500s] copying test_209\load_map.py -> C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\build\lib\test_209
+[4.500s] copying test_209\make_map.py -> C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\build\lib\test_209
+[4.500s] copying test_209\make_path.py -> C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\build\lib\test_209
+[4.500s] copying test_209\path_node.py -> C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\build\lib\test_209
+[4.515s] running install
+[4.515s] running install_lib
+[4.515s] copying C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\build\lib\test_209\load_map.py -> C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\Lib\site-packages\test_209
+[4.515s] copying C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\build\lib\test_209\make_map.py -> C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\Lib\site-packages\test_209
+[4.515s] copying C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\build\lib\test_209\make_path.py -> C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\Lib\site-packages\test_209
+[4.531s] copying C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\build\lib\test_209\path_node.py -> C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\Lib\site-packages\test_209
+[4.531s] byte-compiling C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\Lib\site-packages\test_209\load_map.py to load_map.cpython-37.pyc
+[4.546s] byte-compiling C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\Lib\site-packages\test_209\make_map.py to make_map.cpython-37.pyc
+[4.546s] byte-compiling C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\Lib\site-packages\test_209\make_path.py to make_path.cpython-37.pyc
+[4.546s] byte-compiling C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\Lib\site-packages\test_209\path_node.py to path_node.cpython-37.pyc
+[4.562s] running install_data
+[4.562s] running install_egg_info
+[4.562s] removing 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\Lib\site-packages\test_209-0.0.0-py3.7.egg-info' (and everything under it)
+[4.578s] Copying ..\..\build\test_209\test_209.egg-info to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\Lib\site-packages\test_209-0.0.0-py3.7.egg-info
+[4.750s] running install_scripts
+[4.750s] Installing astar-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.750s] Installing astar.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.750s] Installing drive-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.750s] Installing drive.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.750s] Installing follow-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.750s] Installing follow.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.750s] Installing lidar-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.765s] Installing lidar.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.765s] Installing make-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.765s] Installing make.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.765s] Installing map-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.765s] Installing map.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.765s] Installing mapping-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.765s] Installing mapping.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.765s] Installing odom-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.765s] Installing odom.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.765s] Installing path-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.765s] Installing path.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[4.765s] writing list of installed files to 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\install.log'
+[4.906s] Invoked command in 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\src\test_209' returned '0': PYTHONPATH=C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\prefix_override;C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\Lib\site-packages;%PYTHONPATH% c:\python37\python.exe setup.py egg_info --egg-base ..\..\build\test_209 build --build-base C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\build install --record C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\install.log --install-scripts $base/lib/test_209 --single-version-externally-managed

@@ -1,0 +1,43 @@
+[4.141s] Invoking command in 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\src\ssafy_bridge': PYTHONPATH=C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\prefix_override;C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\Lib\site-packages;%PYTHONPATH% c:\python37\python.exe setup.py egg_info --egg-base ..\..\build\ssafy_bridge build --build-base C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\build install --record C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\install.log --install-scripts $base/lib/ssafy_bridge --single-version-externally-managed
+[4.938s] running egg_info
+[4.938s] creating ..\..\build\ssafy_bridge\ssafy_bridge.egg-info
+[4.938s] writing ..\..\build\ssafy_bridge\ssafy_bridge.egg-info\PKG-INFO
+[4.938s] writing dependency_links to ..\..\build\ssafy_bridge\ssafy_bridge.egg-info\dependency_links.txt
+[4.938s] writing entry points to ..\..\build\ssafy_bridge\ssafy_bridge.egg-info\entry_points.txt
+[4.938s] writing requirements to ..\..\build\ssafy_bridge\ssafy_bridge.egg-info\requires.txt
+[4.938s] writing top-level names to ..\..\build\ssafy_bridge\ssafy_bridge.egg-info\top_level.txt
+[4.938s] writing manifest file '..\..\build\ssafy_bridge\ssafy_bridge.egg-info\SOURCES.txt'
+[4.985s] reading manifest file '..\..\build\ssafy_bridge\ssafy_bridge.egg-info\SOURCES.txt'
+[4.985s] writing manifest file '..\..\build\ssafy_bridge\ssafy_bridge.egg-info\SOURCES.txt'
+[4.985s] running build
+[4.985s] running build_py
+[4.985s] creating C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\build
+[4.985s] creating C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\build\lib
+[4.985s] creating C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\build\lib\ssafy_bridge
+[4.985s] copying ssafy_bridge\cam_viewer.py -> C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\build\lib\ssafy_bridge
+[5.000s] copying ssafy_bridge\ssafy_udp_parser.py -> C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\build\lib\ssafy_bridge
+[5.000s] copying ssafy_bridge\sub_to_udp.py -> C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\build\lib\ssafy_bridge
+[5.000s] copying ssafy_bridge\udp_to_cam.py -> C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\build\lib\ssafy_bridge
+[5.000s] copying ssafy_bridge\udp_to_laser.py -> C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\build\lib\ssafy_bridge
+[5.000s] copying ssafy_bridge\udp_to_pub.py -> C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\build\lib\ssafy_bridge
+[5.016s] copying ssafy_bridge\utils.py -> C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\build\lib\ssafy_bridge
+[5.016s] copying ssafy_bridge\__init__.py -> C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\build\lib\ssafy_bridge
+[5.016s] running install
+[5.016s] running install_lib
+[5.031s] running install_data
+[5.031s] running install_egg_info
+[5.031s] removing 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\Lib\site-packages\ssafy_bridge-0.0.0-py3.7.egg-info' (and everything under it)
+[5.031s] Copying ..\..\build\ssafy_bridge\ssafy_bridge.egg-info to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\Lib\site-packages\ssafy_bridge-0.0.0-py3.7.egg-info
+[5.063s] running install_scripts
+[5.094s] Installing cam_viewer-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.094s] Installing cam_viewer.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.094s] Installing sub_to_udp-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.110s] Installing sub_to_udp.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.110s] Installing udp_to_cam-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.110s] Installing udp_to_cam.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.110s] Installing udp_to_laser-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.110s] Installing udp_to_laser.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.110s] Installing udp_to_pub-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.110s] Installing udp_to_pub.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.110s] writing list of installed files to 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\install.log'
+[5.313s] Invoked command in 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\src\ssafy_bridge' returned '0': PYTHONPATH=C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\prefix_override;C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\Lib\site-packages;%PYTHONPATH% c:\python37\python.exe setup.py egg_info --egg-base ..\..\build\ssafy_bridge build --build-base C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\build install --record C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\install.log --install-scripts $base/lib/ssafy_bridge --single-version-externally-managed
