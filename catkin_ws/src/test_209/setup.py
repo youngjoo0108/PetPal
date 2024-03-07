@@ -29,6 +29,8 @@ setup(
             'mapping=test_209.make_map:main',
             'astar=test_209.a_star:main',
             'drive=test_209.drive_test:main',
+            'astarlocal=test_209.a_star_local:main',
+            'odomprint=test_209.odom_print:main',
         ],
     },
 )

@@ -11,11 +11,6 @@ def generate_launch_description():
         ),
         Node(
             package = 'test_209',
-            node_executable = 'astar',
-            node_name = 'astar',
-        ),
-        Node(
-            package = 'test_209',
             node_executable = 'lidar',
             node_name = 'lidar',
             output = 'screen',
@@ -31,4 +26,20 @@ def generate_launch_description():
             node_executable = 'mapping',
             node_name = 'mapping',
         ),
+        Node(
+            package = 'test_209',
+            node_executable = 'astar',
+            node_name = 'astar',
+            output = 'screen' ,
+        ),
+        Node(
+            package = 'test_209',
+            node_executable = 'astarlocal',
+            node_name = 'astarlocal',
+        ),
+        # Node(
+        #     package = 'test_209',
+        #     node_executable = 'odomprint',
+        #     node_name = 'odomprint',
+        # ),
     ])
