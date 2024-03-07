@@ -1,5 +1,5 @@
-<!-- ![header](https://capsule-render.vercel.app/api?type=wave&color=auto&height=300&section=header&text=YOLO%20for%20object%20detection&fontSize=90) -->
-<img src="https://capsule-render.vercel.app/api?type=wave&color=auto&height=300&section=header&text=YOLO%20for%20object%20detection&fontSize=90" />
+<!-- ![header](https://capsule-render.vercel.app/api?type=wave&color=auto&height=300&section=header&text=YOLO%20object%20detection&fontSize=70) -->
+<img src="https://capsule-render.vercel.app/api?type=wave&color=auto&height=300&section=header&text=YOLO%20object%20detection&fontSize=70" style="width: 100%;">
 
 <h2>Yolo v8 nano ver.1 [2024-03-05]</h2>
 
