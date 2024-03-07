@@ -10,8 +10,8 @@ from sensor_msgs.msg import CompressedImage
 
 params_cam_0 = {
     "SOCKET_TYPE": 'JPG',
-    "WIDTH": 320, # image width
-    "HEIGHT": 240, # image height
+    "WIDTH": 400, # image width
+    "HEIGHT": 300, # image height
     "FOV": 60, # Field of view
     "localIP": "127.0.0.1",
     "localPort": 1232,
