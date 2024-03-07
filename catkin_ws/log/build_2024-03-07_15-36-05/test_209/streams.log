@@ -1,0 +1,40 @@
+[4.766s] Invoking command in 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\src\test_209': PYTHONPATH=C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\prefix_override;C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\Lib\site-packages;%PYTHONPATH% installDir=%installDir%
+IntelliJ IDEA=C:\Program Files\JetBrains\IntelliJ IDEA 2023.3.3\bin; c:\python37\python.exe setup.py egg_info --egg-base ..\..\build\test_209 build --build-base C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\build install --record C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\install.log --install-scripts $base/lib/test_209 --single-version-externally-managed
+[5.281s] running egg_info
+[5.281s] writing ..\..\build\test_209\test_209.egg-info\PKG-INFO
+[5.281s] writing dependency_links to ..\..\build\test_209\test_209.egg-info\dependency_links.txt
+[5.281s] writing entry points to ..\..\build\test_209\test_209.egg-info\entry_points.txt
+[5.281s] writing requirements to ..\..\build\test_209\test_209.egg-info\requires.txt
+[5.281s] writing top-level names to ..\..\build\test_209\test_209.egg-info\top_level.txt
+[5.312s] reading manifest file '..\..\build\test_209\test_209.egg-info\SOURCES.txt'
+[5.312s] writing manifest file '..\..\build\test_209\test_209.egg-info\SOURCES.txt'
+[5.312s] running build
+[5.312s] running build_py
+[5.312s] running install
+[5.312s] running install_lib
+[5.328s] running install_data
+[5.328s] running install_egg_info
+[5.344s] removing 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\Lib\site-packages\test_209-0.0.0-py3.7.egg-info' (and everything under it)
+[5.344s] Copying ..\..\build\test_209\test_209.egg-info to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\Lib\site-packages\test_209-0.0.0-py3.7.egg-info
+[5.359s] running install_scripts
+[5.391s] Installing astar-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.391s] Installing astar.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.391s] Installing drive-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.391s] Installing drive.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.391s] Installing follow-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.391s] Installing follow.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.391s] Installing lidar-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.391s] Installing lidar.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.391s] Installing make-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.391s] Installing make.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.391s] Installing map-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.391s] Installing map.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.391s] Installing mapping-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.391s] Installing mapping.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.391s] Installing odom-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.391s] Installing odom.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.406s] Installing path-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.406s] Installing path.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\lib\test_209
+[5.406s] writing list of installed files to 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\install.log'
+[5.656s] Invoked command in 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\src\test_209' returned '0': PYTHONPATH=C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\prefix_override;C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\test_209\Lib\site-packages;%PYTHONPATH% installDir=%installDir%
+IntelliJ IDEA=C:\Program Files\JetBrains\IntelliJ IDEA 2023.3.3\bin; c:\python37\python.exe setup.py egg_info --egg-base ..\..\build\test_209 build --build-base C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\build install --record C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\test_209\install.log --install-scripts $base/lib/test_209 --single-version-externally-managed

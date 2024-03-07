@@ -1,0 +1,32 @@
+[4.938s] Invoking command in 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\src\ssafy_bridge': PYTHONPATH=C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\prefix_override;C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\Lib\site-packages;%PYTHONPATH% installDir=%installDir%
+IntelliJ IDEA=C:\Program Files\JetBrains\IntelliJ IDEA 2023.3.3\bin; c:\python37\python.exe setup.py egg_info --egg-base ..\..\build\ssafy_bridge build --build-base C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\build install --record C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\install.log --install-scripts $base/lib/ssafy_bridge --single-version-externally-managed
+[5.407s] running egg_info
+[5.407s] writing ..\..\build\ssafy_bridge\ssafy_bridge.egg-info\PKG-INFO
+[5.407s] writing dependency_links to ..\..\build\ssafy_bridge\ssafy_bridge.egg-info\dependency_links.txt
+[5.407s] writing entry points to ..\..\build\ssafy_bridge\ssafy_bridge.egg-info\entry_points.txt
+[5.407s] writing requirements to ..\..\build\ssafy_bridge\ssafy_bridge.egg-info\requires.txt
+[5.407s] writing top-level names to ..\..\build\ssafy_bridge\ssafy_bridge.egg-info\top_level.txt
+[5.438s] reading manifest file '..\..\build\ssafy_bridge\ssafy_bridge.egg-info\SOURCES.txt'
+[5.438s] writing manifest file '..\..\build\ssafy_bridge\ssafy_bridge.egg-info\SOURCES.txt'
+[5.438s] running build
+[5.438s] running build_py
+[5.438s] running install
+[5.438s] running install_lib
+[5.469s] running install_data
+[5.469s] running install_egg_info
+[5.469s] removing 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\Lib\site-packages\ssafy_bridge-0.0.0-py3.7.egg-info' (and everything under it)
+[5.469s] Copying ..\..\build\ssafy_bridge\ssafy_bridge.egg-info to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\Lib\site-packages\ssafy_bridge-0.0.0-py3.7.egg-info
+[5.469s] running install_scripts
+[5.516s] Installing cam_viewer-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.516s] Installing cam_viewer.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.516s] Installing sub_to_udp-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.516s] Installing sub_to_udp.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.516s] Installing udp_to_cam-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.516s] Installing udp_to_cam.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.516s] Installing udp_to_laser-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.516s] Installing udp_to_laser.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.516s] Installing udp_to_pub-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.516s] Installing udp_to_pub.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\lib\ssafy_bridge
+[5.516s] writing list of installed files to 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\install.log'
+[5.782s] Invoked command in 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\src\ssafy_bridge' returned '0': PYTHONPATH=C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\prefix_override;C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\ssafy_bridge\Lib\site-packages;%PYTHONPATH% installDir=%installDir%
+IntelliJ IDEA=C:\Program Files\JetBrains\IntelliJ IDEA 2023.3.3\bin; c:\python37\python.exe setup.py egg_info --egg-base ..\..\build\ssafy_bridge build --build-base C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\build install --record C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\ssafy_bridge\install.log --install-scripts $base/lib/ssafy_bridge --single-version-externally-managed

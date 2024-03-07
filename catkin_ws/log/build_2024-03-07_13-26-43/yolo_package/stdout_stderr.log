@@ -1,0 +1,22 @@
+running egg_info
+writing ..\..\build\yolo_package\yolo_package.egg-info\PKG-INFO
+writing dependency_links to ..\..\build\yolo_package\yolo_package.egg-info\dependency_links.txt
+writing entry points to ..\..\build\yolo_package\yolo_package.egg-info\entry_points.txt
+writing requirements to ..\..\build\yolo_package\yolo_package.egg-info\requires.txt
+writing top-level names to ..\..\build\yolo_package\yolo_package.egg-info\top_level.txt
+reading manifest file '..\..\build\yolo_package\yolo_package.egg-info\SOURCES.txt'
+writing manifest file '..\..\build\yolo_package\yolo_package.egg-info\SOURCES.txt'
+running build
+running build_py
+running install
+running install_lib
+running install_data
+running install_egg_info
+removing 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\yolo_package\Lib\site-packages\yolo_package-0.0.0-py3.7.egg-info' (and everything under it)
+Copying ..\..\build\yolo_package\yolo_package.egg-info to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\yolo_package\Lib\site-packages\yolo_package-0.0.0-py3.7.egg-info
+running install_scripts
+Installing save_camera-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\yolo_package\lib\yolo_package
+Installing save_camera.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\yolo_package\lib\yolo_package
+Installing yolo-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\yolo_package\lib\yolo_package
+Installing yolo.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\yolo_package\lib\yolo_package
+writing list of installed files to 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\yolo_package\install.log'
