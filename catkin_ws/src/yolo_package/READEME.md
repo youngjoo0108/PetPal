@@ -1,11 +1,13 @@
-YOLO for object detection
+![header](https://capsule-render.vercel.app/api?type=wave&color=auto&height=300&section=header&text=YOLO%20for%20object%20detection&fontSize=90)
 
 <h2>Yolo v8 nano ver.1 [2024-03-05]</h2>
+
 - model name : my_model_2
 - Epoch : 10
 - Dataset(number of images) : 300
 - classes(number of class) : 12
 <h3>Result</h3>
+
 - Percision : 0.72554
 - Recall : 0.64783
 - mAP50 : 0.68614
@@ -14,11 +16,13 @@ YOLO for object detection
 
 
 <h2>Yolo v8 nano ver.2 [2024-03-06]</h2>
+
 - model name : my_model_3
 - Epoch : 20
 - Dataset(number of images) : 300
 - classes(number of class) : 12
 <h3>Result</h3>
+
 - Percision : 0.82701
 - Recall : 0.73746
 - mAP50 : 0.82524
@@ -27,11 +31,13 @@ YOLO for object detection
 
 
 <h2>Yolo v8 nano ver.3 [2024-03-06]</h2>
+
 - model name : my_model_v2_1
 - Epoch : 20
 - Dataset(number of images) : 400
 - classes(number of class) : 16
 <h3>Result</h3>
+
 - Percision : 0.76724
 - Recall : 0.57109
 - mAP50 : 0.57756
@@ -40,11 +46,13 @@ YOLO for object detection
 
 
 <h2>Yolo v8 nano ver.4 [2024-03-06]</h2>
+
 - model name : my_model_v2_2
 - Epoch : 30
 - Dataset(number of images) : 400
 - classes(number of class) : 16
 <h3>Result</h3>
+
 - Percision : 0.77765
 - Recall : 0.62348
 - mAP50 : 0.61579
@@ -53,11 +61,13 @@ YOLO for object detection
 
 
 <h2>Yolo v8 small ver.1 [2024-03-07]</h2>
+
 - model name : my_model_small_1
 - Epoch : 30
 - Dataset(number of images) : 400
 - classes(number of class) : 16
 <h3>Result</h3>
+
 - Percision : 0.79117
 - Recall : 0.74283
 - mAP50 : 0.7817
@@ -66,11 +76,13 @@ YOLO for object detection
 
 
 <h2>Yolo v8 medium ver.1 [2024-03-07]</h2>
+
 - model name : my_model_medium_1
 - Epoch : 30
 - Dataset(number of images) : 400
 - classes(number of class) : 16
 <h3>Result</h3>
+
 - Percision : 0.74838
 - Recall : 0.75301
 - mAP50 : 0.79077
