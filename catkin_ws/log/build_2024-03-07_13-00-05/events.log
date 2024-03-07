@@ -1,0 +1,107 @@
+[0.000000] (-) TimerEvent: {}
+[0.000000] (my_package) JobQueued: {'identifier': 'my_package', 'dependencies': OrderedDict()}
+[0.000000] (ssafy_bridge) JobQueued: {'identifier': 'ssafy_bridge', 'dependencies': OrderedDict()}
+[0.000000] (ssafy_msgs) JobQueued: {'identifier': 'ssafy_msgs', 'dependencies': OrderedDict()}
+[0.000000] (test_209) JobQueued: {'identifier': 'test_209', 'dependencies': OrderedDict()}
+[0.000000] (yolo_package) JobQueued: {'identifier': 'yolo_package', 'dependencies': OrderedDict()}
+[0.000000] (my_package) JobStarted: {'identifier': 'my_package'}
+[0.109000] (-) TimerEvent: {}
+[0.219000] (-) TimerEvent: {}
+[0.344000] (-) TimerEvent: {}
+[0.344000] (ssafy_bridge) JobStarted: {'identifier': 'ssafy_bridge'}
+[0.453000] (-) TimerEvent: {}
+[0.562000] (-) TimerEvent: {}
+[0.672000] (-) TimerEvent: {}
+[0.703000] (ssafy_msgs) JobStarted: {'identifier': 'ssafy_msgs'}
+[0.781000] (-) TimerEvent: {}
+[0.891000] (-) TimerEvent: {}
+[1.000000] (test_209) JobStarted: {'identifier': 'test_209'}
+[1.000000] (-) TimerEvent: {}
+[1.109000] (-) TimerEvent: {}
+[1.219000] (-) TimerEvent: {}
+[1.328000] (yolo_package) JobStarted: {'identifier': 'yolo_package'}
+[1.328000] (-) TimerEvent: {}
+[1.437000] (-) TimerEvent: {}
+[1.547000] (-) TimerEvent: {}
+[1.656000] (-) TimerEvent: {}
+[1.656000] (ssafy_msgs) JobProgress: {'identifier': 'ssafy_msgs', 'progress': 'cmake'}
+[1.656000] (ssafy_msgs) JobProgress: {'identifier': 'ssafy_msgs', 'progress': 'build'}
+[1.672000] (ssafy_msgs) Command: {'cmd': ['C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.EXE', '--build', 'C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\build\\ssafy_msgs', '--config', 'Release'], 'cwd': 'C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\build\\ssafy_msgs', 'env': {'ALLUSERSPROFILE': 'C:\\ProgramData', 'AMENT_PREFIX_PATH': 'C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\install\\test_209;C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\install\\ssafy_msgs;C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\install\\ssafy_bridge;C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\install\\my_package;C:\\dev\\ros2-eloquent', 'APPDATA': 'C:\\Users\\SSAFY\\AppData\\Roaming', 'architectureName': 'x64Win64VS2017', 'ChocolateyInstall': 'C:\\ProgramData\\chocolatey', 'ChocolateyLastPathUpdate': '133528801051356539', 'CMAKE_PREFIX_PATH': 'C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\install\\ssafy_msgs;C:\\dev\\ros2-eloquent;C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\install\\test_209;C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\install\\ssafy_bridge;C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\install\\my_package', 'COLCON': '1', 'COLCON_PREFIX_PATH': 'C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\install\\;C:\\dev\\ros2-eloquent\\', 'CommandPromptType': 'Native', 'CommonProgramFiles': 'C:\\Program Files\\Common Files', 'CommonProgramFiles(x86)': 'C:\\Program Files (x86)\\Common Files', 'CommonProgramW6432': 'C:\\Program Files\\Common Files', 'COMPUTERNAME': 'DESKTOP-LL7FDJ6', 'ComSpec': 'C:\\Windows\\system32\\cmd.exe', 'DevEnvDir': 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\', 'DriverData': 'C:\\Windows\\System32\\Drivers\\DriverData', 'ExtensionSdkDir': 'C:\\Program Files (x86)\\Microsoft SDKs\\Windows Kits\\10\\ExtensionSDKs', 'EXTERNAL_INCLUDE': 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\include;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\ATLMFC\\include;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Auxiliary\\VS\\include;C:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.22621.0\\ucrt;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.22621.0\\\\um;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.22621.0\\\\shared;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.22621.0\\\\winrt;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.22621.0\\\\cppwinrt', 'Framework40Version': 'v4.0', 'FrameworkDir': 'C:\\Windows\\Microsoft.NET\\Framework64\\', 'FrameworkDir64': 'C:\\Windows\\Microsoft.NET\\Framework64\\', 'FrameworkVersion': 'v4.0.30319', 'FrameworkVersion64': 'v4.0.30319', 'HOMEDRIVE': 'C:', 'HOMEPATH': '\\Users\\SSAFY', 'hostVersion': '5.3.1', 'INCLUDE': 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\include;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\ATLMFC\\include;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Auxiliary\\VS\\include;C:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.22621.0\\ucrt;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.22621.0\\\\um;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.22621.0\\\\shared;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.22621.0\\\\winrt;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.22621.0\\\\cppwinrt', 'installDir': 'C:\\Program Files\\rti_connext_dds-5.3.1\\resource\\scripts\\..\\..\nIntelliJ IDEA=C:\\Program Files\\JetBrains\\IntelliJ IDEA 2023.3.3\\bin;', 'LIB': 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\ATLMFC\\lib\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\lib\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.22621.0\\ucrt\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\\\lib\\10.0.22621.0\\\\um\\x64', 'LIBPATH': 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\ATLMFC\\lib\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\lib\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\lib\\x86\\store\\references;C:\\Program Files (x86)\\Windows Kits\\10\\UnionMetadata\\10.0.22621.0;C:\\Program Files (x86)\\Windows Kits\\10\\References\\10.0.22621.0;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319', 'LOCALAPPDATA': 'C:\\Users\\SSAFY\\AppData\\Local', 'LOGONSERVER': '\\\\DESKTOP-LL7FDJ6', 'NDDSHOME': 'C:\\Program Files\\rti_connext_dds-5.3.1', 'NUMBER_OF_PROCESSORS': '12', 'OneDrive': 'C:\\Users\\SSAFY\\OneDrive', 'OpenCV_DIR': 'C:\\opencv', 'OPENSSL_CONF': 'C:\\OpenSSL-Win64\\bin\\openssl.cfg', 'OS': 'Windows_NT', 'OSPL_ERRORFILE': '<stderr>', 'OSPL_HOME': 'C:\\dev\\opensplice\\HDE\\x86_64.win64\\', 'OSPL_INFOFILE': '<stdout>', 'OSPL_TMPL_PATH': 'C:\\dev\\opensplice\\HDE\\x86_64.win64\\\\etc\\idlpp', 'OSPL_URI': 'file:///share/opensplice_cmake_module/config/ros_ospl.xml', 'OSPL_VERBOSITY': '2', 'Path': 'c:\\python37\\lib\\site-packages\\pywin32_system32;C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\install\\ssafy_msgs\\bin;C:\\dev\\ros2-eloquent\\opt\\yaml_cpp_vendor\\bin;C:\\dev\\ros2-eloquent\\opt\\rviz_ogre_vendor\\bin;C:\\dev\\ros2-eloquent\\opt\\rviz_assimp_vendor\\bin;C:\\dev\\opensplice\\HDE\\x86_64.win64\\\\bin;C:\\dev\\opensplice\\HDE\\x86_64.win64\\\\lib;C:\\dev\\opensplice\\HDE\\x86_64.win64\\\\examples\\lib;C:\\dev\\ros2-eloquent\\opt\\libcurl_vendor\\bin;C:\\Program Files\\rti_connext_dds-5.3.1\\bin;C:\\Program Files\\rti_connext_dds-5.3.1\\lib\\x64Win64VS2017;C:\\dev\\ros2-eloquent\\Scripts;C:\\dev\\ros2-eloquent\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\bin\\HostX64\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\Performance Tools\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\Performance Tools;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Team Tools\\DiagnosticsHub\\Collector;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.22621.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\;C:\\Python37\\Scripts\\;C:\\Python37\\;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\Windows\\System32\\OpenSSH\\;C:\\Program Files\\Bandizip\\;C:\\Program Files\\nodejs\\;C:\\MinGW\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\Git\\cmd;C:\\ProgramData\\chocolatey\\bin;C:\\ProgramData\\chocolatey\\lib\\cunit\\lib;C:\\ProgramData\\chocolatey\\lib\\tinyxml2\\lib;C:\\ProgramData\\chocolatey\\lib\\log4cxx\\lib;C:\\ProgramData\\chocolatey\\lib\\bullet\\lib;C:\\Users\\SSAFY\\myCMD;C:\\Users\\SSAFY\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\SSAFY\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Users\\SSAFY\\AppData\\Roaming\\npm;C:\\Program Files\\JetBrains\\IntelliJ IDEA 2023.3.3\\bin;;C:\\OpenSSL-Win64\\bin;;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe;C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg', 'PATHEXT': '.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.PY;.PYW', 'PKG_CONFIG_PATH': 'C:\\dev\\ros2-eloquent\\lib\\pkgconfig', 'PROCESSOR_ARCHITECTURE': 'AMD64', 'PROCESSOR_IDENTIFIER': 'Intel64 Family 6 Model 165 Stepping 2, GenuineIntel', 'PROCESSOR_LEVEL': '6', 'PROCESSOR_REVISION': 'a502', 'ProgramData': 'C:\\ProgramData', 'ProgramFiles': 'C:\\Program Files', 'ProgramFiles(x86)': 'C:\\Program Files (x86)', 'ProgramW6432': 'C:\\Program Files', 'PROMPT': '$P$G', 'PSModulePath': 'C:\\Program Files\\WindowsPowerShell\\Modules;C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\Modules', 'PUBLIC': 'C:\\Users\\Public', 'PYTHONPATH': 'C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\install\\test_209\\Lib\\site-packages;C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\install\\ssafy_msgs\\Lib\\site-packages;C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\install\\ssafy_bridge\\Lib\\site-packages;C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\install\\my_package\\Lib\\site-packages;C:\\dev\\ros2-eloquent\\Lib\\site-packages', 'ROS_DISTRO': 'eloquent', 'ROS_DOMAIN_ID': '0', 'ROS_LOCALHOST_ONLY': '0', 'ROS_PYTHON_VERSION': '3', 'ROS_VERSION': '2', 'scriptDir': 'C:\\Program Files\\rti_connext_dds-5.3.1\\resource\\scripts\\', 'scriptName': 'rtisetenv_x64Win64VS2017', 'SESSIONNAME': 'Console', 'SPLICE_ORB': 'DDS_OpenFusion_1_6_1', 'SystemDrive': 'C:', 'SystemRoot': 'C:\\Windows', 'TEMP': 'C:\\Users\\SSAFY\\AppData\\Local\\Temp', 'TMP': 'C:\\Users\\SSAFY\\AppData\\Local\\Temp', 'UCRTVersion': '10.0.22621.0', 'UniversalCRTSdkDir': 'C:\\Program Files (x86)\\Windows Kits\\10\\', 'USERDOMAIN': 'DESKTOP-LL7FDJ6', 'USERDOMAIN_ROAMINGPROFILE': 'DESKTOP-LL7FDJ6', 'USERNAME': 'SSAFY', 'USERPROFILE': 'C:\\Users\\SSAFY', 'VCIDEInstallDir': 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\VC\\', 'VCINSTALLDIR': 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\', 'VCPKG_ROOT': 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\vcpkg', 'VCToolsInstallDir': 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\', 'VCToolsRedistDir': 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Redist\\MSVC\\14.38.33130\\', 'VCToolsVersion': '14.38.33130', 'VisualStudioVersion': '17.0', 'VS170COMNTOOLS': 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\', 'VSCMD_ARG_app_plat': 'Desktop', 'VSCMD_ARG_HOST_ARCH': 'x64', 'VSCMD_ARG_STARTDIR': 'none', 'VSCMD_ARG_TGT_ARCH': 'x64', 'VSCMD_VER': '17.8.3', 'VSINSTALLDIR': 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\', 'windir': 'C:\\Windows', 'WindowsLibPath': 'C:\\Program Files (x86)\\Windows Kits\\10\\UnionMetadata\\10.0.22621.0;C:\\Program Files (x86)\\Windows Kits\\10\\References\\10.0.22621.0', 'WindowsSdkBinPath': 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\', 'WindowsSdkDir': 'C:\\Program Files (x86)\\Windows Kits\\10\\', 'WindowsSDKLibVersion': '10.0.22621.0\\', 'WindowsSdkVerBinPath': 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.22621.0\\', 'WindowsSDKVersion': '10.0.22621.0\\', 'WSLENV': 'WT_SESSION:WT_PROFILE_ID:', 'WT_PROFILE_ID': '{f37d6ec7-9f74-554a-9dc9-5e7d612ea62e}', 'WT_SESSION': '8929c56a-1d2e-4347-ada0-1d988e34ce24', '__DOTNET_ADD_64BIT': '1', '__DOTNET_PREFERRED_BITNESS': '64', '__VSCMD_PREINIT_PATH': 'C:\\Python37\\Scripts\\;C:\\Python37\\;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\Windows\\System32\\OpenSSH\\;C:\\Program Files\\Bandizip\\;C:\\Program Files\\nodejs\\;C:\\MinGW\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\Git\\cmd;C:\\ProgramData\\chocolatey\\bin;C:\\ProgramData\\chocolatey\\lib\\cunit\\lib;C:\\ProgramData\\chocolatey\\lib\\tinyxml2\\lib;C:\\ProgramData\\chocolatey\\lib\\log4cxx\\lib;C:\\ProgramData\\chocolatey\\lib\\bullet\\lib;C:\\Users\\SSAFY\\myCMD;C:\\Users\\SSAFY\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\SSAFY\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Users\\SSAFY\\AppData\\Roaming\\npm;C:\\Program Files\\JetBrains\\IntelliJ IDEA 2023.3.3\\bin;;C:\\OpenSSL-Win64\\bin;', 'CL': '/MP'}, 'shell': False}
+[1.766000] (-) TimerEvent: {}
+[1.891000] (-) TimerEvent: {}
+[2.000000] (-) TimerEvent: {}
+[2.109000] (-) TimerEvent: {}
+[2.219000] (-) TimerEvent: {}
+[2.328000] (-) TimerEvent: {}
+[2.437000] (-) TimerEvent: {}
+[2.547000] (-) TimerEvent: {}
+[2.656000] (-) TimerEvent: {}
+[2.781000] (-) TimerEvent: {}
+[2.891000] (-) TimerEvent: {}
+[3.000000] (-) TimerEvent: {}
+[3.109000] (-) TimerEvent: {}
+[3.219000] (-) TimerEvent: {}
+[3.328000] (-) TimerEvent: {}
+[3.453000] (-) TimerEvent: {}
+[3.562000] (-) TimerEvent: {}
+[3.672000] (-) TimerEvent: {}
+[3.766000] (ssafy_msgs) StdoutLine: {'line': b'CMake is re-running because C:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/build/ssafy_msgs/CMakeFiles/generate.stamp is out-of-date.\n'}
+[3.781000] (-) TimerEvent: {}
+[3.781000] (ssafy_msgs) StdoutLine: {'line': b"  the file 'C:/Program Files/CMake/share/cmake-3.28/Modules/CMakeCCompiler.cmake.in'\n"}
+[3.781000] (ssafy_msgs) StdoutLine: {'line': b"  is newer than 'C:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/build/ssafy_msgs/CMakeFiles/generate.stamp.depend'\n"}
+[3.781000] (ssafy_msgs) StdoutLine: {'line': b"  result='0'\n"}
+[3.781000] (ssafy_msgs) StdoutLine: {'line': b'-- Selecting Windows SDK version 10.0.22621.0 to target Windows 10.0.19045.\n'}
+[3.781000] (ssafy_msgs) StdoutLine: {'line': b'-- Configuring incomplete, errors occurred!\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'CMake Error: File C:/Program Files/CMake/share/cmake-3.28/Modules/CMakeSystem.cmake.in does not exist.\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'CMake Error at C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.27/Modules/CMakeDetermineSystem.cmake:224 (configure_file):\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'  configure_file Problem configuring file\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'  CMakeLists.txt:2 (project)\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'CMake Error at C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.27/Modules/CMakeDetermineCCompiler.cmake:24 (include):\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'  include could not find requested file:\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'    C:/Program Files/CMake/share/cmake-3.28/Modules/CMakeDetermineCompiler.cmake\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'  CMakeLists.txt:2 (project)\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'CMake Error at C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.27/Modules/CMakeDetermineCCompiler.cmake:105 (file):\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'  file failed to open for reading (No such file or directory):\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'    C:/Program Files/CMake/share/cmake-3.28/Modules/CMakePlatformId.h.in\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'  CMakeLists.txt:2 (project)\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'CMake Error at C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.27/Modules/CMakeDetermineCCompiler.cmake:122 (include):\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'  include could not find requested file:\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'    C:/Program Files/CMake/share/cmake-3.28/Modules/CMakeDetermineCompilerId.cmake\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'  CMakeLists.txt:2 (project)\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'CMake Error at C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.27/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID):\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'  Unknown CMake command "CMAKE_DETERMINE_COMPILER_ID".\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'  CMakeLists.txt:2 (project)\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'\n'}
+[3.781000] (ssafy_msgs) StderrLine: {'line': b'CMake Configure step failed.  Build files cannot be regenerated correctly.\n'}
+[3.891000] (-) TimerEvent: {}
+[4.000000] (-) TimerEvent: {}
+[4.125000] (-) TimerEvent: {}
+[4.234000] (-) TimerEvent: {}
+[4.344000] (-) TimerEvent: {}
+[4.453000] (-) TimerEvent: {}
+[4.453000] (ssafy_msgs) CommandEnded: {'returncode': 4294967295}
+[4.562000] (-) TimerEvent: {}
+[4.672000] (-) TimerEvent: {}
+[4.703000] (ssafy_msgs) JobEnded: {'identifier': 'ssafy_msgs', 'rc': 4294967295}
+[4.719000] (my_package) JobEnded: {'identifier': 'my_package', 'rc': 'SIGINT'}
+[4.719000] (ssafy_bridge) JobEnded: {'identifier': 'ssafy_bridge', 'rc': 'SIGINT'}
+[4.719000] (yolo_package) JobEnded: {'identifier': 'yolo_package', 'rc': 'SIGINT'}
+[4.719000] (test_209) JobEnded: {'identifier': 'test_209', 'rc': 'SIGINT'}
+[4.734000] (-) EventReactorShutdown: {}

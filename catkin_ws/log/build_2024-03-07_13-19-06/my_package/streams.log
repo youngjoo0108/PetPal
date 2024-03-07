@@ -1,0 +1,34 @@
+[5.219s] Invoking command in 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\src\my_package': PYTHONPATH=C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\my_package\prefix_override;C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\my_package\Lib\site-packages;%PYTHONPATH% installDir=%installDir%
+IntelliJ IDEA=C:\Program Files\JetBrains\IntelliJ IDEA 2023.3.3\bin; c:\python37\python.exe setup.py egg_info --egg-base ..\..\build\my_package build --build-base C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\my_package\build install --record C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\my_package\install.log --install-scripts $base/lib/my_package --single-version-externally-managed
+[5.657s] running egg_info
+[5.657s] writing ..\..\build\my_package\my_package.egg-info\PKG-INFO
+[5.657s] writing dependency_links to ..\..\build\my_package\my_package.egg-info\dependency_links.txt
+[5.657s] writing entry points to ..\..\build\my_package\my_package.egg-info\entry_points.txt
+[5.657s] writing requirements to ..\..\build\my_package\my_package.egg-info\requires.txt
+[5.657s] writing top-level names to ..\..\build\my_package\my_package.egg-info\top_level.txt
+[5.688s] reading manifest file '..\..\build\my_package\my_package.egg-info\SOURCES.txt'
+[5.688s] writing manifest file '..\..\build\my_package\my_package.egg-info\SOURCES.txt'
+[5.688s] running build
+[5.688s] running build_py
+[5.688s] running install
+[5.688s] running install_lib
+[5.688s] running install_data
+[5.688s] running install_egg_info
+[5.703s] removing 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\my_package\Lib\site-packages\my_package-0.0.0-py3.7.egg-info' (and everything under it)
+[5.703s] Copying ..\..\build\my_package\my_package.egg-info to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\my_package\Lib\site-packages\my_package-0.0.0-py3.7.egg-info
+[5.703s] running install_scripts
+[5.735s] Installing communication-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\my_package\lib\my_package
+[5.735s] Installing communication.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\my_package\lib\my_package
+[5.735s] Installing listener-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\my_package\lib\my_package
+[5.735s] Installing listener.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\my_package\lib\my_package
+[5.735s] Installing my_node-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\my_package\lib\my_package
+[5.735s] Installing my_node.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\my_package\lib\my_package
+[5.735s] Installing odom-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\my_package\lib\my_package
+[5.735s] Installing odom.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\my_package\lib\my_package
+[5.735s] Installing path-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\my_package\lib\my_package
+[5.735s] Installing path.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\my_package\lib\my_package
+[5.735s] Installing talker-script.py script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\my_package\lib\my_package
+[5.735s] Installing talker.exe script to C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\my_package\lib\my_package
+[5.735s] writing list of installed files to 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\my_package\install.log'
+[5.750s] Invoked command in 'C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\src\my_package' returned '0': PYTHONPATH=C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\my_package\prefix_override;C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\my_package\Lib\site-packages;%PYTHONPATH% installDir=%installDir%
+IntelliJ IDEA=C:\Program Files\JetBrains\IntelliJ IDEA 2023.3.3\bin; c:\python37\python.exe setup.py egg_info --egg-base ..\..\build\my_package build --build-base C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\my_package\build install --record C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\build\my_package\install.log --install-scripts $base/lib/my_package --single-version-externally-managed

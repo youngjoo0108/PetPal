@@ -7,9 +7,8 @@
 
 :: source chained prefixes
 call:_colcon_prefix_chain_bat_call_script "C:\dev\ros2-eloquent\local_setup.bat"
-call:_colcon_prefix_chain_bat_call_script "C:\Users\SSAFY\Desktop\catkin_ws\install\local_setup.bat"
 call:_colcon_prefix_chain_bat_call_script "C:\dev\ros2-eloquent\\local_setup.bat"
-call:_colcon_prefix_chain_bat_call_script "C:\Users\SSAFY\Desktop\catkin_ws\install\\local_setup.bat"
+call:_colcon_prefix_chain_bat_call_script "C:\Users\SSAFY\Desktop\S10P22A209\catkin_ws\install\\local_setup.bat"
 
 :: source this prefix
 call:_colcon_prefix_chain_bat_call_script "%%~dp0local_setup.bat"

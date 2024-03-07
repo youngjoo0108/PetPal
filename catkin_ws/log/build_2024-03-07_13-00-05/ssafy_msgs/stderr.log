@@ -1,0 +1,38 @@
+CMake Error: File C:/Program Files/CMake/share/cmake-3.28/Modules/CMakeSystem.cmake.in does not exist.
+CMake Error at C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.27/Modules/CMakeDetermineSystem.cmake:224 (configure_file):
+  configure_file Problem configuring file
+Call Stack (most recent call first):
+  CMakeLists.txt:2 (project)
+
+
+CMake Error at C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.27/Modules/CMakeDetermineCCompiler.cmake:24 (include):
+  include could not find requested file:
+
+    C:/Program Files/CMake/share/cmake-3.28/Modules/CMakeDetermineCompiler.cmake
+Call Stack (most recent call first):
+  CMakeLists.txt:2 (project)
+
+
+CMake Error at C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.27/Modules/CMakeDetermineCCompiler.cmake:105 (file):
+  file failed to open for reading (No such file or directory):
+
+    C:/Program Files/CMake/share/cmake-3.28/Modules/CMakePlatformId.h.in
+Call Stack (most recent call first):
+  CMakeLists.txt:2 (project)
+
+
+CMake Error at C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.27/Modules/CMakeDetermineCCompiler.cmake:122 (include):
+  include could not find requested file:
+
+    C:/Program Files/CMake/share/cmake-3.28/Modules/CMakeDetermineCompilerId.cmake
+Call Stack (most recent call first):
+  CMakeLists.txt:2 (project)
+
+
+CMake Error at C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.27/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID):
+  Unknown CMake command "CMAKE_DETERMINE_COMPILER_ID".
+Call Stack (most recent call first):
+  CMakeLists.txt:2 (project)
+
+
+CMake Configure step failed.  Build files cannot be regenerated correctly.
