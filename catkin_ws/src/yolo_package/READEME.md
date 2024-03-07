@@ -88,3 +88,18 @@
 - mAP50 : 0.79077
 - mAP50-95 : 0.46745
 - Processing Time Per Image(OnDevice) : 1.0ms preprocess, **148.5ms inference**, 1.1ms postprocess
+
+<h2>Yolo v8 small ver.2 [2024-03-07]</h2>
+
+- model name : my_model_**small**_2
+- Epoch : **60**
+- Dataset(number of images) : 400
+- classes(number of class) : 16
+<h3>Result</h3>
+
+- Percision : 0.71919
+- Recall : 0.78445
+- mAP50 : 0.80152
+- mAP50-95 : 0.51579
+- Processing Time Per Image(OnDevice) : 
+
