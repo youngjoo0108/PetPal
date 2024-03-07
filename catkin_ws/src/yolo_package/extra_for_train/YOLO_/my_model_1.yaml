@@ -1,0 +1,15 @@
+names:
+  0: Dog
+  1: Person
+  2: Plant
+  3: Chair
+  4: BrownTable
+  5: WhiteTable
+  6: SquareTable
+  7: BackPack
+  8: Wallet
+  9: CarKey
+  10: RemoteController
+  11: Bed
+train: myData/train/
+val: myData/vaild/

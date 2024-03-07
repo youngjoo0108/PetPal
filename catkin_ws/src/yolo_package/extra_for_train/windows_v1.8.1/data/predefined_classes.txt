@@ -1,0 +1,16 @@
+Dog
+Person
+Plant
+SmallThing
+Chair
+Table
+BoxTable
+BackPack
+Wallet
+CarKey
+RemoteController
+Bed
+Sofa
+AirConditioner
+TV
+Washer
