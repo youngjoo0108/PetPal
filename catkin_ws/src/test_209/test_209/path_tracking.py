@@ -79,6 +79,15 @@ class followTheCarrot(Node):
           local_forward_point = det_trans_matrix.dot(global_forward_point)
           theta = -atan2(local_forward_point[1], local_forward_point[0])
 
+
+ 
+          # self.cmd_msg.linear.x = 1.0
+          # self.cmd_msg.angular.z = theta
+
+          # if self.collision:
+          #   self.cmd_msg.linear.x = 0.1
+          #   self.cmd_msg.angular.z = theta
+
           if theta > 1.5 or theta < -1.5:
             self.cmd_msg.linear.x = 0.0
             self.cmd_msg.angular.z = theta / 5
@@ -97,7 +106,6 @@ class followTheCarrot(Node):
           if self.collision:
             self.cmd_msg.linear.x = 0.1
             self.cmd_msg.angular.z = theta
-
       
       else:
         self.cmd_msg.linear.x = 0.0

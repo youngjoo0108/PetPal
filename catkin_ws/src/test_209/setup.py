@@ -24,6 +24,7 @@ setup(
             'path=test_209.path_node:main',
             'lidar=test_209.lidar_node:main',
             'follow=test_209.path_tracking:main',
+            'purefollow=test_209.pure_pursuit:main',
             'make=test_209.make_path:main',
             'map=test_209.load_map:main',
             'mapping=test_209.make_map:main',

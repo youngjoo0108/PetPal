@@ -15,10 +15,16 @@ def generate_launch_description():
             node_name = 'lidar',
             output = 'screen',
         ),
+        # Node(
+        #     package = 'test_209',
+        #     node_executable = 'follow',
+        #     node_name = 'follow',
+        #     output = 'screen',
+        # ),
         Node(
             package = 'test_209',
-            node_executable = 'follow',
-            node_name = 'follow',
+            node_executable = 'purefollow',
+            node_name = 'purefollow',
             output = 'screen',
         ),
         Node(
