@@ -14,6 +14,7 @@ test/test_flake8.py
 test/test_pep257.py
 test_209/__init__.py
 test_209/a_star.py
+test_209/a_star_local.py
 test_209/drive_test.py
 test_209/follow_node.py
 test_209/lidar_node.py
@@ -21,6 +22,7 @@ test_209/load_map.py
 test_209/make_map.py
 test_209/make_path.py
 test_209/odom_node.py
+test_209/odom_print.py
 test_209/path_node.py
 test_209/path_tracking.py
 test_209/utils.py

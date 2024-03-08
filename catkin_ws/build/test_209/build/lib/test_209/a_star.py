@@ -49,7 +49,7 @@ class a_star(Node):
         self.map_offset_x=-8-8.75
         self.map_offset_y=-4-8.75
     
-        self.GRIDSIZE=350 
+        self.GRIDSIZE=350
  
         self.dx = [-1,0,0,1,-1,-1,1,1]
         self.dy = [0,1,-1,0,-1,1,-1,1]
@@ -60,8 +60,24 @@ class a_star(Node):
         self.is_grid_update=True
         
         # 로직 3. 맵 데이터 행렬로 바꾸기
-        map_to_grid = np.array(self.map_msg.data).reshape((self.map_size_x, self.map_size_y))
-        self.grid = np.where(map_to_grid == 100, 1, 0)  # Obstacle cells as 1, free space as 0
+        self.map_to_grid = np.array(self.map_msg.data).reshape((self.map_size_x, self.map_size_y)).transpose()
+        # self.map_to_grid = np.array(self.map_msg.data).reshape((self.map_size_x, self.map_size_y))
+        self.grid = np.where(self.map_to_grid > 30, 1, 0)  # Obstacle cells as 1, free space as 0
+
+        file_path_1 = 'C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\src\\test_209\\map\\astar.txt'
+        file_path_2 = 'C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\src\\test_209\\map\\astarmap.txt'
+
+        # 맵 정보를 텍스트 형식으로 변환하여 저장
+        with open(file_path_1, 'w') as f:
+            for row in self.grid:
+                # 한 행씩 파일에 쓰기
+                f.write(' '.join(map(str, row)) + '\n')
+
+        # 맵 정보를 텍스트 형식으로 변환하여 저장
+        with open(file_path_2, 'w') as f:
+            for row in self.map_to_grid:
+                # 한 행씩 파일에 쓰기
+                f.write(' '.join(map(str, row)) + '\n')
 
 
     def pose_to_grid_cell(self,x,y):
@@ -120,17 +136,25 @@ class a_star(Node):
                 start_grid_cell=self.pose_to_grid_cell(x,y)
 
                 self.path = [[0 for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)]
-                self.cost = np.array([[self.GRIDSIZE*self.GRIDSIZE for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)])
+                self.cost = np.array([[self.GRIDSIZE*self.GRIDSIZE for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)], dtype=float)
 
                 
                 # 다익스트라 알고리즘을 완성하고 주석을 해제 시켜주세요. 
                 # 시작지, 목적지가 탐색가능한 영역이고, 시작지와 목적지가 같지 않으면 경로탐색을 합니다.
-                if self.grid[start_grid_cell[0]][start_grid_cell[1]] ==0  and self.grid[self.goal[0]][self.goal[1]] ==0  and start_grid_cell != self.goal :
+
+                print(f'start : {start_grid_cell}, {self.map_to_grid[start_grid_cell[0]][start_grid_cell[1]]} ,goal : {self.goal},{self.map_to_grid[self.goal[0]][self.goal[1]]}')
+                # print(f'start : {start_grid_cell}, {self.map_to_grid[start_grid_cell[1]][start_grid_cell[0]]} ,goal : {self.goal},{self.map_to_grid[self.goal[1]][self.goal[0]]}')
+                # if self.grid[start_grid_cell[0]][ start_grid_cell[1]] ==0  and self.grid[self.goal[0]][self.goal[1]] ==0  and start_grid_cell != self.goal :
+                # if self.grid[self.goal[1]][self.goal[0]] ==0  and start_grid_cell != self.goal :
+                if self.grid[self.goal[0]][self.goal[1]] ==0  and start_grid_cell != self.goal :
                     self.dijkstra(start_grid_cell)
+                else:
+                    print('na')
 
 
                 self.global_path_msg=Path()
                 self.global_path_msg.header.frame_id='map'
+                print(self.final_path)
                 for grid_cell in reversed(self.final_path) :
                     tmp_pose=PoseStamped()
                     waypoint_x,waypoint_y=self.grid_cell_to_pose(grid_cell)
@@ -145,33 +169,55 @@ class a_star(Node):
     def dijkstra(self,start):
         Q = deque()
         Q.append(start)
-        self.cost[start[0]][start[1]] = 1
+        self.cost[start[0]][start[1]] = 0
         found = False
         
         # 로직 7. grid 기반 최단경로 탐색
         
         while Q:
             current = Q.popleft()
-
             if current == self.goal:
                 found = True
                 break
 
+            # for i in range(8):
+            #     next = (current[0] + self.dx[i], current[1] + self.dy[i])
+            #     if 0 <= next[0] < self.GRIDSIZE and 0 <= next[1] < self.GRIDSIZE:
+            #         # if self.grid[next[1]][next[0]] == 0:  # If next is not an obstacle
+            #         if self.grid[next[0]][next[1]] == 0:  # If next is not an obstacle
+            #             new_cost = self.cost[current[0]][current[1]] + self.dCost[i]
+            #             if self.cost[next[0]][next[1]] > new_cost:
+            #                 Q.append(next)
+            #                 self.path[next[0]][next[1]] = current
+            #                 self.cost[next[0]][next[1]] = new_cost
+
             for i in range(8):
                 next = (current[0] + self.dx[i], current[1] + self.dy[i])
                 if 0 <= next[0] < self.GRIDSIZE and 0 <= next[1] < self.GRIDSIZE:
-                    if self.grid[next[0]][next[1]] == 0:  # If next is not an obstacle
+                    # Check if the 3x3 area around the next point is all zero
+                    area_is_clear = True
+                    for x in range(next[0]-1, next[0]+2):
+                        for y in range(next[1]-1, next[1]+2):
+                            if not (0 <= x < self.GRIDSIZE and 0 <= y < self.GRIDSIZE):
+                                area_is_clear = False
+                                break
+                            if self.grid[x][y] != 0:
+                                area_is_clear = False
+                                break
+                        if not area_is_clear:
+                            break
+
+                    if area_is_clear:
                         new_cost = self.cost[current[0]][current[1]] + self.dCost[i]
                         if self.cost[next[0]][next[1]] > new_cost:
                             Q.append(next)
                             self.path[next[0]][next[1]] = current
                             self.cost[next[0]][next[1]] = new_cost
-
         if found:
             node = self.goal
             while node != start:
                 self.final_path.append(node)
-                node = self.path[node[0]][node[1]]
+                node = self.path[node[0]][node[1]]                
 
         
 def main(args=None):
