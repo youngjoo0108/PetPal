@@ -1,4 +1,0 @@
-[console_scripts]
-save_camera = yolo_package.save_camera:main
-yolo = yolo_package.yolo:main
-

@@ -1,8 +1,0 @@
-[console_scripts]
-communication = my_package.communication:main
-listener = my_package.subscriber_memeber_function:main
-my_node = my_package.my_node:main
-odom = my_package.odo:main
-path = my_package.path:main
-talker = my_package.publisher_member_function:main
-

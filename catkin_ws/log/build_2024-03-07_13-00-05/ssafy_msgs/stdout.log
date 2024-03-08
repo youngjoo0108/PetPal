@@ -1,6 +1,0 @@
-CMake is re-running because C:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/build/ssafy_msgs/CMakeFiles/generate.stamp is out-of-date.
-  the file 'C:/Program Files/CMake/share/cmake-3.28/Modules/CMakeCCompiler.cmake.in'
-  is newer than 'C:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/build/ssafy_msgs/CMakeFiles/generate.stamp.depend'
-  result='0'
--- Selecting Windows SDK version 10.0.22621.0 to target Windows 10.0.19045.
--- Configuring incomplete, errors occurred!
