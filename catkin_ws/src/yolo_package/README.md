@@ -1,5 +1,7 @@
 <img src="https://capsule-render.vercel.app/api?type=wave&color=auto&height=300&section=header&text=YOLO%20object%20detection&fontSize=70" style="width: 100%;">
 
+git ignore test
+
 <h2>Yolo v8 nano ver.1 [2024-03-05]</h2>
 
 - model name : my_model_2
