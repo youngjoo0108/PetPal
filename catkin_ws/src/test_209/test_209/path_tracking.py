@@ -79,11 +79,25 @@ class followTheCarrot(Node):
           local_forward_point = det_trans_matrix.dot(global_forward_point)
           theta = -atan2(local_forward_point[1], local_forward_point[0])
 
-          self.cmd_msg.linear.x = 1.0
-          self.cmd_msg.angular.z = theta
+          if theta > 1.5 or theta < -1.5:
+            self.cmd_msg.linear.x = 0.0
+            self.cmd_msg.angular.z = theta / 5
+
+          elif 0.7 < theta < 1.5 or -1.5 < theta < -0.7:
+            self.cmd_msg.linear.x = 0.2
+            self.cmd_msg.angular.z = theta / 4
+          
+          elif 0.3 < theta <= 0.7 or -0.7 <= theta < -0.3:
+            self.cmd_msg.linear.x = 0.5
+            self.cmd_msg.angular.z = theta / 2
+          else:
+            self.cmd_msg.linear.x = 1.0
+            self.cmd_msg.angular.z = theta
 
           if self.collision:
-            self.cmd_msg.linear.x = 0.0
+            self.cmd_msg.linear.x = 0.1
+            self.cmd_msg.angular.z = theta
+
       
       else:
         self.cmd_msg.linear.x = 0.0
@@ -126,7 +140,7 @@ class followTheCarrot(Node):
       for waypoint in self.path_msg.poses:
         for lidar_point in pcd_msg.points:
           distance = sqrt(pow(waypoint.pose.position.x-lidar_point.x,2) + pow(waypoint.pose.position.y-lidar_point.y,2))
-          if distance < 0.1:
+          if distance < 0.02:
             self.collision = True
 
       self.is_lidar = True
