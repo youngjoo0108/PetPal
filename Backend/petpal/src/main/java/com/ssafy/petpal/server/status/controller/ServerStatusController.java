@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ServerStatusController {
     @GetMapping("/api/v1/test")
     public String testAPI() {
-        return "Service is up and running!";
+        return "✅ Service is up and running!";
     }
 }
