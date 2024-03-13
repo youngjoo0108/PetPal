@@ -1,4 +1,4 @@
-import rclpy
+import rclpy, time
 from rclpy.node import Node
 
 from geometry_msgs.msg import Twist, Point, Point32
@@ -88,70 +88,110 @@ class followTheCarrot(Node):
           #   self.cmd_msg.linear.x = 0.1
           #   self.cmd_msg.angular.z = theta
 
-          if theta > 1.5 or theta < -1.5:
-            self.cmd_msg.linear.x = 0.0
-            self.cmd_msg.angular.z = theta / 5
+        #   if theta > 1.5 or theta < -1.5:
+        #     self.cmd_msg.linear.x = 0.0
+        #     self.cmd_msg.angular.z = theta / 5
 
-          elif 0.7 < theta < 1.5 or -1.5 < theta < -0.7:
-            self.cmd_msg.linear.x = 0.2
-            self.cmd_msg.angular.z = theta / 4
-          
-          elif 0.3 < theta <= 0.7 or -0.7 <= theta < -0.3:
-            self.cmd_msg.linear.x = 0.5
-            self.cmd_msg.angular.z = theta / 2
+        #   else:
+        #     self.cmd_msg.linear.x = 1.0
+        #     self.cmd_msg.angular.z = theta
+
+          # if self.collision:
+          #   self.cmd_msg.linear.x = 0.1
+          #   self.cmd_msg.angular.z = theta
+            
+          if 0.2 <= self.collision_distance < 0.3:
+              print(self.collision_distance)
+              self.cmd_msg.linear.x = 0.3
+              self.cmd_msg.angular.z = theta / 3
+          elif self.collision_distance < 0.2:
+                print(self.collision_distance)
+                self.cmd_msg.linear.x = 0.0
+                
           else:
-            self.cmd_msg.linear.x = 1.0
-            self.cmd_msg.angular.z = theta
+              if theta > 1.5 or theta < -1.5:
+                self.cmd_msg.linear.x = 0.0
+                self.cmd_msg.angular.z = theta / 5
 
-          if self.collision:
-            self.cmd_msg.linear.x = 0.1
-            self.cmd_msg.angular.z = theta
+              else:
+                self.cmd_msg.linear.x = 1.0
+                self.cmd_msg.angular.z = theta
+
       
       else:
         self.cmd_msg.linear.x = 0.0
         self.cmd_msg.angular.z = 0.0
 
+
+
       self.cmd_pub.publish(self.cmd_msg)
   
   
+  # def lidar_callback(self, msg):
+  #   self.lidar_msg = msg
+
+  #   if self.is_path == True and self.is_odom == True:
+  #     pcd_msg = PointCloud()
+  #     pcd_msg.header.frame_id = 'map'
+
+  #     pose_x = self.odom_msg.pose.pose.position.x
+  #     pose_y = self.odom_msg.pose.pose.position.y
+  #     theta = self.robot_yaw
+
+  #     t = np.array([
+  #       [cos(theta), -sin(theta), pose_x],
+  #       [sin(theta), cos(theta), pose_y],
+  #       [0,0,1]
+  #     ])
+
+  #     for angle,r in enumerate(msg.ranges):
+  #       global_point = Point32()
+
+  #       if 0.0 < r < 12.0 :
+  #         local_x = r * cos(angle*pi/180)
+  #         local_y = r * sin(angle*pi/180)
+  #         local_point = np.array([[local_x],[local_y],[1]])
+  #         global_result = t.dot(local_point)
+  #         global_point.x = global_result[0][0]
+  #         global_point.y = global_result[1][0]
+  #         pcd_msg.points.append(global_point)
+
+  #     self.collision = False
+
+  #     for waypoint in self.path_msg.poses:
+  #       for lidar_point in pcd_msg.points:
+  #         distance = sqrt(pow(waypoint.pose.position.x-lidar_point.x,2) + pow(waypoint.pose.position.y-lidar_point.y,2))
+  #         if distance < 0.05:
+  #           self.collision = True
+
+  #     self.is_lidar = True
+      
   def lidar_callback(self, msg):
     self.lidar_msg = msg
+    self.collision_distance = float('inf')  # 충돌 거리 초기화
 
-    if self.is_path == True and self.is_odom == True:
-      pcd_msg = PointCloud()
-      pcd_msg.header.frame_id = 'map'
+    if self.is_path and self.is_odom:
+        pose_x = self.odom_msg.pose.pose.position.x
+        pose_y = self.odom_msg.pose.pose.position.y
+        theta = self.robot_yaw
 
-      pose_x = self.odom_msg.pose.pose.position.x
-      pose_y = self.odom_msg.pose.pose.position.y
-      theta = self.robot_yaw
+        t = np.array([
+            [cos(theta), -sin(theta), pose_x],
+            [sin(theta), cos(theta), pose_y],
+            [0,0,1]
+        ])
 
-      t = np.array([
-        [cos(theta), -sin(theta), pose_x],
-        [sin(theta), cos(theta), pose_y],
-        [0,0,1]
-      ])
+        for angle, r in enumerate(msg.ranges):
+            if 0.0 < r < 12.0:
+                local_x = r * cos(angle * pi / 180)
+                local_y = r * sin(angle * pi / 180)
+                local_point = np.array([[local_x], [local_y], [1]])
+                global_result = t.dot(local_point)
+                distance = sqrt(pow(global_result[0][0] - pose_x, 2) + pow(global_result[1][0] - pose_y, 2))
+                self.collision_distance = min(self.collision_distance, distance)
 
-      for angle,r in enumerate(msg.ranges):
-        global_point = Point32()
+        self.is_lidar = True
 
-        if 0.0 < r < 12.0 :
-          local_x = r * cos(angle*pi/180)
-          local_y = r * sin(angle*pi/180)
-          local_point = np.array([[local_x],[local_y],[1]])
-          global_result = t.dot(local_point)
-          global_point.x = global_result[0][0]
-          global_point.y = global_result[1][0]
-          pcd_msg.points.append(global_point)
-
-      self.collision = False
-
-      for waypoint in self.path_msg.poses:
-        for lidar_point in pcd_msg.points:
-          distance = sqrt(pow(waypoint.pose.position.x-lidar_point.x,2) + pow(waypoint.pose.position.y-lidar_point.y,2))
-          if distance < 0.02:
-            self.collision = True
-
-      self.is_lidar = True
   
   def odom_callback(self, msg):
     self.is_odom = True

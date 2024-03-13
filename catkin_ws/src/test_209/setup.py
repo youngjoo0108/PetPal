@@ -32,6 +32,8 @@ setup(
             'drive=test_209.drive_test:main',
             'astarlocal=test_209.a_star_local:main',
             'odomprint=test_209.odom_print:main',
+            'rrtstar=test_209.rrt_star:main',
+            'hybridastar=test_209.hybrid_a_star:main',
         ],
     },
 )
