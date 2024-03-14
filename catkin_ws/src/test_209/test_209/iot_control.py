@@ -73,6 +73,7 @@ class Controller(Node):
         self.app_control_pub.publish(self.app_control_msg)
         
     def app_on_select(self,num):
+        # commit
         '''
         로직 2. 특정 가전 제품 ON
         '''
@@ -112,8 +113,8 @@ class Controller(Node):
         '''
 
         ## IOT(가전) 제어 함수
-        self.app_all_on()
-        # self.app_all_off()
+        # self.app_all_on()
+        self.app_all_off()
         # self.app_select_on(12)
         # self.app_select_off(12)
 
