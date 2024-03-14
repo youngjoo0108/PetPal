@@ -7,6 +7,7 @@ import rclpy
 from rclpy.node import Node
 
 from sensor_msgs.msg import CompressedImage
+from std_msgs.msg import String
 
 # image parser 노드는 이미지를 받아서 opencv 의 imshow로 윈도우창에 띄우는 역할을 합니다.
 # 이를 resize나 convert를 사용하여 이미지를 원하는대로 바꿔보세요.
@@ -36,12 +37,16 @@ class IMGParser(Node):
 
     def __init__(self):
         super().__init__(node_name='image_convertor')
+        
+        try:
+            self.publisher_ = self.create_publisher(String, 'captured_object', 10)
+        except:
+            print("init publisher error")
 
         # 로직 1. image subscriber 생성
         ## 아래와 같이 subscriber가 
         ## 미리 정의된 토픽 이름인 '/image_jpeg/compressed' 에서
         ## CompressedImage 메시지를 받도록 설정된다.
-
         try:
             self.subscription = self.create_subscription(
                 CompressedImage,
@@ -49,7 +54,12 @@ class IMGParser(Node):
                 self.img_callback,
                 10)
         except:
-            print('init error')
+            print('init image subscription error')
+            
+    
+    def capture_callback(self, msg):
+        self.publisher_.publish(msg)
+        self.get_logger().info('Publishing Capture: "%s"' % msg.data)
         
 
     def img_callback(self, msg):
@@ -92,10 +102,17 @@ class IMGParser(Node):
             label = int(data[5])
             cv2.rectangle(img_bgr, (xmin, ymin), (xmax, ymax), GREEN, 2)
             cv2.putText(img_bgr, class_list[label]+' '+str(round(confidence, 2)) + '%', (xmin, ymin), cv2.FONT_ITALIC, 0.5, WHITE, 1)
+            msg = String()
+            msg.data = class_list[label] + ' '+str(round(confidence, 2)) + '%' + '\n' + '(' + str(xmin) + ' ' + str(ymin) + ') (' + str(xmax) + ' ' + str(ymax) + '\n'
+            self.capture_callback(msg)
+            
         # 로직 5. 이미지 출력 (cv2.imshow)       
         
         re_img = cv2.resize(img_bgr, (0, 0), fx=2, fy=2, interpolation=cv2.INTER_NEAREST)
         
+        msg_line = String()
+        msg_line.data = '---'
+        self.capture_callback(msg_line)
         cv2.imshow("re_img", re_img)
         # cv2.imshow("img_gray", img_gray)
         # cv2.imshow("resize and gray", img_resize)       

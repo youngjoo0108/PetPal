@@ -40,6 +40,7 @@ class a_star(Node):
         self.is_found_path=False
         self.is_grid_update=False
 
+        self.count = 0
 
         # 로직 2. 파라미터 설정
         self.goal = [184,224] 
@@ -61,23 +62,22 @@ class a_star(Node):
         
         # 로직 3. 맵 데이터 행렬로 바꾸기
         self.map_to_grid = np.array(self.map_msg.data).reshape((self.map_size_x, self.map_size_y)).transpose()
-        # self.map_to_grid = np.array(self.map_msg.data).reshape((self.map_size_x, self.map_size_y))
-        self.grid = np.where(self.map_to_grid > 30, 1, 0)  # Obstacle cells as 1, free space as 0
+        # self.grid = np.where(self.map_to_grid == 0, 0, 1)  # Obstacle cells as 1, free space as 0
 
-        file_path_1 = 'C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\src\\test_209\\map\\astar.txt'
-        file_path_2 = 'C:\\Users\\SSAFY\\Desktop\\S10P22A209\\catkin_ws\\src\\test_209\\map\\astarmap.txt'
-
-        # 맵 정보를 텍스트 형식으로 변환하여 저장
-        with open(file_path_1, 'w') as f:
-            for row in self.grid:
-                # 한 행씩 파일에 쓰기
-                f.write(' '.join(map(str, row)) + '\n')
-
-        # 맵 정보를 텍스트 형식으로 변환하여 저장
-        with open(file_path_2, 'w') as f:
-            for row in self.map_to_grid:
-                # 한 행씩 파일에 쓰기
-                f.write(' '.join(map(str, row)) + '\n')
+        for i in range(self.map_size_x):
+            for j in range(self.map_size_y):
+                # 값이 100인 원소 찾기
+                if self.map_to_grid[i, j] == 100:
+                    # 주변 원소 탐색
+                    for dx in range(-5, 6):  # x 좌표 차이가 -2부터 2까지
+                        for dy in range(-5, 6):  # y 좌표 차이가 -2부터 2까지
+                            # 새로운 위치 계산
+                            new_i = i + dx
+                            new_j = j + dy
+                            # 새로운 위치가 배열 범위 내에 있는지 확인
+                            if 0 <= new_i < self.map_size_x and 0 <= new_j < self.map_size_y and self.map_to_grid[new_i, new_j] == 0:
+                                # 조건에 맞는 주변 원소의 값을 100으로 설정
+                                self.map_to_grid[new_i, new_j] = 101
 
 
     def pose_to_grid_cell(self,x,y):
@@ -111,10 +111,12 @@ class a_star(Node):
     def map_callback(self,msg):
         self.is_map=True
         self.map_msg=msg
+        self.is_grid_update = False
         
 
     def goal_callback(self,msg):
-        
+        print('sub', self.count)
+        self.count += 1
         if msg.header.frame_id=='map':
             # 로직 6. goal_pose 메시지 수신하여 목표 위치 설정
             goal_x=msg.pose.position.x
@@ -142,11 +144,9 @@ class a_star(Node):
                 # 다익스트라 알고리즘을 완성하고 주석을 해제 시켜주세요. 
                 # 시작지, 목적지가 탐색가능한 영역이고, 시작지와 목적지가 같지 않으면 경로탐색을 합니다.
 
-                print(f'start : {start_grid_cell}, {self.map_to_grid[start_grid_cell[0]][start_grid_cell[1]]} ,goal : {self.goal},{self.map_to_grid[self.goal[0]][self.goal[1]]}')
+                #print(f'start : {start_grid_cell}, {self.map_to_grid[start_grid_cell[0]][start_grid_cell[1]]} ,goal : {self.goal},{self.map_to_grid[self.goal[0]][self.goal[1]]}')
                 # print(f'start : {start_grid_cell}, {self.map_to_grid[start_grid_cell[1]][start_grid_cell[0]]} ,goal : {self.goal},{self.map_to_grid[self.goal[1]][self.goal[0]]}')
-                # if self.grid[start_grid_cell[0]][ start_grid_cell[1]] ==0  and self.grid[self.goal[0]][self.goal[1]] ==0  and start_grid_cell != self.goal :
-                # if self.grid[self.goal[1]][self.goal[0]] ==0  and start_grid_cell != self.goal :
-                if self.grid[self.goal[0]][self.goal[1]] ==0  and start_grid_cell != self.goal :
+                if start_grid_cell != self.goal :
                     self.dijkstra(start_grid_cell)
                 else:
                     print('na')
@@ -154,8 +154,7 @@ class a_star(Node):
 
                 self.global_path_msg=Path()
                 self.global_path_msg.header.frame_id='map'
-                print(self.final_path)
-                for grid_cell in reversed(self.final_path) :
+                for grid_cell in reversed(self.final_path):
                     tmp_pose=PoseStamped()
                     waypoint_x,waypoint_y=self.grid_cell_to_pose(grid_cell)
                     tmp_pose.pose.position.x=waypoint_x
@@ -176,49 +175,27 @@ class a_star(Node):
         
         while Q:
             current = Q.popleft()
+            
             if current == self.goal:
                 found = True
                 break
 
-            # for i in range(8):
-            #     next = (current[0] + self.dx[i], current[1] + self.dy[i])
-            #     if 0 <= next[0] < self.GRIDSIZE and 0 <= next[1] < self.GRIDSIZE:
-            #         # if self.grid[next[1]][next[0]] == 0:  # If next is not an obstacle
-            #         if self.grid[next[0]][next[1]] == 0:  # If next is not an obstacle
-            #             new_cost = self.cost[current[0]][current[1]] + self.dCost[i]
-            #             if self.cost[next[0]][next[1]] > new_cost:
-            #                 Q.append(next)
-            #                 self.path[next[0]][next[1]] = current
-            #                 self.cost[next[0]][next[1]] = new_cost
-
             for i in range(8):
                 next = (current[0] + self.dx[i], current[1] + self.dy[i])
                 if 0 <= next[0] < self.GRIDSIZE and 0 <= next[1] < self.GRIDSIZE:
-                    # Check if the 3x3 area around the next point is all zero
-                    area_is_clear = True
-                    for x in range(next[0]-2, next[0]+3):
-                        for y in range(next[1]-2, next[1]+3):
-                            if not (0 <= x < self.GRIDSIZE and 0 <= y < self.GRIDSIZE):
-                                area_is_clear = False
-                                break
-                            if self.grid[x][y] != 0:
-                                area_is_clear = False
-                                break
-                        if not area_is_clear:
-                            break
-
-                    if area_is_clear:
+                    if self.map_to_grid[next[0]][next[1]] < 50:  # If next is not an obstacle
                         new_cost = self.cost[current[0]][current[1]] + self.dCost[i]
                         if self.cost[next[0]][next[1]] > new_cost:
                             Q.append(next)
                             self.path[next[0]][next[1]] = current
                             self.cost[next[0]][next[1]] = new_cost
+                            
+
         if found:
             node = self.goal
             while node != start:
                 self.final_path.append(node)
-                node = self.path[node[0]][node[1]]                
-
+                node = self.path[node[0]][node[1]]
         
 def main(args=None):
     rclpy.init(args=args)
