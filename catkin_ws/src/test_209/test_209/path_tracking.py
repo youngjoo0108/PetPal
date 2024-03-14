@@ -104,13 +104,14 @@ class followTheCarrot(Node):
               print(self.collision_distance)
               self.cmd_msg.linear.x = 0.3
               self.cmd_msg.angular.z = theta / 3
-          elif self.collision_distance < 0.2:
+          elif self.collision_distance < 0.1:
                 print(self.collision_distance)
                 self.cmd_msg.linear.x = 0.0
+                self.cmd_msg.angular.z = 0.0
                 
           else:
               if theta > 1.5 or theta < -1.5:
-                self.cmd_msg.linear.x = 0.0
+                self.cmd_msg.linear.x = 0.1
                 self.cmd_msg.angular.z = theta / 5
 
               else:
