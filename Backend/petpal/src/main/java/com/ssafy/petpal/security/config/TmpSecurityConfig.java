@@ -20,6 +20,6 @@ public class TmpSecurityConfig {
                 )
                 .httpBasic(withDefaults())  // HTTP Basic 인증 활성화
                 .formLogin(withDefaults());  // 폼 로그인 활성화
-        return http.build(); //Jira 연동 테스트2
+        return http.build(); //Jira 연동 테스트3
     }
 }
