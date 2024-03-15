@@ -5,6 +5,7 @@ import os
 from geometry_msgs.msg import Pose,PoseStamped
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,OccupancyGrid,MapMetaData,Path
+from std_msgs.msg import Bool
 from math import pi,cos,sin,pow,sqrt
 from collections import deque
 
@@ -15,18 +16,22 @@ class patrolPath(Node):
         self.map_sub = self.create_subscription(OccupancyGrid,'/map',self.map_callback,10)
         self.odom_sub = self.create_subscription(Odometry,'/odom',self.odom_callback, 10)
         self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
-        self.timer = self.create_timer(0.1, self.timer_callback)
+        self.timer = self.create_timer(1, self.timer_callback)
+
+        # test
+        self.error_pub = self.create_publisher(Bool, 'err', 10)
+        self.error_msg = Bool()
 
         self.goal_msg = PoseStamped()
         self.goal_msg.header.frame_id = 'map'
         self.map_msg = OccupancyGrid()
         self.odom_msg = Odometry()
 
-        self.map_size_x = 350
-        self.map_size_y = 350
+        self.map_size_x=700
+        self.map_size_y=700
         self.map_resolution=0.05
-        self.map_offset_x=-8-8.75
-        self.map_offset_y=-4-8.75
+        # self.map_offset_x=-8-8.75
+        # self.map_offset_y=-4-8.75
 
         self.dx = [-1,0,0,1]
         self.dy = [0,1,-1,0]
@@ -37,6 +42,7 @@ class patrolPath(Node):
         self.is_odom=False
         self.is_map=False
         self.is_grid_update=False
+        self.is_param = False
 
     
     def map_callback(self,msg):
@@ -46,11 +52,20 @@ class patrolPath(Node):
 
 
     def odom_callback(self, msg):
+        if self.is_param == False:
+            self.is_param = True
+
+            self.map_offset_x= msg.pose.pose.position.x - (self.map_size_x*self.map_resolution*0.5)
+            self.map_offset_y= msg.pose.pose.position.y - (self.map_size_y*self.map_resolution*0.5)
+
         self.is_odom = True
         self.odom_msg = msg
         
 
     def timer_callback(self):
+        if self.is_param==False:
+            return
+
         x=self.odom_msg.pose.pose.position.x
         y=self.odom_msg.pose.pose.position.y
         now_grid_cell=self.pose_to_grid_cell(x,y)
@@ -63,8 +78,14 @@ class patrolPath(Node):
                 #print(now_grid_cell)
             self.goal = self.select_goal(now_grid_cell)
             if self.goal == [-1, -1]:
-                print('error') # 후진 또는 제자리 회전 추가
+                self.error_msg.data = True
+                self.error_pub.publish(self.error_msg)
+                print('err!')
                 return
+            else:
+                self.error_msg.data = False
+                self.error_pub.publish(self.error_msg)
+                print('not err')
                 
                 #self.is_goal = False
             goal_x, goal_y = self.grid_cell_to_pose(self.goal)
@@ -146,7 +167,7 @@ class patrolPath(Node):
                 #print(next_x, next_y)
                 if self.map_to_grid[next_x][next_y] == 0:
                     Q.append((next_x, next_y))
-                elif 40 < self.map_to_grid[next_x][next_y] and self.map_to_grid[next_x][next_y] < 100:
+                elif 49 < self.map_to_grid[next_x][next_y] and self.map_to_grid[next_x][next_y] < 100:
                     self.target = [next_x, next_y]
                     return [now[0], now[1]]
     
