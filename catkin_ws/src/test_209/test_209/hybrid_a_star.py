@@ -19,7 +19,7 @@ class hybrid_a_star(Node):
         self.odom_sub = self.create_subscription(Odometry,'odom',self.odom_callback,1)
         self.goal_sub = self.create_subscription(PoseStamped,'goal_pose',self.goal_callback,1)
         self.a_star_pub= self.create_publisher(Path, 'global_path', 1)
-        
+
         self.map_msg=OccupancyGrid()
         self.odom_msg=Odometry()
         self.cmd_pub = self.create_publisher(Twist, 'cmd_vel', 10)
@@ -173,6 +173,7 @@ class hybrid_a_star(Node):
     
 
     def a_star(self, start):
+        print(self.goal)
         Q = deque()
         Q.append((start, 0 + self.heuristic(start, self.goal)))  # 시작 노드와 시작 노드의 휴리스틱 비용을 큐에 추가
         self.cost[start[0]][start[1]] = 0
