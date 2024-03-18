@@ -75,7 +75,8 @@ class Controller(Node):
                           (-4.98, -3.75), (-2.52, -3.64), (-7.34, -1.13), (-9.8, -5.17), 
                           (-7.33, -2.77), (-12.49, -2.63), (-4.98, -3.75), (-2.52, -3.64), (-8.76, -1.15)]
         
-        self.iot_todo = [i for i in range(17)]
+        # self.iot_todo = [(i, 1) for i in range(17)]
+        self.iot_todo = [(0, 2), (1, 2), (2, 2), (3, 2), (4, 2), (6, 2), (13, 2), (14, 1)]
 
         self.map_size_x=350
         self.map_size_y=350
@@ -103,7 +104,6 @@ class Controller(Node):
         self.app_status_msg=msg  
 
     def app_all_on(self):
-        # print("on")
         for i in range(17):
             self.app_control_msg.data[i]=1
         self.app_control_pub.publish(self.app_control_msg)
@@ -114,50 +114,22 @@ class Controller(Node):
         self.app_control_pub.publish(self.app_control_msg)
         
     def app_on_select(self,num):
-
         self.app_control_msg.data[num]=1
         self.app_control_pub.publish(self.app_control_msg)
         
-        '''
-        로직 2. 특정 가전 제품 ON
-        '''
-
+      
     def app_off_select(self,num):
-        '''
-        로직 3. 특정 가전 제품 OFF
-        '''
-
-
-    def turtlebot_go(self) :
-        # self.cmd_msg.linear.x=0.3
-        # self.cmd_msg.angular.z=0.0
-        pass
-
-    def turtlebot_stop(self) :
-        '''
-        로직 4. 터틀봇 정지
-        '''
-
-    def turtlebot_cw_rot(self) :
-        # self.cmd_msg.linear.x = 0.0
-        # self.cmd_msg.angular.z = 1
-
-        '''
-        로직 5. 터틀봇 시계방향 회전
-        '''
-
-    def turtlebot_cww_rot(self) :
-        '''
-        로직 6. 터틀봇 반시계방향 회전
-        '''
+        self.app_control_msg.data[num]=2
+        self.app_control_pub.publish(self.app_control_msg)
 
     def timer_callback(self):
         if self.iot_todo:
-            if self.app_status_msg.data[self.iot_todo[0]] == 2:
-                self.turtlebot_togo(self.iot_todo[0])
+            if self.app_status_msg.data[self.iot_todo[0][0]] != self.iot_todo[0][1]:
+                self.turtlebot_togo(self.iot_todo[0][0])
             else:
                 self.iot_todo.pop(0)
-                self.turtlebot_togo(self.iot_todo[0])
+                if self.iot_todo:
+                    self.turtlebot_togo(self.iot_todo[0][0])
         
 
     def turtlebot_togo(self, num):
@@ -175,33 +147,16 @@ class Controller(Node):
         # print(self.goal)
         self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
         self.goal_pub.publish(self.goal_msg)
-        self.app_on_select(num)
-        if self.app_status_msg.data[self.iot_todo[0]] == 1:
-            self.iot_todo.pop(0)
-        '''
-        로직1. 수신 데이터 출력
-        터틀봇 상태 : 현재 선솏도, 현재 각속도, 배터리 상태, 충전 상태 출력
-        환경 정보 : 날짜, 시간, 온도, 날씨 출력
-        가전 제품 : 가전상태 출력        
-        '''
-        # iot_info = {'kl' : }
-        # print(self.turtlebot_status_msg.)
-        # print(f' 터틀봇 : {self.turtlebot_status_msg}, 환경: {self.envir_status_msg}, 가전: {self.app_status_msg}')
-        ## IOT(가전) 제어 함수
-        # self.app_all_on()
-        # self.app_all_off()
-        # self.app_on_select(12)
-        # self.app_select_off(12)
-
-
-        ## 터틀봇 제어 함수
-        # self.turtlebot_go()
-        # self.turtlebot_stop()
-        # self.turtlebot_cw_rot()
-        # self.turtlebot_ccw_rot()
-
-
-        # self.cmd_publisher.publish(self.cmd_msg)
+        
+        # 켜야 할 때
+        if self.iot_todo[0][1] == 1:
+            self.app_on_select(num)
+            if self.app_status_msg.data[self.iot_todo[0][0]] == 1:
+                self.iot_todo.pop(0)
+        elif self.iot_todo[0][1] == 2:
+            self.app_off_select(num)
+            if self.app_status_msg.data[self.iot_todo[0][0]] == 2:
+                self.iot_todo.pop(0)
 
 
 def main(args=None):

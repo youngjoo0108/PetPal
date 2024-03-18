@@ -102,6 +102,7 @@ class followTheCarrot(Node):
             else:
                 self.cmd_msg.linear.x = 0.0
                 self.cmd_msg.angular.z = 0.0
+                
 
             self.cmd_pub.publish(self.cmd_msg)
   
