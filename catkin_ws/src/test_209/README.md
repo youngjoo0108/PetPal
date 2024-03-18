@@ -14,9 +14,9 @@ _Node Name : path_tracking.py_
 - publish 된 local_path 데이터를 subscribe하여 경로 추종
 - 현재 위치와 경로 간의 오차를 계산하여 전방 주시 거리 설정 후 이동
 
-_Node Name : a_star.py_
+_Node Name : dijkstra.py_
 
-- A star 알고리즘을 사용하여 현지 위치부터 목적지까지의 최적 경로 생성
+- dijkstra 알고리즘을 사용하여 현지 위치부터 목적지까지의 최적 경로 생성
 - global_path로 데이터를 publish
 
 _Node Name : a_star_local.py_
@@ -57,5 +57,28 @@ _Node Name : map_setting.py_
 - Path : a_star에서 최적 경로를 생성할 때, 장매물과 너무 인접한 경로 생성 문제
 
   - 벽 근처의 [5,5] 그리드에 가중치를 두어 해결
+
+## Path
+
+_Node Name : a_star.py_
+
+- A* 알고리즘을 사용하여 현지 위치부터 목적지까지의 최적 경로 생성
+- heuristic 함수는 8방향을 고려한 cost 값 계산을 통해 설정
+- 이에 대한 dijkstra 와의 효율 차이는 추후 실험을 통해 작성 예정
+
+## Follow
+
+_Node Name : pure_pursuit.py_
+
+- 기존의 carrot follow 알고리즘은 바로 앞의 경로 방향 그대로 steering 값을 조절하여 비틀 거리는 문제점 발생
+- pure pursuit 제어 알고리즘을 통해 유연한 로봇 이동을 구현
+
+
+## IoT
+
+_Node Name : iot_control.py_
+
+- map1의 iot기기 좌표 정보를 저장 후 index 값과 동작 명령어( ex> (1, 2) = 1번(방1 전등)기기를 off(2) 한다.)를 통해 경로 생성 및 iot 기기 전원 관리
+- 터틀봇 상태, 기기 상태 등을 구독하고 명령이 다수 발생하면 순차적으로 수행. 이 과정에서 터틀봇과 기기 상태의 변화에 따라 goal 변경과 경로의 변경 등 다양한 로직을 timer 를 통해 3초 간격으로 수행
 
 ---
