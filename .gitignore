@@ -2,3 +2,5 @@ catkin_ws/build/
 catkin_ws/install/
 catkin_ws/log/
 catkin_ws/src/test_209/map/
+catkin_ws/src/test_209/launch/__pycache__/
+catkin_ws/src/ssafy_bridge/launch/__pycache__/

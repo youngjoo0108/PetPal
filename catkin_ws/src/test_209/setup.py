@@ -34,6 +34,7 @@ setup(
             'odomprint=test_209.odom_print:main',
             'hybridastar=test_209.hybrid_a_star:main',
             'iotcontrol=test_209.iot_control:main',
+            'setting=test_209.setting:main',
         ],
     },
 )

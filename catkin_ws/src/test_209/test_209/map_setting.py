@@ -5,7 +5,7 @@ import os
 from geometry_msgs.msg import Pose,PoseStamped
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,OccupancyGrid,MapMetaData,Path
-from std_msgs.msg import Bool
+from std_msgs.msg import Int32
 from math import pi,cos,sin,pow,sqrt
 from collections import deque
 
@@ -19,8 +19,8 @@ class patrolPath(Node):
         self.timer = self.create_timer(1, self.timer_callback)
 
         # test
-        self.error_pub = self.create_publisher(Bool, 'err', 10)
-        self.error_msg = Bool()
+        self.error_pub = self.create_publisher(Int32, 'err', 10)
+        self.error_msg = Int32()
 
         self.goal_msg = PoseStamped()
         self.goal_msg.header.frame_id = 'map'
@@ -37,7 +37,6 @@ class patrolPath(Node):
         self.dy = [0,1,-1,0]
         self.is_goal = True
         self.goal = [ 0, 0 ]
-        self.target = [ -1, -1 ]
 
         self.is_odom=False
         self.is_map=False
@@ -76,16 +75,21 @@ class patrolPath(Node):
 
             # if self.is_goal: # 도착한 경우 새 목적지 설정
                 #print(now_grid_cell)
-            self.goal = self.select_goal(now_grid_cell)
-            if self.goal == [-1, -1]:
-                self.error_msg.data = True
+            if self.map_to_grid[now_grid_cell[0], now_grid_cell[1]] != 0:
+                self.error_msg.data = 2
                 self.error_pub.publish(self.error_msg)
-                print('err!')
+                return
+
+            self.goal = self.select_goal(now_grid_cell)
+            print(self.goal)
+            dis = (now_grid_cell[0] - self.goal[0], now_grid_cell[1] - self.goal[1])
+            if self.goal == [-1, -1] or (dis[0]*dis[0]+dis[1]*dis[1]) <= 25:
+                self.error_msg.data = 1
+                self.error_pub.publish(self.error_msg)
                 return
             else:
-                self.error_msg.data = False
+                self.error_msg.data = 0
                 self.error_pub.publish(self.error_msg)
-                print('not err')
                 
                 #self.is_goal = False
             goal_x, goal_y = self.grid_cell_to_pose(self.goal)
@@ -99,7 +103,6 @@ class patrolPath(Node):
             self.goal_msg.pose.orientation.z = q.z
             self.goal_msg.pose.orientation.w = q.w
 
-            print(self.goal)
             self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
             self.goal_pub.publish(self.goal_msg)
 
@@ -145,8 +148,9 @@ class patrolPath(Node):
         y = grid_cell[1] * self.map_resolution + self.map_offset_y
 
         return [x,y]
-        
+
     def select_goal(self, start):
+
         Q = deque()
         Q.append(start)
         vis = np.zeros((self.map_size_x, self.map_size_y))
