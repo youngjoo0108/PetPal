@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-
+from std_msgs.msg import Bool
 from geometry_msgs.msg import Twist, Point, Point32
 from sensor_msgs.msg import LaserScan,PointCloud
 from ssafy_msgs.msg import TurtlebotStatus
@@ -18,10 +18,12 @@ class followTheCarrot(Node):
         self.status_sub = self.create_subscription(TurtlebotStatus, 'turtlebot_status', self.status_callback, 10)
         self.path_sub = self.create_subscription(Path, '/local_path', self.path_callback, 10)
         self.lidar_sub = self.create_subscription(LaserScan, '/scan', self.lidar_callback, 10)
+        self.error_sub = self.create_subscription(Bool, '/err', self.error_callback, 1)
 
         time_period = 0.05
         self.timer = self.create_timer(time_period, self.timer_callback)
 
+        self.is_error = False
         self.is_odom = False
         self.is_path = False
         self.is_status = False
@@ -37,6 +39,9 @@ class followTheCarrot(Node):
         self.lfd = 0.1
         self.min_lfd = 0.1
         self.max_lfd = 2.0
+
+    def error_callback(self, msg):
+        self.is_error = msg.data
 
     def timer_callback(self):
     
@@ -79,7 +84,11 @@ class followTheCarrot(Node):
                 local_forward_point = det_trans_matrix.dot(global_forward_point)
                 theta = -atan2(local_forward_point[1], local_forward_point[0])
 
-                if self.collision:
+                if self.is_error:
+                    self.cmd_msg.linear.x = -0.2
+                    self.cmd_msg.angular.z = 0.2
+
+                elif self.collision:
                     self.cmd_msg.linear.x = 0.0
                     self.cmd_msg.angular.z = theta / 2
                 
@@ -102,9 +111,13 @@ class followTheCarrot(Node):
             else:
                 self.cmd_msg.linear.x = 0.0
                 self.cmd_msg.angular.z = 0.0
-                
 
-            self.cmd_pub.publish(self.cmd_msg)
+        else: #처음 제자리 회전
+            self.cmd_msg.linear.x = 0.0
+            self.cmd_msg.angular.z = 0.5
+        
+        self.cmd_pub.publish(self.cmd_msg)
+        print('pub')
   
     def check_collision(self, msg):
         for angle,r in enumerate(msg.ranges):

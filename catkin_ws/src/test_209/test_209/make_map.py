@@ -31,10 +31,10 @@ import time
 
 params_map = {
     "MAP_RESOLUTION": 0.05,
-    "OCCUPANCY_UP": 0.02,
-    "OCCUPANCY_DOWN": 0.01,
+    "OCCUPANCY_UP": 0.05,
+    "OCCUPANCY_DOWN": 0.03,
     "MAP_CENTER": (-8.0, -4.0),
-    "MAP_SIZE": (17.5, 17.5),
+    "MAP_SIZE": (35.0, 35.0),
     "MAP_FILENAME": 'test.png',
     "MAPVIS_RESIZE_SCALE": 2.0
 }
@@ -152,67 +152,92 @@ class Mapper(Node):
         self.subscription = self.create_subscription(LaserScan,
         '/scan',self.scan_callback,10)
         self.map_pub = self.create_publisher(OccupancyGrid, '/map', 1)
+        self.status_sub = self.create_subscription(TurtlebotStatus, '/turtlebot_status', self.status_callback, 10)
+
+        self.is_status = False
         
         self.map_msg=OccupancyGrid()
         self.map_msg.header.frame_id="map"
-        self.map_size=int(params_map["MAP_SIZE"][0]\
+
+        # self.map_size=int(params_map["MAP_SIZE"][0]\
+        #     /params_map["MAP_RESOLUTION"]*params_map["MAP_SIZE"][1]/params_map["MAP_RESOLUTION"])
+
+        # m = MapMetaData()
+        # m.resolution = params_map["MAP_RESOLUTION"]
+        # m.width = int(params_map["MAP_SIZE"][0]/params_map["MAP_RESOLUTION"])
+        # m.height = int(params_map["MAP_SIZE"][1]/params_map["MAP_RESOLUTION"])
+        # quat = np.array([0, 0, 0, 1])
+        # m.origin = Pose()
+
+        # m.origin.position.x = params_map["MAP_CENTER"][0] -8.75
+        # m.origin.position.y = params_map["MAP_CENTER"][1] -8.75
+        # self.map_meta_data = m
+
+        # self.map_msg.info=self.map_meta_data
+
+        # # 로직 2 : mapping 클래스 생성
+        # self.mapping = Mapping(params_map)
+
+    def status_callback(self, msg):
+        if self.is_status == False:
+            self.is_status = True
+
+            params_map["MAP_CENTER"] = (msg.twist.angular.x, msg.twist.angular.y)
+
+            self.map_size=int(params_map["MAP_SIZE"][0]\
             /params_map["MAP_RESOLUTION"]*params_map["MAP_SIZE"][1]/params_map["MAP_RESOLUTION"])
 
-        m = MapMetaData()
-        m.resolution = params_map["MAP_RESOLUTION"]
-        m.width = int(params_map["MAP_SIZE"][0]/params_map["MAP_RESOLUTION"])
-        m.height = int(params_map["MAP_SIZE"][1]/params_map["MAP_RESOLUTION"])
-        quat = np.array([0, 0, 0, 1])
-        m.origin = Pose()
-        m.origin.position.x = params_map["MAP_CENTER"][0] -8.75
-        m.origin.position.y = params_map["MAP_CENTER"][1] -8.75
-        self.map_meta_data = m
+            m = MapMetaData()
+            m.resolution = params_map["MAP_RESOLUTION"]
+            m.width = int(params_map["MAP_SIZE"][0]/params_map["MAP_RESOLUTION"])
+            m.height = int(params_map["MAP_SIZE"][1]/params_map["MAP_RESOLUTION"])
+            quat = np.array([0, 0, 0, 1])
+            m.origin = Pose()
 
-        self.map_msg.info=self.map_meta_data
+            m.origin.position.x = params_map["MAP_CENTER"][0] - (params_map["MAP_SIZE"][0]/2)
+            m.origin.position.y = params_map["MAP_CENTER"][1] - (params_map["MAP_SIZE"][1]/2)
+            self.map_meta_data = m
 
-        # 로직 2 : mapping 클래스 생성
-        self.mapping = Mapping(params_map)
+            self.map_msg.info=self.map_meta_data
 
-    def odom_callback(self, msg):
-        self.odom_msg = msg
-        q = Quaternion(msg.pose.pose.orientation.w , msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z)
-        _,_,self.robot_yaw = q.to_euler()
+            # 로직 2 : mapping 클래스 생성
+            self.mapping = Mapping(params_map)
 
 
     def scan_callback(self,msg):
-        
-        # 로직 4 : laser scan 메시지 안의 ground truth pose 받기?
-        pose_x = msg.range_min
-        pose_y = msg.scan_time
-        heading = msg.time_increment
+        if self.is_status:
+            # 로직 4 : laser scan 메시지 안의 ground truth pose 받기?
+            pose_x = msg.range_min
+            pose_y = msg.scan_time
+            heading = msg.time_increment
 
-        # 로직 5 : lidar scan 결과 수신
-        Distance = np.array(msg.ranges)
-        x = Distance * np.cos(np.linspace(0, 2 * np.pi, 360))
-        y = Distance * np.sin(np.linspace(0, 2 * np.pi, 360))
-        laser = np.vstack((x.reshape((1, -1)), y.reshape((1, -1))))
+            # 로직 5 : lidar scan 결과 수신
+            Distance = np.array(msg.ranges)
+            x = Distance * np.cos(np.linspace(0, 2 * np.pi, 360))
+            y = Distance * np.sin(np.linspace(0, 2 * np.pi, 360))
+            laser = np.vstack((x.reshape((1, -1)), y.reshape((1, -1))))
 
-        # 로직 6 : map 업데이트 실행(4,5번이 완성되면 바로 주석처리된 것을 해제하고 쓰시면 됩니다.)
-        pose = np.array([[pose_x],[pose_y],[heading]])
-        self.mapping.update(pose, laser)
+            # 로직 6 : map 업데이트 실행(4,5번이 완성되면 바로 주석처리된 것을 해제하고 쓰시면 됩니다.)
+            pose = np.array([[pose_x],[pose_y],[heading]])
+            self.mapping.update(pose, laser)
 
-        np_map_data=self.mapping.map.reshape(1,self.map_size) 
-        list_map_data=np_map_data.tolist()
+            np_map_data=self.mapping.map.reshape(1,self.map_size) 
+            list_map_data=np_map_data.tolist()
 
-        for i in range(self.map_size):
-            list_map_data[0][i]=100-int(list_map_data[0][i]*100)
-            if list_map_data[0][i] >100 :
-                list_map_data[0][i]=100
- 
-            if list_map_data[0][i] <0 :
-                list_map_data[0][i]=0
+            for i in range(self.map_size):
+                list_map_data[0][i]=100-int(list_map_data[0][i]*100)
+                if list_map_data[0][i] >100 :
+                    list_map_data[0][i]=100
+
+                if list_map_data[0][i] <0 :
+                    list_map_data[0][i]=0
 
 
-        # 로직 11 : 업데이트 중인 map publish(#으로 주석처리된 것을 해제하고 쓰시고, 나머지 부분은 직접 완성시켜 실행하십시오)
+            # 로직 11 : 업데이트 중인 map publish(#으로 주석처리된 것을 해제하고 쓰시고, 나머지 부분은 직접 완성시켜 실행하십시오)
 
-        self.map_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
-        self.map_msg.data = list_map_data[0]
-        self.map_pub.publish(self.map_msg)
+            self.map_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
+            self.map_msg.data = list_map_data[0]
+            self.map_pub.publish(self.map_msg)
 
 
 def save_map(node,file_path):

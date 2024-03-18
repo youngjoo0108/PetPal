@@ -40,17 +40,16 @@ class a_star(Node):
         self.is_found_path=False
         self.is_grid_update=False
 
-        self.count = 0
-
+        self.is_param = False
         # 로직 2. 파라미터 설정
-        self.goal = [184,224] 
-        self.map_size_x=350
-        self.map_size_y=350
+        self.goal = (0,0)
+        self.map_size_x=700
+        self.map_size_y=700
         self.map_resolution=0.05
-        self.map_offset_x=-8-8.75
-        self.map_offset_y=-4-8.75
+        # self.map_offset_x=-8-8.75
+        # self.map_offset_y=-4-8.75
     
-        self.GRIDSIZE=350
+        self.GRIDSIZE=700
  
         self.dx = [-1,0,0,1,-1,-1,1,1]
         self.dy = [0,1,-1,0,-1,1,-1,1]
@@ -104,6 +103,12 @@ class a_star(Node):
 
 
     def odom_callback(self,msg):
+        if self.is_param == False:
+            self.is_param = True
+
+            self.map_offset_x= msg.pose.pose.position.x - (self.map_size_x*self.map_resolution*0.5)
+            self.map_offset_y= msg.pose.pose.position.y - (self.map_size_y*self.map_resolution*0.5)
+
         self.is_odom=True
         self.odom_msg=msg
 
@@ -115,18 +120,17 @@ class a_star(Node):
         
 
     def goal_callback(self,msg):
-        print('sub', self.count)
-        self.count += 1
+        
         if msg.header.frame_id=='map':
             # 로직 6. goal_pose 메시지 수신하여 목표 위치 설정
             goal_x=msg.pose.position.x
             goal_y=msg.pose.position.y
-            goal_cell=self.pose_to_grid_cell(goal_x, goal_y)
-            self.goal = goal_cell
+            goal_cell_x, goal_cell_y =self.pose_to_grid_cell(goal_x, goal_y)
+            self.goal = (goal_cell_x, goal_cell_y)
             # print(msg)
             
 
-            if self.is_map ==True and self.is_odom==True  :
+            if self.is_map ==True and self.is_odom==True and self.is_param==True:
                 if self.is_grid_update==False :
                     self.grid_update()
 
@@ -149,8 +153,7 @@ class a_star(Node):
                 if start_grid_cell != self.goal :
                     self.dijkstra(start_grid_cell)
                 else:
-                    print('na')
-
+                    pass
 
                 self.global_path_msg=Path()
                 self.global_path_msg.header.frame_id='map'
@@ -175,7 +178,7 @@ class a_star(Node):
         
         while Q:
             current = Q.popleft()
-            
+
             if current == self.goal:
                 found = True
                 break
@@ -183,14 +186,14 @@ class a_star(Node):
             for i in range(8):
                 next = (current[0] + self.dx[i], current[1] + self.dy[i])
                 if 0 <= next[0] < self.GRIDSIZE and 0 <= next[1] < self.GRIDSIZE:
-                    if self.map_to_grid[next[0]][next[1]] < 50:  # If next is not an obstacle
+                    if self.map_to_grid[next[0]][next[1]] < 50 or next == self.goal:  # If next is not an obstacle
                         new_cost = self.cost[current[0]][current[1]] + self.dCost[i]
                         if self.cost[next[0]][next[1]] > new_cost:
                             Q.append(next)
                             self.path[next[0]][next[1]] = current
                             self.cost[next[0]][next[1]] = new_cost
                             
-
+        
         if found:
             node = self.goal
             while node != start:
