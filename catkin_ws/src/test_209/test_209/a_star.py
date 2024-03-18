@@ -10,7 +10,7 @@ from collections import deque
 from geometry_msgs.msg import Twist
 
 
-class hybrid_a_star(Node):
+class a_star(Node):
 
     def __init__(self):
         super().__init__('a_Star')
@@ -138,7 +138,7 @@ class hybrid_a_star(Node):
                         self.cmd_msg.linear.x = 0.0
                         self.cmd_pub.publish(self.cmd_msg)
                         
-                    self.a_star(start_grid_cell)
+                    self.astar(start_grid_cell)
 
                 else:
                     print('na')
@@ -172,7 +172,7 @@ class hybrid_a_star(Node):
     #     return sqrt(dx*dx + dy*dy)
     
 
-    def a_star(self, start):
+    def astar(self, start):
         print(self.goal)
         Q = deque()
         Q.append((start, 0 + self.heuristic(start, self.goal)))  # 시작 노드와 시작 노드의 휴리스틱 비용을 큐에 추가
@@ -208,7 +208,7 @@ class hybrid_a_star(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    global_planner = hybrid_a_star()
+    global_planner = a_star()
 
     rclpy.spin(global_planner)
 

@@ -43,6 +43,11 @@ def generate_launch_description():
             node_executable = 'astarlocal',
             node_name = 'astarlocal',
         ),
+        Node(
+            package = 'test_209',
+            node_executable = 'iotcontrol',
+            node_name = 'iotcontrol',
+        ),
         # Node(
         #     package = 'test_209',
         #     node_executable = 'odomprint',

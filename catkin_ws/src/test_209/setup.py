@@ -20,11 +20,11 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            # 좌표 관련
+            # coordinate
             'odom=test_209.odom_node:main',
             'lidar=test_209.lidar_node:main',
 
-            # 경로 주행
+            # follow
             'follow=test_209.path_tracking:main',
             'purefollow=test_209.pure_pursuit:main',
 
@@ -34,8 +34,8 @@ setup(
 
             # path planning
             'dijkstra=test_209.dijkstra:main',
-            'astarlocal=test_209.a_star_local:main',
             'astar=test_209.a_star:main',
+            'astarlocal=test_209.a_star_local:main',
 
             # iot control
             'iotcontrol=test_209.iot_control:main',
