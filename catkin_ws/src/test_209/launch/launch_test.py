@@ -32,16 +32,10 @@ def generate_launch_description():
             node_executable = 'mapping',
             node_name = 'mapping',
         ),
-        # Node(
-        #     package = 'test_209',
-        #     node_executable = 'astar',
-        #     node_name = 'astar',
-        #     output = 'screen' ,
-        # ),
         Node(
             package = 'test_209',
-            node_executable = 'hybridastar',
-            node_name = 'hybridastar',
+            node_executable = 'astar',
+            node_name = 'astar',
             output = 'screen' ,
         ),
         Node(

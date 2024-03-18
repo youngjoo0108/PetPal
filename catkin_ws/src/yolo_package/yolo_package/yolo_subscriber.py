@@ -16,6 +16,7 @@ class YoloSubscriber(Node):
         self.subscription  # prevent unused variable warning
 
     def listener_callback(self, msg):
+        #
         self.get_logger().info('Yolo Subscriber heards: "%s"' % msg.data)
 
 
