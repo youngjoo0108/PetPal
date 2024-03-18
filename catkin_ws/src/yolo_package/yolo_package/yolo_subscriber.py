@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 
 from std_msgs.msg import String
+import json
 
 
 class YoloSubscriber(Node):
@@ -16,14 +17,21 @@ class YoloSubscriber(Node):
         self.subscription  # prevent unused variable warning
 
     def listener_callback(self, msg):
-        self.get_logger().info('Yolo Subscriber heards: "%s"' % msg.data)
+        data = json.loads(msg.data)
+        for dog in data['list']:
+            print(dog)
+            self.get_logger().info('Yolo Subscriber heards: "%s"' % dog)
+            
+        print('')
 
 
 def main(args=None):
     rclpy.init(args=args)
-
+    
+    print('yolo sub start')
     yolo_subscriber = YoloSubscriber()
 
+    print('yolo sub run!')
     rclpy.spin(yolo_subscriber)
 
     # Destroy the node explicitly

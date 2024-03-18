@@ -5,9 +5,12 @@ import cv2
 from ultralytics import YOLO
 import rclpy
 from rclpy.node import Node
+from rclpy.time import Time
+import datetime
 
 from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import String
+import json
 
 # image parser 노드는 이미지를 받아서 opencv 의 imshow로 윈도우창에 띄우는 역할을 합니다.
 # 이를 resize나 convert를 사용하여 이미지를 원하는대로 바꿔보세요.
@@ -89,8 +92,18 @@ class IMGParser(Node):
         img_resize = 
         '''
         
+        current_time = self.get_clock().now()
+        # ROS 시간을 datetime 객체로 변환
+        ns = current_time.nanoseconds
+        # 나노초를 datetime 객체로 변환
+        datetime_time = datetime.datetime.fromtimestamp(ns / 1e9)
+        # 문자열로 포매팅
+        time_str = datetime_time.strftime('%Y-%m-%d-%H:%M:%S')
+        
         results = model(img_bgr)
         detection = results[0]  # 탐지된 객체 정보
+        
+        puppy_list = []
 
         for data in detection.boxes.data.tolist(): # data : [xmin, ymin, xmax, ymax, confidence_score, class_id]
             # print(data)
@@ -102,17 +115,26 @@ class IMGParser(Node):
             label = int(data[5])
             cv2.rectangle(img_bgr, (xmin, ymin), (xmax, ymax), GREEN, 2)
             cv2.putText(img_bgr, class_list[label]+' '+str(round(confidence, 2)) + '%', (xmin, ymin), cv2.FONT_ITALIC, 0.5, WHITE, 1)
+            
+            if(class_list[label] == 'Dog'):
+                #2024-03-15-12-50-23/Desk/82.3%/0.1234-0.8743/0.4352-0.7657
+                dog_data = time_str + '/' + class_list[label] + '/'+str(round(confidence, 2)) + '%' + '/' + str(xmin) + '-' + str(ymin) + '/' + str(xmax) + '-' + str(ymax)
+                puppy_list.append(dog_data)
+        
+        print('puppy list : ')
+        print(puppy_list)
+        if(len(puppy_list) != 0):
+            print('send puppy list')
+            topic_data = {'list': puppy_list}
+            json_str = json.dumps(topic_data)
             msg = String()
-            msg.data = class_list[label] + ' '+str(round(confidence, 2)) + '%' + '\n' + '(' + str(xmin) + ' ' + str(ymin) + ') (' + str(xmax) + ' ' + str(ymax) + '\n'
+            msg.data = json_str
             self.capture_callback(msg)
             
         # 로직 5. 이미지 출력 (cv2.imshow)       
         
         re_img = cv2.resize(img_bgr, (0, 0), fx=2, fy=2, interpolation=cv2.INTER_NEAREST)
-        
-        msg_line = String()
-        msg_line.data = '---'
-        self.capture_callback(msg_line)
+
         cv2.imshow("re_img", re_img)
         # cv2.imshow("img_gray", img_gray)
         # cv2.imshow("resize and gray", img_resize)       
