@@ -19,6 +19,14 @@ class _IndoorScreenState extends State<IndoorScreen> {
       child: Container(
           height: MediaQuery.of(context).size.height / 10,
           decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5), // 그림자 색상 설정
+                spreadRadius: 0, // 그림자가 퍼지는 범위 설정
+                blurRadius: 3, // 그림자의 흐림 정도 설정
+                offset: const Offset(0, 2), // 그림자의 위치 조정 (x, y)
+              ),
+            ],
             borderRadius: BorderRadius.circular(16),
             color: lightYellow,
           ),

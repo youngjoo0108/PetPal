@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/component/camera_screen.dart';
-import 'package:frontend/component/map_screen.dart';
-import 'package:frontend/component/weather_screen.dart';
+import 'package:frontend/component/stream/camera_screen.dart';
+import 'package:frontend/component/stream/map_screen.dart';
+import 'package:frontend/component/weather/weather_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,16 +18,36 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const SafeArea(
+    return SafeArea(
       child: Column(
         children: [
-          WeatherScreen(),
+          const WeatherScreen(),
           Expanded(
-            child: Column(
-              children: [
-                CameraScreen(),
-                MapScreen(),
-              ],
+            child: Container(
+              margin: const EdgeInsets.only(top: 10),
+              decoration: BoxDecoration(
+                color: Colors.white, // 컨테이너 배경색
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5), // 그림자 색상
+                    spreadRadius: 3, // 그림자 범위
+                    blurRadius: 4, // 그림자 흐림 효과
+                    offset: const Offset(0, 3), // 그림자 위치 조정
+                  ),
+                ],
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20.0), // 상단 왼쪽 둥근 처리
+                  topRight: Radius.circular(20.0), // 상단 오른쪽 둥근 처리
+                ),
+              ),
+              child: const Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  CameraScreen(),
+                  MapScreen(),
+                ],
+              ),
             ),
           ),
           // WeatherScreen(
