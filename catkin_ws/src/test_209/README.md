@@ -2,8 +2,6 @@
 
 ## Odometry
 
-![1](https://lab.ssafy.com/s10-mobility-smarthome-sub2/S10P22A209/-/raw/da7d64e7641677ca47469144c8be156eeb19bedf/catkin_ws/src/test_209/test_209/image/image-1.png)
-
 _Node Name : odom_node.py_
 
 - IMU 센서를 활용해 처음 offset 설정
@@ -66,8 +64,14 @@ _Node Name : a_star.py_
 
 - A* 알고리즘을 사용하여 현지 위치부터 목적지까지의 최적 경로 생성
 - heuristic 함수는 8방향을 고려한 cost 값 계산을 통해 설정
-- 이에 대한 dijkstra 와의 효율 차이
-  ```
+- 이에 대한 dijkstra 와의 효율 차이 (A* 알고리즘이 30 ~ 50% 정도의 시간 효율성을 갖는다)
+
+|            |        1         |        2         |        3         |        4         |         5        |         6        |
+|------------|------------------|------------------|------------------|------------------|------------------|------------------|
+|            |![1](https://lab.ssafy.com/s10-mobility-smarthome-sub2/S10P22A209/-/raw/da7d64e7641677ca47469144c8be156eeb19bedf/catkin_ws/src/test_209/test_209/image/image.png)|![2](https://lab.ssafy.com/s10-mobility-smarthome-sub2/S10P22A209/-/raw/da7d64e7641677ca47469144c8be156eeb19bedf/catkin_ws/src/test_209/test_209/image/image-2.png)|![3](https://lab.ssafy.com/s10-mobility-smarthome-sub2/S10P22A209/-/raw/da7d64e7641677ca47469144c8be156eeb19bedf/catkin_ws/src/test_209/test_209/image/image-4.png)|![4](https://lab.ssafy.com/s10-mobility-smarthome-sub2/S10P22A209/-/raw/da7d64e7641677ca47469144c8be156eeb19bedf/catkin_ws/src/test_209/test_209/image/image-6.png)|![5](https://lab.ssafy.com/s10-mobility-smarthome-sub2/S10P22A209/-/raw/da7d64e7641677ca47469144c8be156eeb19bedf/catkin_ws/src/test_209/test_209/image/image-8.png)|![6](https://lab.ssafy.com/s10-mobility-smarthome-sub2/S10P22A209/-/raw/da7d64e7641677ca47469144c8be156eeb19bedf/catkin_ws/src/test_209/test_209/image/image-10.png)|
+| Dijkstra(s)   |2.425417423248291 |2.2658658027648926|2.507333755493164 |2.205069065093994 |2.4135243892669678|2.5657551288604736|
+| A*(s)         |1.1773033142089844|1.4452247619628906|1.6590280532836914|1.3965215682983398|1.715087652206421 |1.5892083644866943|
+
 
 
 ## Follow
