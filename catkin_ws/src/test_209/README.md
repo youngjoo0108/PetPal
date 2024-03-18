@@ -64,7 +64,9 @@ _Node Name : a_star.py_
 
 - A* 알고리즘을 사용하여 현지 위치부터 목적지까지의 최적 경로 생성
 - heuristic 함수는 8방향을 고려한 cost 값 계산을 통해 설정
-- 이에 대한 dijkstra 와의 효율 차이는 추후 실험을 통해 작성 예정
+- 이에 대한 dijkstra 와의 효율 차이
+  ```
+
 
 ## Follow
 

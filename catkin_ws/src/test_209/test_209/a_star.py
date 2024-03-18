@@ -102,6 +102,7 @@ class a_star(Node):
         
 
     def goal_callback(self,msg):
+        start_time = time.time()
 
         if msg.header.frame_id=='map':
             goal_x=msg.pose.position.x
@@ -161,6 +162,10 @@ class a_star(Node):
                 if len(self.final_path)!=0 :
                     self.a_star_pub.publish(self.global_path_msg)
 
+                    
+                end_time = time.time()  
+                elapsed_time = end_time - start_time 
+                print(f"경로 생성에 소요된 시간: {elapsed_time} 초")
 
     def heuristic(self, node, goal):
         dx = abs(node[0] - goal[0])
