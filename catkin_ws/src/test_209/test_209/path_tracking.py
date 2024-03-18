@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Bool
+from std_msgs.msg import Int32
 from geometry_msgs.msg import Twist, Point, Point32
 from sensor_msgs.msg import LaserScan,PointCloud
 from ssafy_msgs.msg import TurtlebotStatus
@@ -18,12 +18,12 @@ class followTheCarrot(Node):
         self.status_sub = self.create_subscription(TurtlebotStatus, 'turtlebot_status', self.status_callback, 10)
         self.path_sub = self.create_subscription(Path, '/local_path', self.path_callback, 10)
         self.lidar_sub = self.create_subscription(LaserScan, '/scan', self.lidar_callback, 10)
-        self.error_sub = self.create_subscription(Bool, '/err', self.error_callback, 1)
+        self.error_sub = self.create_subscription(Int32, '/err', self.error_callback, 1)
 
         time_period = 0.05
         self.timer = self.create_timer(time_period, self.timer_callback)
 
-        self.is_error = False
+        self.error_type = 0
         self.is_odom = False
         self.is_path = False
         self.is_status = False
@@ -41,83 +41,85 @@ class followTheCarrot(Node):
         self.max_lfd = 2.0
 
     def error_callback(self, msg):
-        self.is_error = msg.data
+        self.error_type = msg.data
+        print('error_type = ', msg.data)
 
     def timer_callback(self):
     
         if self.is_status and self.is_odom == True and self.is_path == True and self.is_lidar == True:
-            if len(self.path_msg.poses) > 1:
-                self.is_look_forward_point = False
+            if self.error_type == 0:
+                if len(self.path_msg.poses) > 1:
+                    self.is_look_forward_point = False
 
-                robot_pose_x = self.odom_msg.pose.pose.position.x
-                robot_pose_y = self.odom_msg.pose.pose.position.y
-                lateral_error = sqrt(pow(self.path_msg.poses[0].pose.position.x - robot_pose_x,2)+pow(self.path_msg.poses[0].pose.position.y - robot_pose_y,2))
+                    robot_pose_x = self.odom_msg.pose.pose.position.x
+                    robot_pose_y = self.odom_msg.pose.pose.position.y
+                    lateral_error = sqrt(pow(self.path_msg.poses[0].pose.position.x - robot_pose_x,2)+pow(self.path_msg.poses[0].pose.position.y - robot_pose_y,2))
 
-                self.lfd = (self.status_msg.twist.linear.x + lateral_error)*0.5
+                    self.lfd = (self.status_msg.twist.linear.x + lateral_error)*0.5
 
-                if self.lfd < self.min_lfd:
-                    self.lfd = self.min_lfd
-                if self.lfd > self.max_lfd:
-                    self.lfd = self.max_lfd
+                    if self.lfd < self.min_lfd:
+                        self.lfd = self.min_lfd
+                    if self.lfd > self.max_lfd:
+                        self.lfd = self.max_lfd
 
-                min_dis = float('inf')
+                    min_dis = float('inf')
 
-                for num, waypoint in enumerate(self.path_msg.poses):
-                    self.current_point = waypoint.pose.position
+                    for num, waypoint in enumerate(self.path_msg.poses):
+                        self.current_point = waypoint.pose.position
 
-                dis = sqrt(pow(self.path_msg.poses[0].pose.position.x - self.current_point.x, 2) + pow(self.path_msg.poses[0].pose.position.y - self.current_point.y, 2))
-                if abs(dis-self.lfd) < min_dis:
-                    min_dis = abs(dis-self.lfd)
-                    self.forward_point = self.current_point
-                    self.is_look_forward_point = True
+                    dis = sqrt(pow(self.path_msg.poses[0].pose.position.x - self.current_point.x, 2) + pow(self.path_msg.poses[0].pose.position.y - self.current_point.y, 2))
+                    if abs(dis-self.lfd) < min_dis:
+                        min_dis = abs(dis-self.lfd)
+                        self.forward_point = self.current_point
+                        self.is_look_forward_point = True
 
-                if self.is_look_forward_point:
-                    global_forward_point = [self.forward_point.x, self.forward_point.y, 1]
+                    if self.is_look_forward_point:
+                        global_forward_point = [self.forward_point.x, self.forward_point.y, 1]
 
-                trans_matrix = np.array([
-                    [cos(self.robot_yaw), -sin(self.robot_yaw), robot_pose_x],
-                    [sin(self.robot_yaw), cos(self.robot_yaw), robot_pose_y],
-                    [0,0,1]
-                ])
+                    trans_matrix = np.array([
+                        [cos(self.robot_yaw), -sin(self.robot_yaw), robot_pose_x],
+                        [sin(self.robot_yaw), cos(self.robot_yaw), robot_pose_y],
+                        [0,0,1]
+                    ])
 
-                det_trans_matrix = np.linalg.inv(trans_matrix)
-                local_forward_point = det_trans_matrix.dot(global_forward_point)
-                theta = -atan2(local_forward_point[1], local_forward_point[0])
+                    det_trans_matrix = np.linalg.inv(trans_matrix)
+                    local_forward_point = det_trans_matrix.dot(global_forward_point)
+                    theta = -atan2(local_forward_point[1], local_forward_point[0])
 
-                if self.is_error:
-                    self.cmd_msg.linear.x = -0.2
-                    self.cmd_msg.angular.z = 0.2
-
-                elif self.collision:
-                    self.cmd_msg.linear.x = 0.0
-                    self.cmd_msg.angular.z = theta / 2
-                
-                else:
-                    if theta > 1.5 or theta < -1.5:
+                    if self.collision:
                         self.cmd_msg.linear.x = 0.0
-                        self.cmd_msg.angular.z = theta / 5
-
-                    elif 0.7 < theta < 1.5 or -1.5 < theta < -0.7:
-                        self.cmd_msg.linear.x = 0.2
-                        self.cmd_msg.angular.z = theta / 4
-                    
-                    elif 0.3 < theta <= 0.7 or -0.7 <= theta < -0.3:
-                        self.cmd_msg.linear.x = 0.5
                         self.cmd_msg.angular.z = theta / 2
+                    
                     else:
-                        self.cmd_msg.linear.x = 1.0
-                        self.cmd_msg.angular.z = theta
+                        if theta > 1.5 or theta < -1.5:
+                            self.cmd_msg.linear.x = 0.0
+                            self.cmd_msg.angular.z = theta / 5
 
-            else:
+                        elif 0.7 < theta < 1.5 or -1.5 < theta < -0.7:
+                            self.cmd_msg.linear.x = 0.2
+                            self.cmd_msg.angular.z = theta / 4
+                        
+                        elif 0.3 < theta <= 0.7 or -0.7 <= theta < -0.3:
+                            self.cmd_msg.linear.x = 0.5
+                            self.cmd_msg.angular.z = theta / 2
+
+                        else:
+                            self.cmd_msg.linear.x = 1.0
+                            self.cmd_msg.angular.z = theta
+
+                else:
+                    self.cmd_msg.linear.x = 0.0
+                    self.cmd_msg.angular.z = 0.0
+
+            elif self.error_type == 1:
                 self.cmd_msg.linear.x = 0.0
-                self.cmd_msg.angular.z = 0.0
+                self.cmd_msg.angular.z = 0.2
 
-        else: #처음 제자리 회전
-            self.cmd_msg.linear.x = 0.0
-            self.cmd_msg.angular.z = 0.5
+            elif self.error_type == 2:
+                self.cmd_msg.linear.x = -0.2
+                self.cmd_msg.angular.z = 0.0
         
-        self.cmd_pub.publish(self.cmd_msg)
-        print('pub')
+            self.cmd_pub.publish(self.cmd_msg)
   
     def check_collision(self, msg):
         for angle,r in enumerate(msg.ranges):
@@ -146,8 +148,6 @@ class followTheCarrot(Node):
     def status_callback(self, msg):
         self.is_status = True
         self.status_msg = msg
-
-
 
 
 def main(args = None):
