@@ -2,6 +2,8 @@
 
 ## Odometry
 
+![1](https://lab.ssafy.com/s10-mobility-smarthome-sub2/S10P22A209/-/raw/da7d64e7641677ca47469144c8be156eeb19bedf/catkin_ws/src/test_209/test_209/image/image-1.png)
+
 _Node Name : odom_node.py_
 
 - IMU 센서를 활용해 처음 offset 설정
