@@ -120,11 +120,8 @@ class IMGParser(Node):
                 #2024-03-15-12-50-23/Desk/82.3%/0.1234-0.8743/0.4352-0.7657
                 dog_data = time_str + '/' + class_list[label] + '/'+str(round(confidence, 2)) + '%' + '/' + str(xmin) + '-' + str(ymin) + '/' + str(xmax) + '-' + str(ymax)
                 puppy_list.append(dog_data)
-        
-        print('puppy list : ')
-        print(puppy_list)
+
         if(len(puppy_list) != 0):
-            print('send puppy list')
             topic_data = {'list': puppy_list}
             json_str = json.dumps(topic_data)
             msg = String()

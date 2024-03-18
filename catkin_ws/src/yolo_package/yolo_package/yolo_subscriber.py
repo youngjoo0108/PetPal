@@ -19,10 +19,8 @@ class YoloSubscriber(Node):
     def listener_callback(self, msg):
         data = json.loads(msg.data)
         for dog in data['list']:
-            print(dog)
+            #print(dog)
             self.get_logger().info('Yolo Subscriber heards: "%s"' % dog)
-            
-        print('')
 
 
 def main(args=None):
