@@ -15,7 +15,7 @@ public class TmpSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/api/v1/test").permitAll()  // /api/v1/test에 대한 접근을 모두에게 허용
+                        .requestMatchers("/**").permitAll()  // /api/v1/test에 대한 접근을 모두에게 허용
                         .anyRequest().authenticated()  // 나머지 요청에 대해서는 인증을 요구
                 )
                 .httpBasic(withDefaults())  // HTTP Basic 인증 활성화
