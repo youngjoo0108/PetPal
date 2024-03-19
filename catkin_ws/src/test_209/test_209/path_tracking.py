@@ -40,14 +40,36 @@ class followTheCarrot(Node):
         self.min_lfd = 0.1
         self.max_lfd = 2.0
 
+    def lidar_check_move(self):
+        if self.lidar_msg.ranges[0] + self.lidar_msg.ranges[180] < 2.0:
+            self.cmd_msg.linear.x = 0.0
+            self.cmd_msg.angular.z = 0.2
+
+        else:
+            if self.lidar_msg.ranges[0] < self.lidar_msg.ranges[180]:
+                self.cmd_msg.linear.x = -0.2
+                self.cmd_msg.angular.z = 0.0
+            else:
+                self.cmd_msg.linear.x = 0.2
+                self.cmd_msg.angular.z = 0.0
+
     def error_callback(self, msg):
         self.error_type = msg.data
-        print('error_type = ', msg.data)
 
     def timer_callback(self):
-    
-        if self.is_status and self.is_odom == True and self.is_path == True and self.is_lidar == True:
-            if self.error_type == 0:
+
+        if self.error_type == 1:
+            self.cmd_msg.linear.x = 0.0
+            self.cmd_msg.angular.z = 0.2
+
+        elif self.error_type == 2:
+            self.lidar_check_move()
+
+        # elif self.error_type == 3:
+        #     self.lidar_check_move()
+
+        else:
+            if self.is_status and self.is_odom == True and self.is_path == True and self.is_lidar == True:
                 if len(self.path_msg.poses) > 1:
                     self.is_look_forward_point = False
 
@@ -67,11 +89,11 @@ class followTheCarrot(Node):
                     for num, waypoint in enumerate(self.path_msg.poses):
                         self.current_point = waypoint.pose.position
 
-                    dis = sqrt(pow(self.path_msg.poses[0].pose.position.x - self.current_point.x, 2) + pow(self.path_msg.poses[0].pose.position.y - self.current_point.y, 2))
-                    if abs(dis-self.lfd) < min_dis:
-                        min_dis = abs(dis-self.lfd)
-                        self.forward_point = self.current_point
-                        self.is_look_forward_point = True
+                        dis = sqrt(pow(self.path_msg.poses[0].pose.position.x - self.current_point.x, 2) + pow(self.path_msg.poses[0].pose.position.y - self.current_point.y, 2))
+                        if abs(dis-self.lfd) < min_dis:
+                            min_dis = abs(dis-self.lfd)
+                            self.forward_point = self.current_point
+                            self.is_look_forward_point = True
 
                     if self.is_look_forward_point:
                         global_forward_point = [self.forward_point.x, self.forward_point.y, 1]
@@ -87,44 +109,46 @@ class followTheCarrot(Node):
                     theta = -atan2(local_forward_point[1], local_forward_point[0])
 
                     if self.collision:
-                        self.cmd_msg.linear.x = 0.0
-                        self.cmd_msg.angular.z = theta / 2
+                        if theta < 0:
+                            self.cmd_msg.linear.x = 0.0
+                            self.cmd_msg.angular.z = -0.2
+                        else:
+                            self.cmd_msg.linear.x = 0.0
+                            self.cmd_msg.angular.z = 0.2
                     
                     else:
                         if theta > 1.5 or theta < -1.5:
                             self.cmd_msg.linear.x = 0.0
-                            self.cmd_msg.angular.z = theta / 5
+                            self.cmd_msg.angular.z = theta/2
 
                         elif 0.7 < theta < 1.5 or -1.5 < theta < -0.7:
                             self.cmd_msg.linear.x = 0.2
-                            self.cmd_msg.angular.z = theta / 4
+                            self.cmd_msg.angular.z = theta/3
                         
-                        elif 0.3 < theta <= 0.7 or -0.7 <= theta < -0.3:
+                        elif 0.2 < theta <= 0.7 or -0.7 <= theta < -0.2:
                             self.cmd_msg.linear.x = 0.5
-                            self.cmd_msg.angular.z = theta / 2
+                            self.cmd_msg.angular.z = theta/4
 
                         else:
-                            self.cmd_msg.linear.x = 1.0
-                            self.cmd_msg.angular.z = theta
+                            if 0.2 < self.lidar_msg.ranges[0]/5 < 1.0:
+                                self.cmd_msg.linear.x = self.lidar_msg.ranges[0]/5
+                            elif self.lidar_msg.ranges[0]/5 > 1.0:
+                                self.cmd_msg.linear.x = 1.0
+                            else:
+                                self.cmd_msg.linear.x = 0.2
+                            #self.cmd_msg.linear.x = min(1.0, self.lidar_msg.ranges[0]/5)
+                            self.cmd_msg.angular.z = theta/5
 
                 else:
                     self.cmd_msg.linear.x = 0.0
                     self.cmd_msg.angular.z = 0.0
-
-            elif self.error_type == 1:
-                self.cmd_msg.linear.x = 0.0
-                self.cmd_msg.angular.z = 0.2
-
-            elif self.error_type == 2:
-                self.cmd_msg.linear.x = -0.2
-                self.cmd_msg.angular.z = 0.0
         
-            self.cmd_pub.publish(self.cmd_msg)
+        self.cmd_pub.publish(self.cmd_msg)
   
     def check_collision(self, msg):
         for angle,r in enumerate(msg.ranges):
             if angle < 20 or angle > 340:
-                if 0.0 < r < 0.5:
+                if 0.0 < r < 0.3:
                     return True
         return False
   

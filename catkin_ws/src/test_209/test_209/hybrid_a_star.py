@@ -29,17 +29,16 @@ class hybrid_a_star(Node):
         self.is_found_path=False
         self.is_grid_update=False
 
-        self.count = 0
-
+        self.is_param = False
         # 로직 2. 파라미터 설정
         self.goal = [184,224] 
-        self.map_size_x=350
-        self.map_size_y=350
+        self.map_size_x=700
+        self.map_size_y=700
         self.map_resolution=0.05
-        self.map_offset_x=-8-8.75
-        self.map_offset_y=-4-8.75
+        # self.map_offset_x=-8-8.75
+        # self.map_offset_y=-4-8.75
     
-        self.GRIDSIZE=350
+        self.GRIDSIZE=700
  
         self.dx = [-1,0,0,1,-1,-1,1,1]
         self.dy = [0,1,-1,0,-1,1,-1,1]
@@ -86,6 +85,12 @@ class hybrid_a_star(Node):
 
 
     def odom_callback(self,msg):
+        if self.is_param == False:
+            self.is_param = True
+
+            self.map_offset_x= msg.pose.pose.position.x - (self.map_size_x*self.map_resolution*0.5)
+            self.map_offset_y= msg.pose.pose.position.y - (self.map_size_y*self.map_resolution*0.5)
+
         self.is_odom=True
         self.odom_msg=msg
 
@@ -97,8 +102,7 @@ class hybrid_a_star(Node):
         
 
     def goal_callback(self,msg):
-        print('sub', self.count)
-        self.count += 1
+
         if msg.header.frame_id=='map':
             goal_x=msg.pose.position.x
             goal_y=msg.pose.position.y
@@ -106,7 +110,7 @@ class hybrid_a_star(Node):
             self.goal = goal_cell
             
 
-            if self.is_map ==True and self.is_odom==True  :
+            if self.is_map ==True and self.is_odom==True and self.is_param == True:
                 if self.is_grid_update==False :
                     self.grid_update()
 

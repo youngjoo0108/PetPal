@@ -6,7 +6,7 @@ from geometry_msgs.msg import Pose,PoseStamped
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,OccupancyGrid,MapMetaData,Path
 from std_msgs.msg import Int32
-from math import pi,cos,sin,pow,sqrt
+from math import pi,cos,sin, sqrt
 from collections import deque
 
 class patrolPath(Node):
@@ -16,7 +16,7 @@ class patrolPath(Node):
         self.map_sub = self.create_subscription(OccupancyGrid,'/map',self.map_callback,10)
         self.odom_sub = self.create_subscription(Odometry,'/odom',self.odom_callback, 10)
         self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
-        self.timer = self.create_timer(1, self.timer_callback)
+        self.timer = self.create_timer(0.5, self.timer_callback)
 
         # test
         self.error_pub = self.create_publisher(Int32, 'err', 10)
@@ -42,6 +42,8 @@ class patrolPath(Node):
         self.is_map=False
         self.is_grid_update=False
         self.is_param = False
+
+        self.count = 0
 
     
     def map_callback(self,msg):
@@ -69,29 +71,44 @@ class patrolPath(Node):
         y=self.odom_msg.pose.pose.position.y
         now_grid_cell=self.pose_to_grid_cell(x,y)
 
+        # dist = sqrt(pow(now_grid_cell[0] - self.goal[0], 2) + pow(now_grid_cell[1] - self.goal[1], 2))
+        # if self.is_goal == False and dist > 5:
+        #     return
+
         if self.is_map==True and self.is_odom==True:
             if self.is_grid_update==False :
                 self.grid_update()
 
             # if self.is_goal: # 도착한 경우 새 목적지 설정
                 #print(now_grid_cell)
-            if self.map_to_grid[now_grid_cell[0], now_grid_cell[1]] != 0:
+            if 100 <= self.map_to_grid[now_grid_cell[0], now_grid_cell[1]] < 105:
                 self.error_msg.data = 2
                 self.error_pub.publish(self.error_msg)
+                print('error2')
                 return
 
             self.goal = self.select_goal(now_grid_cell)
             print(self.goal)
             dis = (now_grid_cell[0] - self.goal[0], now_grid_cell[1] - self.goal[1])
             if self.goal == [-1, -1] or (dis[0]*dis[0]+dis[1]*dis[1]) <= 25:
-                self.error_msg.data = 1
-                self.error_pub.publish(self.error_msg)
-                return
+                if self.count >= 10:
+                    self.count = 0
+                    self.error_msg.data = 3
+                    self.error_pub.publish(self.error_msg)
+                    self.goal = [350, 350]
+                else:
+                    self.count += 1
+                    self.error_msg.data = 1
+                    self.error_pub.publish(self.error_msg)
+                    return
+                
+                # self.error_pub.publish(self.error_msg)
+                # return
             else:
                 self.error_msg.data = 0
                 self.error_pub.publish(self.error_msg)
+                self.is_goal = False
                 
-                #self.is_goal = False
             goal_x, goal_y = self.grid_cell_to_pose(self.goal)
 
             self.goal_msg.pose.position.x = goal_x
@@ -171,7 +188,7 @@ class patrolPath(Node):
                 #print(next_x, next_y)
                 if self.map_to_grid[next_x][next_y] == 0:
                     Q.append((next_x, next_y))
-                elif 49 < self.map_to_grid[next_x][next_y] and self.map_to_grid[next_x][next_y] < 100:
+                elif 20 < self.map_to_grid[next_x][next_y] and self.map_to_grid[next_x][next_y] < 100:
                     self.target = [next_x, next_y]
                     return [now[0], now[1]]
     
