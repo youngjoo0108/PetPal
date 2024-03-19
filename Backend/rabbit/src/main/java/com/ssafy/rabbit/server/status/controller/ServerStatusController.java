@@ -9,5 +9,5 @@ public class ServerStatusController {
     public String testAPI() {
         return "✅ RabbitMQ Service is up and running!";
     }
-    //PipeLine Test2
+    //PipeLine Test
 }
