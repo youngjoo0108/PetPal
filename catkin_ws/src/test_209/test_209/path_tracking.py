@@ -29,6 +29,7 @@ class followTheCarrot(Node):
         self.is_status = False
         self.is_lidar = False
         self.collision = False
+        self.goal = False
         self.odom_msg = Odometry()
 
         self.path_msg = Path()
@@ -57,8 +58,10 @@ class followTheCarrot(Node):
         self.error_type = msg.data
 
     def timer_callback(self):
+        if self.goal:
+            return
 
-        if self.error_type == 1:
+        if self.error_type == 1 or self.error_type == 4:
             self.cmd_msg.linear.x = 0.0
             self.cmd_msg.angular.z = 0.2
 
@@ -67,6 +70,11 @@ class followTheCarrot(Node):
 
         # elif self.error_type == 3:
         #     self.lidar_check_move()
+
+        elif self.error_type == 100:
+            self.cmd_msg.linear.x = 0.0
+            self.cmd_msg.angular.z = 0.0
+            self.goal = True
 
         else:
             if self.is_status and self.is_odom == True and self.is_path == True and self.is_lidar == True:

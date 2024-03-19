@@ -35,7 +35,7 @@ class patrolPath(Node):
 
         self.dx = [-1,0,0,1]
         self.dy = [0,1,-1,0]
-        self.is_goal = True
+        self.is_goal = False
         self.goal = [ 0, 0 ]
 
         self.is_odom=False
@@ -43,7 +43,9 @@ class patrolPath(Node):
         self.is_grid_update=False
         self.is_param = False
 
-        self.count = 0
+        self.end_count = 0
+        self.count1 = 0
+        self.count2 = 0
 
     
     def map_callback(self,msg):
@@ -64,7 +66,7 @@ class patrolPath(Node):
         
 
     def timer_callback(self):
-        if self.is_param==False:
+        if self.is_param==False or self.is_goal==True:
             return
 
         x=self.odom_msg.pose.pose.position.x
@@ -81,33 +83,44 @@ class patrolPath(Node):
 
             # if self.is_goal: # 도착한 경우 새 목적지 설정
                 #print(now_grid_cell)
-            if 100 <= self.map_to_grid[now_grid_cell[0], now_grid_cell[1]] < 105:
-                self.error_msg.data = 2
+            if 100 <= self.map_to_grid[now_grid_cell[0], now_grid_cell[1]]:
+                if self.count2 >= 10:
+                    self.count2 = 0
+                    self.error_msg.data = 4
+                    print('error4')
+                else:
+                    self.count2 += 1
+                    self.error_msg.data = 2
+                    print('error2')
+                
                 self.error_pub.publish(self.error_msg)
-                print('error2')
                 return
 
             self.goal = self.select_goal(now_grid_cell)
             print(self.goal)
             dis = (now_grid_cell[0] - self.goal[0], now_grid_cell[1] - self.goal[1])
             if self.goal == [-1, -1] or (dis[0]*dis[0]+dis[1]*dis[1]) <= 25:
-                if self.count >= 10:
-                    self.count = 0
-                    self.error_msg.data = 3
+                if self.count1 >= 10:
+                    self.count1 = 0
+                    self.error_msg.data = 0
                     self.error_pub.publish(self.error_msg)
                     self.goal = [350, 350]
                 else:
-                    self.count += 1
+                    self.count1 += 1
                     self.error_msg.data = 1
                     self.error_pub.publish(self.error_msg)
                     return
                 
                 # self.error_pub.publish(self.error_msg)
                 # return
+            elif self.goal == [-2, -2]:
+                self.error_msg.data = 100
+                self.error_pub.publish(self.error_msg)
+                self.is_goal = True
+
             else:
                 self.error_msg.data = 0
                 self.error_pub.publish(self.error_msg)
-                self.is_goal = False
                 
             goal_x, goal_y = self.grid_cell_to_pose(self.goal)
 
@@ -176,6 +189,13 @@ class patrolPath(Node):
         while Q:
             now = Q.popleft()
 
+            if vis[now[0], now[1]] >= 200 and self.map_to_grid[now[0], now[1]] == 0:
+                self.end_count += 1
+                if self.end_count >= 10:
+                    return [-2, -2]
+                else:
+                    return [now[0], now[1]]
+
             for i in range(4):
                 next_x, next_y = now[0] + self.dx[i], now[1] + self.dy[i]
 
@@ -184,7 +204,7 @@ class patrolPath(Node):
                 if vis[next_x][next_y] != 0:
                     continue  # 이미 방문한 셀은 무시
 
-                vis[next_x, next_y] = 1
+                vis[next_x, next_y] = vis[now[0], now[1]] + 1
                 #print(next_x, next_y)
                 if self.map_to_grid[next_x][next_y] == 0:
                     Q.append((next_x, next_y))
