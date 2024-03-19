@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ServerStatusController {
-    @GetMapping("/api/v1/rabbitTest")
+    @GetMapping("/rabbit")
     public String testAPI() {
         return "✅ RabbitMQ Service is up and running!";
     }
-    //PipeLine Test
+    //PipeLine Test 버려
 }
