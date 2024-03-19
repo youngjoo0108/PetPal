@@ -1,6 +1,8 @@
+import 'package:frontend/model/appliance.dart';
+
 class Room {
   final String name;
-  final List<String> appliances;
+  final List<Appliance> appliances;
 
   Room({required this.name, required this.appliances});
 }

@@ -6,6 +6,7 @@ import 'package:frontend/const/colors.dart';
 import 'package:frontend/screen/menu_screen.dart';
 // import 'package:frontend/screen/mode_screen.dart';
 import 'package:frontend/screen/noti_screen.dart';
+import 'package:frontend/screen/reserve_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -36,7 +37,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     return Scaffold(
       backgroundColor: white,
       appBar: AppBar(
-        elevation: 0.5,
+        // elevation: 0.5,
         backgroundColor: lightYellow,
         title: Padding(
           padding: const EdgeInsets.symmetric(vertical: 0),
@@ -73,8 +74,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         controller: controller,
         children: const [
           HomeScreen(),
-          HomeScreen(),
           ControlScreen(),
+          ReserveScreen(),
           NotiScreen(),
           MenuScreen(),
         ],

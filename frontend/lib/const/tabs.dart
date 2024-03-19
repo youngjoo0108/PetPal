@@ -19,14 +19,14 @@ const tabs = [
     location: 'HomeScreen',
   ),
   TabInfo(
-    icon: Icons.android,
-    label: '모드',
-    location: 'ModeScreen',
-  ),
-  TabInfo(
     icon: Icons.control_camera_rounded,
     label: '제어',
     location: 'ControlScreen',
+  ),
+  TabInfo(
+    icon: Icons.calendar_month_outlined,
+    label: '예약',
+    location: 'ReserveScreen',
   ),
   TabInfo(
     icon: Icons.notifications,

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/const/colors.dart';
+import 'package:frontend/model/appliance.dart';
+import 'package:frontend/model/room.dart';
 
 class AutoControlScreen extends StatefulWidget {
   const AutoControlScreen({super.key});
@@ -10,24 +13,40 @@ class AutoControlScreen extends StatefulWidget {
 class _AutoControlScreenState extends State<AutoControlScreen> {
   int _selectedRoomIndex = 0;
 
-  final List<Map<String, dynamic>> rooms = [
-    {
-      'name': '거실',
-      'appliances': ['TV', '에어컨', '청소기', '공기청정기', '세탁기', '냉장고'],
-    },
-    {
-      'name': '주방',
-      'appliances': ['냉장고', '전자레인지', '커피머신'],
-    },
-    {
-      'name': '침실',
-      'appliances': ['스탠드', '가습기', '알람시계'],
-    },
+  final rooms = [
+    Room(
+      name: '거실',
+      appliances: [
+        Appliance(name: '전등', imagePath: 'asset/img/light.png'),
+        Appliance(name: '커튼', imagePath: 'asset/img/curtains.png'),
+        Appliance(name: 'TV', imagePath: 'asset/img/tv.png'),
+        Appliance(name: '에어컨', imagePath: 'asset/img/airConditioner.png'),
+        Appliance(name: '공기청정기', imagePath: 'asset/img/purifier.png'),
+      ],
+    ),
+    Room(
+      name: '주방',
+      appliances: [
+        Appliance(name: '전등', imagePath: 'asset/img/light.png'),
+        Appliance(name: '커튼', imagePath: 'asset/img/curtains.png'),
+        Appliance(name: '세탁기', imagePath: 'asset/img/washingMachine.png'),
+      ],
+    ),
+    Room(
+      name: '침실',
+      appliances: [
+        Appliance(name: '전등', imagePath: 'asset/img/light.png'),
+        Appliance(name: '커튼', imagePath: 'asset/img/curtains.png'),
+        Appliance(name: 'TV', imagePath: 'asset/img/tv.png'),
+        Appliance(name: '에어컨', imagePath: 'asset/img/airConditioner.png'),
+        Appliance(name: '공기청정기', imagePath: 'asset/img/purifier.png'),
+      ],
+    ),
   ];
 
-  List<List<String>> _getPaginatedAppliances(
-      List<String> appliances, int itemsPerPage) {
-    var pages = <List<String>>[];
+  List<List<Appliance>> _getPaginatedAppliances(
+      List<Appliance> appliances, int itemsPerPage) {
+    var pages = <List<Appliance>>[];
     for (int i = 0; i < appliances.length; i += itemsPerPage) {
       pages.add(appliances.sublist(
           i,
@@ -41,7 +60,7 @@ class _AutoControlScreenState extends State<AutoControlScreen> {
   @override
   Widget build(BuildContext context) {
     var paginatedAppliances =
-        _getPaginatedAppliances(rooms[_selectedRoomIndex]['appliances'], 4);
+        _getPaginatedAppliances(rooms[_selectedRoomIndex].appliances, 4);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,7 +75,7 @@ class _AutoControlScreenState extends State<AutoControlScreen> {
               rooms.length,
               (index) => DropdownMenuItem<int>(
                 value: index,
-                child: Text(rooms[index]['name']),
+                child: Text(rooms[index].name),
               ),
             ),
             onChanged: (index) {
@@ -76,11 +95,47 @@ class _AutoControlScreenState extends State<AutoControlScreen> {
                 ),
                 itemCount: paginatedAppliances[pageIndex].length,
                 itemBuilder: (context, itemIndex) {
+                  final appliance = paginatedAppliances[pageIndex][itemIndex];
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Card(
-                      child: ListTile(
-                        title: Text(paginatedAppliances[pageIndex][itemIndex]),
+                      color: appliance.isOn ? lightYellow : Colors.grey[100],
+                      child: Stack(
+                        children: [
+                          Center(
+                            child: FractionallySizedBox(
+                              widthFactor: 3 / 7, // 카드 너비의 2/3만큼 차지
+                              heightFactor: 3 / 7, // 카드 높이의 2/3만큼 차지
+                              child: Image.asset(appliance.imagePath,
+                                  fit: BoxFit.contain),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 10,
+                            left: 0,
+                            right: 0,
+                            child: Text(
+                              appliance.name,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: 10,
+                            right: 10,
+                            child: Switch(
+                              value: appliance.isOn,
+                              onChanged: (bool value) {
+                                setState(() {
+                                  appliance.isOn = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   );

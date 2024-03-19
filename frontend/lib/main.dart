@@ -6,7 +6,9 @@ import 'package:frontend/screen/main_screen.dart';
 void main() {
   runApp(
     MaterialApp(
-        // theme: ThemeData(fontFamily: 'Samsung'),
+        theme: ThemeData(
+          primarySwatch: Colors.yellow,
+        ),
         // debugShowCheckedModeBanner: false,
         initialRoute: '/',
         routes: {
@@ -29,6 +31,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'PETPAL',
+      theme: ThemeData(
+        primarySwatch: Colors.yellow,
+      ),
       home: FutureBuilder(
         future: storage.read(key: "isLoggedIn"),
         builder: (context, snapshot) {
