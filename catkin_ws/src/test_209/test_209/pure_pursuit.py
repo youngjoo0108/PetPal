@@ -11,7 +11,7 @@ class PurePursuit(Node):
     def __init__(self):
         super().__init__('pure_pursuit_path_tracking')
         self.cmd_pub = self.create_publisher(Twist, 'cmd_vel', 10)
-        self.cmd_sub = self.create_subscription(Twist, 'cmd_vel', self.check_velocity, 10)
+        # self.cmd_sub = self.create_subscription(Twist, 'cmd_vel', self.check_velocity, 10)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
         self.path_sub = self.create_subscription(Path, '/local_path', self.path_callback, 10)
         self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
@@ -52,20 +52,20 @@ class PurePursuit(Node):
                     return True
         return False
     
-    def check_velocity(self, msg):
-        # cmd_msg = Twist()
-        self.speed = msg.linear.x
-        if self.speed == 0:
-        # 속도가 0이 된 첫 순간의 시간을 기록
-            if not hasattr(self, 'zero_speed_start_time'):
-                self.zero_speed_start_time = time.time()
-            # 현재 시간과 속도가 0이 된 시간의 차이가 3초 이상이면 True 반환
-            elif time.time() - self.zero_speed_start_time >= 3:
-                return True
-        else:
-            # 속도가 0이 아니면, 시간 기록을 리셋
-            self.zero_speed_start_time = None
-        return False
+    # def check_velocity(self, msg):
+    #     # cmd_msg = Twist()
+    #     self.speed = msg.linear.x
+    #     if self.speed == 0:
+    #     # 속도가 0이 된 첫 순간의 시간을 기록
+    #         if not hasattr(self, 'zero_speed_start_time'):
+    #             self.zero_speed_start_time = time.time()
+    #         # 현재 시간과 속도가 0이 된 시간의 차이가 3초 이상이면 True 반환
+    #         elif time.time() - self.zero_speed_start_time >= 3.0:
+    #             return True
+    #     else:
+    #         # 속도가 0이 아니면, 시간 기록을 리셋
+    #         self.zero_speed_start_time = None
+    #     return False
     
     def lidar_callback(self, msg):
         self.lidar_msg = msg
@@ -92,7 +92,7 @@ class PurePursuit(Node):
                     while True:
                         if time.time() - start_time < 1:  # 1초 동안 실행
                             cmd_msg.linear.x = -0.3
-                            print('후진중!!')
+                            # print('후진중!!')
                         else:
                             cmd_msg.linear.x = 0.0
                             self.cmd_pub.publish(cmd_msg)

@@ -20,21 +20,32 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            # coordinate
             'odom=test_209.odom_node:main',
-            'path=test_209.path_node:main',
             'lidar=test_209.lidar_node:main',
+
+            # follow
             'follow=test_209.path_tracking:main',
             'purefollow=test_209.pure_pursuit:main',
+
+            # mapping
+            'mapping=test_209.make_map:main',
+            'setting=test_209.setting:main',
+
+            # path planning
+            'dijkstra=test_209.dijkstra:main',
+            'astar=test_209.a_star:main',
+            'astarlocal=test_209.a_star_local:main',
+
+            # iot control
+            'iotcontrol=test_209.iot_control:main',
+            
+            # etc(for test)
             'make=test_209.make_path:main',
             'map=test_209.load_map:main',
-            'mapping=test_209.make_map:main',
-            'astar=test_209.a_star:main',
+            'path=test_209.path_node:main',
             'drive=test_209.drive_test:main',
-            'astarlocal=test_209.a_star_local:main',
             'odomprint=test_209.odom_print:main',
-            'hybridastar=test_209.hybrid_a_star:main',
-            'iotcontrol=test_209.iot_control:main',
-            'setting=test_209.map_setting:main',
         ],
     },
 )
