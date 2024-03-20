@@ -124,12 +124,13 @@ class Controller(Node):
 
     def timer_callback(self):
         if self.iot_todo:
-            if self.app_status_msg.data[self.iot_todo[0][0]] != self.iot_todo[0][1]:
-                self.turtlebot_togo(self.iot_todo[0][0])
-            else:
-                self.iot_todo.pop(0)
-                if self.iot_todo:
+            if len(self.app_status_msg.data) >= 17:
+                if self.app_status_msg.data[self.iot_todo[0][0]] != self.iot_todo[0][1]:
                     self.turtlebot_togo(self.iot_todo[0][0])
+                else:
+                    self.iot_todo.pop(0)
+                    if self.iot_todo:
+                        self.turtlebot_togo(self.iot_todo[0][0])
         
 
     def turtlebot_togo(self, num):

@@ -21,12 +21,12 @@ def generate_launch_description():
         #     node_name = 'follow',
         #     output = 'screen',
         # ),
-        # Node(
-        #     package = 'test_209',
-        #     node_executable = 'purefollow',
-        #     node_name = 'purefollow',
-        #     output = 'screen',
-        # ),
+        Node(
+            package = 'test_209',
+            node_executable = 'purefollow',
+            node_name = 'purefollow',
+            output = 'screen',
+        ),
         Node(
             package = 'test_209',
             node_executable = 'mapping',
@@ -47,6 +47,7 @@ def generate_launch_description():
             package = 'test_209',
             node_executable = 'iotcontrol',
             node_name = 'iotcontrol',
+            output = 'screen' ,
         ),
         # Node(
         #     package = 'test_209',
