@@ -35,8 +35,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry config) {
         //메시지 구독 url
         config.enableStompBrokerRelay("/exchange")
-                .setClientLogin(clientId)
-                .setClientPasscode(clientPw)
+                .setClientLogin(username)
+                .setClientPasscode(password)
                 .setSystemLogin(username)
                 .setSystemPasscode(password)
                 .setRelayHost(host)
