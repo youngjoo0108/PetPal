@@ -147,7 +147,7 @@ class A_star(Node):
                 
 
                 if start_grid_cell != self.goal :
-                    self.dijkstra(start_grid_cell)
+                    self.a_star(start_grid_cell)
                 else:
                     pass
 
