@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ssafy.petpal.schedule.dto.ScheduleDto;
 import com.ssafy.petpal.schedule.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/schedules")
+
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
@@ -30,7 +32,5 @@ public class ScheduleController {
     }
 
     @RabbitListener(queues = CONTROL_QUEUE_NAME)
-    public void receive(ScheduleDto scheduleDto) {
-        System.out.println(scheduleDto);
-    }
+    public void receive(ScheduleDto scheduleDto) {}
 }
