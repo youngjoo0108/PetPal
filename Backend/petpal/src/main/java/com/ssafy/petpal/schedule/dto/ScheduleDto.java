@@ -8,4 +8,9 @@ import lombok.Setter;
 public class ScheduleDto {
     private String sender;
     private String message;
+//    private int homeId;
+//    private String scheduleStartTime;
+//    private String taskType;
+//    private int scheduleDay;
+//    private boolean scheduleRepeat;
 }

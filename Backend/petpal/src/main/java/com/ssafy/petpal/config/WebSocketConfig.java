@@ -1,7 +1,6 @@
 package com.ssafy.petpal.config;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -10,7 +9,6 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-@Slf4j
 @Configuration
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
@@ -33,7 +31,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        //메시지 구독 url
         config.enableStompBrokerRelay("/exchange")
                 .setClientLogin(username)
                 .setClientPasscode(password)
@@ -42,7 +39,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setRelayHost(host)
                 .setRelayPort(8083)
                 .setVirtualHost("/");
-        //메시지 발행 url
+
         config.setPathMatcher(new AntPathMatcher("."));
         config.setApplicationDestinationPrefixes("/pub");
     }

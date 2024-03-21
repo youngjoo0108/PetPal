@@ -11,7 +11,6 @@ import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -33,15 +32,12 @@ public class RabbitConfig {
     @Value("${spring.rabbitmq.virtual-host}")
     private String rabbitVh;
 
-    //Queue 등록
     @Bean
     public Queue queue(){ return new Queue(CONTROL_QUEUE_NAME, true); }
 
-    //Exchange 등록
     @Bean
     public TopicExchange exchange(){ return new TopicExchange(CONTROL_EXCHANGE_NAME,true,false); }
 
-    //Exchange와 Queue 바인딩
     @Bean
     public Binding binding(Queue queue, TopicExchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY);
@@ -53,15 +49,6 @@ public class RabbitConfig {
         factory.setMessageConverter(jsonMessageConverter());
         return factory;
     }
-
-    /* messageConverter를 커스터마이징 하기 위해 Bean 새로 등록 */
-//    @Bean
-//    public RabbitTemplate rabbitTemplate(){
-//        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
-//        rabbitTemplate.setMessageConverter(jsonMessageConverter());
-//        rabbitTemplate.setRoutingKey(ROUTING_KEY);
-//        return rabbitTemplate;
-//    }
 
     @Bean
     public ConnectionFactory connectionFactory(){
