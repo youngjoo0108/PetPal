@@ -30,7 +30,7 @@ setup(
 
             # mapping
             'mapping=test_209.make_map:main',
-            'setting=test_209.setting:main',
+            'setting=test_209.map_setting:main',
 
             # path planning
             'dijkstra=test_209.dijkstra:main',
