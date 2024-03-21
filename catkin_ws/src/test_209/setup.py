@@ -39,6 +39,10 @@ setup(
 
             # iot control
             'iotcontrol=test_209.iot_control:main',
+
+            # dog tracking
+            'tracking=test_209.tracking:main',
+            
             
             # etc(for test)
             'make=test_209.make_path:main',
