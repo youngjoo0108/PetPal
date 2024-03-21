@@ -129,18 +129,25 @@ class PurePursuit(Node):
 
                     if theta > 1.5 or theta < -1.5:
                         cmd_msg.linear.x = 0.0
-                        cmd_msg.angular.z = -theta / 5
+                        cmd_msg.angular.z = -theta/2
 
                     elif 0.7 < theta < 1.5 or -1.5 < theta < -0.7:
                         cmd_msg.linear.x = 0.2
-                        cmd_msg.angular.z = -theta / 4
+                        cmd_msg.angular.z = -theta/3
                     
-                    elif 0.3 < theta <= 0.7 or -0.7 <= theta < -0.3:
+                    elif 0.2 < theta <= 0.7 or -0.7 <= theta < -0.2:
                         cmd_msg.linear.x = 0.5
-                        cmd_msg.angular.z = -theta / 3
+                        cmd_msg.angular.z = -theta/4
+
                     else:
-                        cmd_msg.linear.x = 0.8
-                        cmd_msg.angular.z = -theta
+                        if 0.2 < self.lidar_msg.ranges[0]/5 < 1.0:
+                            cmd_msg.linear.x = self.lidar_msg.ranges[0]/5
+                        elif self.lidar_msg.ranges[0]/5 > 1.0:
+                            cmd_msg.linear.x = 1.0
+                        else:
+                            cmd_msg.linear.x = 0.2
+                        #self.cmd_msg.linear.x = min(1.0, self.lidar_msg.ranges[0]/5)
+                        cmd_msg.angular.z = -theta/5
 
 
             else:

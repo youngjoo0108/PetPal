@@ -10,7 +10,7 @@ from collections import deque
 from geometry_msgs.msg import Twist
 
 
-class a_star(Node):
+class A_star(Node):
 
     def __init__(self):
         super().__init__('a_Star')
@@ -216,7 +216,7 @@ class a_star(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    global_planner = a_star()
+    global_planner = A_star()
 
     rclpy.spin(global_planner)
 

@@ -23,7 +23,7 @@ from collections import deque
 # 6. goal_pose 메시지 수신하여 목표 위치 설정
 # 7. grid 기반 최단경로 탐색
 
-class dijkstra(Node):
+class Dijkstra(Node):
 
     def __init__(self):
         super().__init__('a_Star')
@@ -204,7 +204,7 @@ class dijkstra(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    global_planner = dijkstra()
+    global_planner = Dijkstra()
 
     rclpy.spin(global_planner)
 
