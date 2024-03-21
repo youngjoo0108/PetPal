@@ -47,8 +47,10 @@ class NotiScreenState extends State<NotiScreen> {
                 offset: const Offset(0, 3), // 그림자 위치 조정
               ),
             ],
-            borderRadius:
-                const BorderRadius.all(Radius.circular(20.0)), // 모서리 둥글게
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20.0),
+              topRight: Radius.circular(20.0),
+            ), // 모서리 둥글게
           ),
           child: Column(
             children: [

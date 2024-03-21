@@ -40,12 +40,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   topRight: Radius.circular(20.0), // 상단 오른쪽 둥근 처리
                 ),
               ),
-              child: const Column(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  CameraScreen(),
-                  MapScreen(),
+                  Expanded(
+                    child: CameraScreen(),
+                  ),
+                  const Expanded(
+                    child: MapScreen(), // 수정된 부분
+                  ),
                 ],
               ),
             ),

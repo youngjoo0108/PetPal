@@ -23,11 +23,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          OutdoorScreen(
-            outTemp: outHum,
-            outHum: outTemp,
-            weather: weather,
-          ),
+          OutdoorScreen(),
           IndoorScreen(
             inTemp: inTemp,
             inHum: inHum,

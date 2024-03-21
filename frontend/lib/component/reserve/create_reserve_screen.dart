@@ -159,17 +159,18 @@ class _CreateReservationScreenState extends State<CreateReservationScreen> {
         time: selectedTime,
         isActive: true,
       );
-      // 실제 앱에서는 여기서 예약 정보를 저장하거나 처리합니다.
-      // 예를 들어, 데이터베이스에 저장하거나, 서버에 전송할 수 있습니다.
-      // 이 예제에서는 단순히 이전 화면으로 예약 정보를 반환합니다.
-      Navigator.pop(context, newReservation);
+
+      /*
+        ---------------------서버에 전달하는 로직 추가---------------------
+       */
+      Navigator.pop(context, newReservation); // 이전 화면으로 예약 정보 반환
     } else {
       // 방이나 가전이 선택되지 않았을 경우 사용자에게 알림
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('선택 누락'),
+            title: const Text('돌아가'),
             content: const Text('방과 가전을 모두 선택해주세요.'),
             actions: <Widget>[
               TextButton(

@@ -1,3 +1,4 @@
+// import 'dart:collection';
 import 'package:flutter/material.dart';
 
 class MapScreen extends StatelessWidget {
@@ -5,8 +6,13 @@ class MapScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: const Text("MapScreen"),
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20.0),
+        child: const Text("MapView"),
+        // child: MapView(),
+      ),
     );
   }
 }
