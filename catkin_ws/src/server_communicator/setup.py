@@ -20,6 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'server_test = server_communicator.server_test:main',
             'data_publisher = server_communicator.data_publisher:main',
             'gpu_image_publisher = server_communicator.gpu_image_publisher:main',
             'log_publisher = server_communicator.log_publisher:main',

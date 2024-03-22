@@ -189,7 +189,7 @@ class A_star(Node):
             for i in range(8):
                 next = (current[0] + self.dx[i], current[1] + self.dy[i])
                 if 0 <= next[0] < self.GRIDSIZE and 0 <= next[1] < self.GRIDSIZE:
-                    if self.map_to_grid[next[0]][next[1]] < 50 or next == self.goal:  # If next is not an obstacle
+                    if self.map_to_grid[next[0]][next[1]] < 50:  # If next is not an obstacle
                         new_cost = self.cost[current[0]][current[1]] + self.dCost[i]
                         if self.cost[next[0]][next[1]] > new_cost:
                             heuristic_cost = new_cost + self.heuristic(next, self.goal)

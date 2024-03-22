@@ -1,4 +1,4 @@
-import rclpy
+import rclpy, time
 import numpy as np
 from rclpy.node import Node
 import os
@@ -23,7 +23,7 @@ from collections import deque
 # 6. goal_pose 메시지 수신하여 목표 위치 설정
 # 7. grid 기반 최단경로 탐색
 
-class a_star(Node):
+class Dijkstra(Node):
 
     def __init__(self):
         super().__init__('a_Star')
@@ -31,7 +31,7 @@ class a_star(Node):
         self.map_sub = self.create_subscription(OccupancyGrid,'map',self.map_callback,1)
         self.odom_sub = self.create_subscription(Odometry,'odom',self.odom_callback,1)
         self.goal_sub = self.create_subscription(PoseStamped,'goal_pose',self.goal_callback,1)
-        self.a_star_pub= self.create_publisher(Path, 'global_path', 1)
+        self.dijkstra_pub= self.create_publisher(Path, 'global_path', 1)
         
         self.map_msg=OccupancyGrid()
         self.odom_msg=Odometry()
@@ -120,7 +120,8 @@ class a_star(Node):
         
 
     def goal_callback(self,msg):
-        
+        start_time = time.time()
+
         if msg.header.frame_id=='map':
             # 로직 6. goal_pose 메시지 수신하여 목표 위치 설정
             goal_x=msg.pose.position.x
@@ -144,11 +145,7 @@ class a_star(Node):
                 self.cost = np.array([[self.GRIDSIZE*self.GRIDSIZE for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)], dtype=float)
 
                 
-                # 다익스트라 알고리즘을 완성하고 주석을 해제 시켜주세요. 
-                # 시작지, 목적지가 탐색가능한 영역이고, 시작지와 목적지가 같지 않으면 경로탐색을 합니다.
-
-                #print(f'start : {start_grid_cell}, {self.map_to_grid[start_grid_cell[0]][start_grid_cell[1]]} ,goal : {self.goal},{self.map_to_grid[self.goal[0]][self.goal[1]]}')
-                # print(f'start : {start_grid_cell}, {self.map_to_grid[start_grid_cell[1]][start_grid_cell[0]]} ,goal : {self.goal},{self.map_to_grid[self.goal[1]][self.goal[0]]}')
+               
                 if start_grid_cell != self.goal :
                     self.dijkstra(start_grid_cell)
                 else:
@@ -165,7 +162,11 @@ class a_star(Node):
                     self.global_path_msg.poses.append(tmp_pose)
             
                 if len(self.final_path)!=0 :
-                    self.a_star_pub.publish(self.global_path_msg)
+                    self.dijkstra_pub.publish(self.global_path_msg)
+
+                end_time = time.time()  
+                elapsed_time = end_time - start_time 
+                print(f"경로 생성에 소요된 시간: {elapsed_time} 초")
 
     def dijkstra(self,start):
         Q = deque()
@@ -202,7 +203,7 @@ class a_star(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    global_planner = a_star()
+    global_planner = Dijkstra()
 
     rclpy.spin(global_planner)
 
