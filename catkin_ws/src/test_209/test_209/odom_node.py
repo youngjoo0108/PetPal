@@ -33,6 +33,8 @@ class odom(Node):
         self.odom_publisher = self.create_publisher(Odometry, 'odom', 10)
         self.broadcaster = tf2_ros.StaticTransformBroadcaster(self)
 
+        # self.timer = self.create_timer(1, self.timer_callback)
+
 
         # 로봇의 pose를 저장해 publish 할 메시지 변수 입니다.
         self.odom_msg=Odometry()
@@ -67,7 +69,22 @@ class odom(Node):
         self.laser_transform.transform.translation.y = 0.0
         self.laser_transform.transform.translation.z = 1.0
         self.laser_transform.transform.rotation.w = 1.0
+
+        # self.latest_status = TurtlebotStatus()
+        # self.is_latest_status=False
+
+        # self.latest_status.x = 0
+        # self.latest_status.y = 0
+        # self.latest_status.theta = self.theta
+
                       
+    # def timer_callback(self):
+    #     self.x = self.latest_status.twist.angular.x
+    #     self.y = self.latest_status.twist.angular.y
+
+
+    
+
 
     def imu_callback(self,msg):
         # 로직 3. IMU 에서 받은 quaternion을 euler angle로 변환해서 사용
@@ -114,6 +131,8 @@ class odom(Node):
                 # (테스트) linear_x = 1, self.theta = 1.5707(rad), self.period = 1 일 때
                 # self.x=0, self.y=1 이 나와야 합니다. 로봇의 헤딩이 90도 돌아가 있는
                 # 상태에서 선속도를 가진다는 것은 x축방향이 아니라 y축방향으로 이동한다는 뜻입니다. 
+                self.x = msg.twist.angular.x
+                self.y = msg.twist.angular.y
 
                 self.x += linear_x*cos(self.theta)*self.period
                 self.y += linear_x*sin(self.theta)*self.period
