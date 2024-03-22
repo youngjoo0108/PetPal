@@ -21,6 +21,7 @@ class YoloSubscriber(Node):
         for dog in data['list']:
             #print(dog)
             self.get_logger().info('Yolo Subscriber heards: "%s"' % dog)
+            
 
 
 def main(args=None):

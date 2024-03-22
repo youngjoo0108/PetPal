@@ -42,6 +42,7 @@ setup(
 
             # dog tracking
             'tracking=test_209.tracking:main',
+            'tt=test_209.tracking_test:main',
             
             
             # etc(for test)

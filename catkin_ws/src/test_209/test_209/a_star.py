@@ -203,6 +203,7 @@ class A_star(Node):
             while node != start:
                 self.final_path.append(node)
                 node = self.path[node[0]][node[1]]
+                
         
 def main(args=None):
     rclpy.init(args=args)
