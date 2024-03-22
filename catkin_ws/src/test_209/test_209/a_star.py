@@ -23,7 +23,7 @@ from collections import deque
 # 6. goal_pose 메시지 수신하여 목표 위치 설정
 # 7. grid 기반 최단경로 탐색
 
-class a_star(Node):
+class A_star(Node):
 
     def __init__(self):
         super().__init__('a_Star')
@@ -103,11 +103,11 @@ class a_star(Node):
 
 
     def odom_callback(self,msg):
-        if self.is_param == False:
+        if self.is_param == False and self.is_map:
             self.is_param = True
 
-            self.map_offset_x= msg.pose.pose.position.x - (self.map_size_x*self.map_resolution*0.5)
-            self.map_offset_y= msg.pose.pose.position.y - (self.map_size_y*self.map_resolution*0.5)
+            self.map_offset_x= self.map_msg.info.origin.position.x
+            self.map_offset_y= self.map_msg.info.origin.position.y
 
         self.is_odom=True
         self.odom_msg=msg
@@ -145,13 +145,9 @@ class a_star(Node):
                 self.cost = np.array([[self.GRIDSIZE*self.GRIDSIZE for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)], dtype=float)
 
                 
-                # 다익스트라 알고리즘을 완성하고 주석을 해제 시켜주세요. 
-                # 시작지, 목적지가 탐색가능한 영역이고, 시작지와 목적지가 같지 않으면 경로탐색을 합니다.
 
-                #print(f'start : {start_grid_cell}, {self.map_to_grid[start_grid_cell[0]][start_grid_cell[1]]} ,goal : {self.goal},{self.map_to_grid[self.goal[0]][self.goal[1]]}')
-                # print(f'start : {start_grid_cell}, {self.map_to_grid[start_grid_cell[1]][start_grid_cell[0]]} ,goal : {self.goal},{self.map_to_grid[self.goal[1]][self.goal[0]]}')
                 if start_grid_cell != self.goal :
-                    self.dijkstra(start_grid_cell)
+                    self.a_star(start_grid_cell)
                 else:
                     pass
 
@@ -168,17 +164,24 @@ class a_star(Node):
                 if len(self.final_path)!=0 :
                     self.a_star_pub.publish(self.global_path_msg)
 
-    def dijkstra(self,start):
+                    
+    def heuristic(self, node, goal):
+        dx = abs(node[0] - goal[0])
+        dy = abs(node[1] - goal[1])
+        D = 1
+        D2 = 1.414  # 대각선 이동 비용 (sqrt(2))
+        return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
+
+
+    def a_star(self, start):
         Q = deque()
-        Q.append(start)
+        Q.append((start, 0 + self.heuristic(start, self.goal)))  # 시작 노드와 시작 노드의 휴리스틱 비용을 큐에 추가
         self.cost[start[0]][start[1]] = 0
         found = False
         
-        # 로직 7. grid 기반 최단경로 탐색
-        
         while Q:
-            current = Q.popleft()
-
+            current, _ = Q.popleft()
+            
             if current == self.goal:
                 found = True
                 break
@@ -189,11 +192,12 @@ class a_star(Node):
                     if self.map_to_grid[next[0]][next[1]] < 50 or next == self.goal:  # If next is not an obstacle
                         new_cost = self.cost[current[0]][current[1]] + self.dCost[i]
                         if self.cost[next[0]][next[1]] > new_cost:
-                            Q.append(next)
+                            heuristic_cost = new_cost + self.heuristic(next, self.goal)
+                            Q.append((next, heuristic_cost))
+                            Q = deque(sorted(Q, key=lambda x: x[1]))  # 우선순위 큐로 정렬
                             self.path[next[0]][next[1]] = current
                             self.cost[next[0]][next[1]] = new_cost
-                            
-        
+
         if found:
             node = self.goal
             while node != start:
@@ -203,7 +207,7 @@ class a_star(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    global_planner = a_star()
+    global_planner = A_star()
 
     rclpy.spin(global_planner)
 

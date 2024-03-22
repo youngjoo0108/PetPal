@@ -9,10 +9,10 @@ from std_msgs.msg import Int32
 from math import pi,cos,sin, sqrt
 from collections import deque
 
-class patrolPath(Node):
+class mapSetting(Node):
 
     def __init__(self):
-        super().__init__('patrolPath')
+        super().__init__('mapSetting')
         self.map_sub = self.create_subscription(OccupancyGrid,'/map',self.map_callback,10)
         self.odom_sub = self.create_subscription(Odometry,'/odom',self.odom_callback, 10)
         self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
@@ -44,7 +44,7 @@ class patrolPath(Node):
         self.is_param = False
 
         self.end_count = 0
-        self.count1 = 0
+        self.count1 = [0, 0]
         self.count2 = 0
 
     
@@ -95,18 +95,26 @@ class patrolPath(Node):
                 
                 self.error_pub.publish(self.error_msg)
                 return
+            else:
+                self.count2 = 0
 
             self.goal = self.select_goal(now_grid_cell)
             print(self.goal)
             dis = (now_grid_cell[0] - self.goal[0], now_grid_cell[1] - self.goal[1])
             if self.goal == [-1, -1] or (dis[0]*dis[0]+dis[1]*dis[1]) <= 25:
-                if self.count1 >= 10:
-                    self.count1 = 0
+                if self.count1[1] >= 10 and self.count1[0] < 2:
+                    self.count1[1] = 0
+                    self.count1[0] += 1
                     self.error_msg.data = 0
                     self.error_pub.publish(self.error_msg)
                     self.goal = [350, 350]
+                elif self.count1[1] >= 10 and self.count1[0] >= 2:
+                    self.error_msg.data = 100
+                    self.error_pub.publish(self.error_msg)
+                    self.is_goal = True
+                    print('End')
                 else:
-                    self.count1 += 1
+                    self.count1[1] += 1
                     self.error_msg.data = 1
                     self.error_pub.publish(self.error_msg)
                     return
@@ -117,8 +125,10 @@ class patrolPath(Node):
                 self.error_msg.data = 100
                 self.error_pub.publish(self.error_msg)
                 self.is_goal = True
+                print('End')
 
             else:
+                self.count1 = [0, 0]
                 self.error_msg.data = 0
                 self.error_pub.publish(self.error_msg)
                 
@@ -189,7 +199,7 @@ class patrolPath(Node):
         while Q:
             now = Q.popleft()
 
-            if vis[now[0], now[1]] >= 200 and self.map_to_grid[now[0], now[1]] == 0:
+            if vis[now[0], now[1]] >= 400 and self.map_to_grid[now[0], now[1]] == 0:
                 self.end_count += 1
                 if self.end_count >= 10:
                     return [-2, -2]
@@ -217,9 +227,9 @@ class patrolPath(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    global_planner = patrolPath()
-    rclpy.spin(global_planner)
-    global_planner.destroy_node()
+    map_set = mapSetting()
+    rclpy.spin(map_set)
+    map_set.destroy_node()
     rclpy.shutdown()
 
 

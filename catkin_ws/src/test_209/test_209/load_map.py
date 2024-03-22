@@ -48,9 +48,6 @@ class loadMap(Node):
         # self.map_msg.info=self.map_meta_data
 
     def read_txt(self):
-        grid=np.array(self.map_data)
-        grid=np.reshape(grid,(self.map_size_x, self.map_size_y))
-
         full_path = 'C:\\Users\\SSAFY\\Desktop\\\S10P22A209\\catkin_ws\\src\\test_209\\map\\map.txt'
         self.f = open(full_path, 'r')
         
@@ -65,13 +62,17 @@ class loadMap(Node):
         grid = np.array(self.map_data)
         grid = np.reshape(grid,(self.map_size_x, self.map_size_y))
 
-        for y in range(self.map_size_y):
-            for x in range(self.map_size_x):
-                if grid[x][y]==100 :
-                  pass
-                    # 로직 3. 점유영역 근처 필터처리
+        # for y in range(self.map_size_y):
+        #     for x in range(self.map_size_x):
+        #         if grid[x][y]==100 :
+        #             for dx in range(-10, 11):
+        #                 for dy in range(-10, 11):
+        #                     new_i = x + dx
+        #                     new_j = y + dy
 
-                    # 채워 넣기
+        #                     if 0 <= new_i < self.map_size_x and 0 <= new_j < self.map_size_y and grid[new_i, new_j] != 127:
+        #                         grid[new_i, new_j] = 127
+                
         
         np_map_data=grid.reshape(1,self.map_size_x*self.map_size_y) 
         list_map_data=np_map_data.tolist()
