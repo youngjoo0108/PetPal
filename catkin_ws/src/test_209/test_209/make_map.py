@@ -232,7 +232,6 @@ class Mapper(Node):
                 if list_map_data[0][i] <0 :
                     list_map_data[0][i]=0
 
-
             # 로직 11 : 업데이트 중인 map publish(#으로 주석처리된 것을 해제하고 쓰시고, 나머지 부분은 직접 완성시켜 실행하십시오)
 
             self.map_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
@@ -254,9 +253,11 @@ def save_map(node,file_path):
 
     for pixel in node.map_msg.data :
         data+='{0} '.format(pixel)
+    
+    data += '\n{0} {1}'.format(node.map_msg.info.origin.position.x, node.map_msg.info.origin.position.y)
     f.write(data) 
     f.close()
-
+    
         
 def main(args=None):    
     rclpy.init(args=args)

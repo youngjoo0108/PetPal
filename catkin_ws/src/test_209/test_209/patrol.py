@@ -19,6 +19,7 @@ class followTheCarrot(Node):
         self.path_sub = self.create_subscription(Path, '/local_path', self.path_callback, 10)
         self.lidar_sub = self.create_subscription(LaserScan, '/scan', self.lidar_callback, 10)
         self.error_sub = self.create_subscription(Int32, '/err', self.error_callback, 1)
+        self.patrol_pub = self.create_publisher(Int32, 'patrol', 1)
 
         time_period = 0.05
         self.timer = self.create_timer(time_period, self.timer_callback)
@@ -31,6 +32,7 @@ class followTheCarrot(Node):
         self.collision = False
         self.goal = False
         self.odom_msg = Odometry()
+        self.patrol_msg = Int32()
 
         self.path_msg = Path()
         self.cmd_msg = Twist()
@@ -61,25 +63,27 @@ class followTheCarrot(Node):
         if self.goal:
             return
 
-        if self.error_type == 1 or self.error_type == 4:
+        if self.error_type == 1 or self.error_type == 4: # astar 에러/목적지 너무 가까움
             self.cmd_msg.linear.x = 0.0
             self.cmd_msg.angular.z = 0.2
 
-        elif self.error_type == 2:
+        elif self.error_type == 2: # 현재 위치 장애물과 너무 가까움
             self.lidar_check_move()
 
         # elif self.error_type == 3:
         #     self.lidar_check_move()
 
-        elif self.error_type == 100:
+        elif self.error_type == 100: # 탐색 완료
             self.cmd_msg.linear.x = 0.0
             self.cmd_msg.angular.z = 0.0
             self.goal = True
 
         else:
             if self.is_status and self.is_odom == True and self.is_path == True and self.is_lidar == True:
-                if len(self.path_msg.poses) > 1:
+                if len(self.path_msg.poses) > 2:
                     self.is_look_forward_point = False
+                    self.patrol_msg.data = 0
+                    self.patrol_pub.publish(self.patrol_msg)
 
                     robot_pose_x = self.odom_msg.pose.pose.position.x
                     robot_pose_y = self.odom_msg.pose.pose.position.y
@@ -150,6 +154,8 @@ class followTheCarrot(Node):
                 else:
                     self.cmd_msg.linear.x = 0.0
                     self.cmd_msg.angular.z = 0.0
+                    self.patrol_msg.data = 1
+                    self.patrol_pub.publish(self.patrol_msg)
         
         self.cmd_pub.publish(self.cmd_msg)
   
