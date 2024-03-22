@@ -103,11 +103,11 @@ class Dijkstra(Node):
 
 
     def odom_callback(self,msg):
-        if self.is_param == False:
+        if self.is_param == False and self.is_map == True:
             self.is_param = True
 
-            self.map_offset_x= msg.pose.pose.position.x - (self.map_size_x*self.map_resolution*0.5)
-            self.map_offset_y= msg.pose.pose.position.y - (self.map_size_y*self.map_resolution*0.5)
+            self.map_offset_x= self.map_msg.info.origin.position.x
+            self.map_offset_y= self.map_msg.info.origin.position.y
 
         self.is_odom=True
         self.odom_msg=msg
@@ -129,7 +129,6 @@ class Dijkstra(Node):
             goal_cell_x, goal_cell_y =self.pose_to_grid_cell(goal_x, goal_y)
             self.goal = (goal_cell_x, goal_cell_y)
             # print(msg)
-            
 
             if self.is_map ==True and self.is_odom==True and self.is_param==True:
                 if self.is_grid_update==False :

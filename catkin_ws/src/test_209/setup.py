@@ -27,10 +27,13 @@ setup(
             # follow
             'follow=test_209.path_tracking:main',
             'purefollow=test_209.pure_pursuit:main',
+            'patrol=test_209.patrol:main',
 
             # mapping
+            'map=test_209.load_map:main',
             'mapping=test_209.make_map:main',
             'setting=test_209.map_setting:main',
+            'route=test_209.patrol_route:main',
 
             # path planning
             'dijkstra=test_209.dijkstra:main',
@@ -46,7 +49,6 @@ setup(
             
             # etc(for test)
             'make=test_209.make_path:main',
-            'map=test_209.load_map:main',
             'path=test_209.path_node:main',
             'drive=test_209.drive_test:main',
             'odomprint=test_209.odom_print:main',

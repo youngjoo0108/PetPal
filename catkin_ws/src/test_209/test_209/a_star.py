@@ -103,11 +103,11 @@ class A_star(Node):
 
 
     def odom_callback(self,msg):
-        if self.is_param == False:
+        if self.is_param == False and self.is_map:
             self.is_param = True
 
-            self.map_offset_x= msg.pose.pose.position.x - (self.map_size_x*self.map_resolution*0.5)
-            self.map_offset_y= msg.pose.pose.position.y - (self.map_size_y*self.map_resolution*0.5)
+            self.map_offset_x= self.map_msg.info.origin.position.x
+            self.map_offset_y= self.map_msg.info.origin.position.y
 
         self.is_odom=True
         self.odom_msg=msg
@@ -147,7 +147,7 @@ class A_star(Node):
                 
 
                 if start_grid_cell != self.goal :
-                    self.dijkstra(start_grid_cell)
+                    self.a_star(start_grid_cell)
                 else:
                     pass
 
