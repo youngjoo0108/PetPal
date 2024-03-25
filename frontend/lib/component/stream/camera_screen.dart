@@ -1,60 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
-class CameraScreen extends StatefulWidget {
-  // Echo 테스트용 WebSocket 서버 URL로 수정
-  final WebSocketChannel channel =
-      WebSocketChannel.connect(Uri.parse('ws://echo.websocket.org'));
-
-  CameraScreen({super.key});
-
-  @override
-  CameraScreenState createState() => CameraScreenState();
-}
-
-class CameraScreenState extends State<CameraScreen> {
-  final TextEditingController _controller = TextEditingController();
-
-  void _sendMessage() {
-    if (_controller.text.isNotEmpty) {
-      widget.channel.sink.add(_controller.text);
-    }
-  }
+class CameraScreen extends StatelessWidget {
+  const CameraScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Form(
-            child: TextFormField(
-              controller: _controller,
-              decoration: const InputDecoration(
-                  labelText: 'WebSocket Test - ws://echo.websocket.org'),
+    // 이미지의 경로는 예시이며, 실제 앱의 에셋 경로에 맞게 조정해야 합니다.
+    String imagePath = 'asset/img/camera.jpg';
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 20, right: 20, left: 20),
+      child: Container(
+        width: 320, // 이미지의 너비 설정
+        height: 240, // 이미지의 높이 설정
+        decoration: BoxDecoration(
+          // 이미지를 BoxDecoration의 decorationImage로 설정
+          image: DecorationImage(
+            image: AssetImage(imagePath),
+            fit: BoxFit.cover, // 이미지가 컨테이너 영역을 꽉 채우도록 설정
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 3,
+              blurRadius: 4,
+              offset: const Offset(0, 3),
             ),
-          ),
-          const SizedBox(height: 24.0),
-          StreamBuilder(
-            stream: widget.channel.stream,
-            builder: (context, snapshot) {
-              return Text(snapshot.hasData ? '${snapshot.data}' : '');
-            },
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _sendMessage,
-        tooltip: 'Send message',
-        child: const Icon(Icons.send),
+          ],
+          borderRadius: const BorderRadius.all(Radius.circular(20)), // 둥근 모서리
+        ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    widget.channel.sink.close();
-    _controller.dispose();
-    super.dispose();
   }
 }

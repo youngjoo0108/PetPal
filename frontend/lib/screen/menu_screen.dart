@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/const/colors.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'login_screen.dart';
 
-class MenuScreen extends StatelessWidget {
+class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
 
+  @override
+  State<MenuScreen> createState() => _MenuScreenState();
+}
+
+class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,8 +55,6 @@ class MenuScreen extends StatelessWidget {
                     _buildMenuItem(Icons.android, "기기 등록"),
                     _buildDivider(),
                     _buildMenuItem(Icons.home_outlined, "홈 스캔"),
-                    _buildDivider(),
-                    _buildMenuItem(Icons.swap_horiz, "모드 변경"),
                   ],
                 ),
               ),
@@ -104,11 +109,25 @@ class MenuScreen extends StatelessWidget {
     return ListTile(
       leading: Icon(icon),
       title: Text(title),
-      onTap: () {
-        /**
-         * 각 항목을 탭했을 때 로직 추가--------------------------
-         */
-      },
+      onTap: () => _onMenuItemTap(title),
+    );
+  }
+
+  void _onMenuItemTap(String title) {
+    if (title == "로그아웃") {
+      _logout();
+    }
+    // 다른 메뉴 항목에 대한 조건 분기를 여기에 추가할 수 있습니다.
+  }
+
+  void _logout() async {
+    const storage = FlutterSecureStorage();
+    await storage.delete(key: "isLoggedIn"); // 로그인 상태를 삭제합니다.
+
+    // 로그아웃 후 로그인 화면으로 이동합니다.
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
     );
   }
 

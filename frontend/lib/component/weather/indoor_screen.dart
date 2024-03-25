@@ -1,17 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/component/service/fetch_weather.dart';
 import 'package:frontend/const/colors.dart';
 
 class IndoorScreen extends StatefulWidget {
-  final int inTemp;
-  final int inHum;
-
-  const IndoorScreen({required this.inTemp, required this.inHum, super.key});
+  const IndoorScreen({super.key});
 
   @override
   State<IndoorScreen> createState() => _IndoorScreenState();
 }
 
 class _IndoorScreenState extends State<IndoorScreen> {
+  int? inTemp;
+  int? feelLike;
+
+  @override
+  void initState() {
+    super.initState();
+    // 비동기 작업을 initState 내에서 스케줄링
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchWeather('Seoul').then((data) {
+        if (mounted) {
+          setState(() {
+            // API에서 받은 데이터로 상태 업데이트
+            feelLike =
+                ((data['main']['feels_like'] as double) - 273.15).round();
+            inTemp = 15;
+          });
+        }
+      }).catchError((error) {
+        // 오류 처리
+        print("Error fetching weather data: $error");
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -30,7 +52,7 @@ class _IndoorScreenState extends State<IndoorScreen> {
             borderRadius: BorderRadius.circular(16),
             color: lightYellow,
           ),
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -38,16 +60,16 @@ class _IndoorScreenState extends State<IndoorScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    '내부 온도',
+                  const Text(
+                    '체감 온도',
                     style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   Text(
-                    '20',
-                    style: TextStyle(
+                    feelLike?.toString() ?? 'Loading...',
+                    style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
                     ),
@@ -58,16 +80,16 @@ class _IndoorScreenState extends State<IndoorScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    '내부 습도',
+                  const Text(
+                    '실내 온도',
                     style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   Text(
-                    '50',
-                    style: TextStyle(
+                    inTemp?.toString() ?? 'Loading...',
+                    style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
                     ),

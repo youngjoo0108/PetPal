@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/const/colors.dart';
+import 'package:frontend/const/time_creator.dart';
 import 'package:frontend/model/appliance.dart';
 import 'package:frontend/model/room.dart';
 import 'package:frontend/model/reservation.dart'; // 'Reservation' 클래스 경로
@@ -15,17 +16,19 @@ class CreateReservationScreen extends StatefulWidget {
 }
 
 class _CreateReservationScreenState extends State<CreateReservationScreen> {
-  DateTime selectedDate = DateTime.now();
-  TimeOfDay selectedTime = TimeOfDay.now();
+  DateTime selectedDate = TimeCreator.nowInKorea();
+  TimeOfDay selectedTime = TimeCreator.timeOfDayInKorea();
   Room? selectedRoom;
   Appliance? selectedAppliance;
+  String? selectedAction;
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
-      firstDate: DateTime.now(), // 현재 날짜를 최소 날짜로 설정
-      lastDate: DateTime(2100), // 미래의 어떤 날짜를 최대 날짜로 설정
+      firstDate: TimeCreator.nowInKorea(), // 현재 날짜를 최소 날짜로 설정
+      lastDate:
+          TimeCreator.specificDateInKorea(2100, 12, 31), // 미래의 어떤 날짜를 최대 날짜로 설정
     );
     if (picked != null && picked != selectedDate) {
       setState(() {
@@ -86,6 +89,20 @@ class _CreateReservationScreenState extends State<CreateReservationScreen> {
                 },
                 (Appliance appliance) =>
                     appliance.name, // Appliance 객체의 name 속성을 문자열로 사용
+              ),
+            const SizedBox(height: 20), // 요소 사이의 간격
+            if (selectedRoom != null && selectedAppliance != null)
+              buildDropdownButtonFormField<String>(
+                '동작 선택',
+                selectedAction,
+                ['on', 'off'], // 동작 선택 옵션
+                (String? value) {
+                  setState(() {
+                    selectedAction = value;
+                  });
+                },
+                (String action) =>
+                    action.toUpperCase(), // 'on' 또는 'off'를 대문자로 표시
               ),
             const SizedBox(height: 20), // 요소 사이의 간격
             buildDateTimePicker(
@@ -151,15 +168,23 @@ class _CreateReservationScreenState extends State<CreateReservationScreen> {
   }
 
   void createReservation() {
-    if (selectedRoom != null && selectedAppliance != null) {
+    if (selectedRoom != null &&
+        selectedAppliance != null &&
+        selectedAction != null) {
       final Reservation newReservation = Reservation(
         room: selectedRoom!,
         appliance: selectedAppliance!,
         date: selectedDate,
         time: selectedTime,
+        action: selectedAction!,
         isActive: true,
       );
-
+      print(newReservation.room.name);
+      print(newReservation.appliance.name);
+      print(newReservation.date);
+      print(newReservation.time);
+      print(newReservation.action);
+      print(newReservation.isActive);
       /*
         ---------------------서버에 전달하는 로직 추가---------------------
        */
@@ -171,7 +196,7 @@ class _CreateReservationScreenState extends State<CreateReservationScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('돌아가'),
-            content: const Text('방과 가전을 모두 선택해주세요.'),
+            content: const Text('방과 가전, 동작을 모두 선택해주세요.'),
             actions: <Widget>[
               TextButton(
                 child: const Text('확인'),

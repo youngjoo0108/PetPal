@@ -19,16 +19,10 @@ class _WeatherScreenState extends State<WeatherScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Column(
+      child: const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          OutdoorScreen(),
-          IndoorScreen(
-            inTemp: inTemp,
-            inHum: inHum,
-          )
-        ],
+        children: [OutdoorScreen(), IndoorScreen()],
       ),
     );
   }

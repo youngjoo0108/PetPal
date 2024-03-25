@@ -19,10 +19,10 @@ class _OutdoorScreenState extends State<OutdoorScreen> {
   @override
   void initState() {
     super.initState();
-    weather = 'Sunny';
     // 비동기 작업을 initState 내에서 스케줄링
     WidgetsBinding.instance.addPostFrameCallback((_) {
       fetchWeather('Seoul').then((data) {
+        weather = 'Sunny';
         if (mounted) {
           setState(() {
             // API에서 받은 데이터로 상태 업데이트
@@ -99,22 +99,39 @@ class _OutdoorScreenState extends State<OutdoorScreen> {
                                               10 *
                                               2,
                                     )
-                                  : Image.asset(
-                                      'asset/img/rainy.png',
-                                      width: MediaQuery.of(context).size.width /
-                                          18 *
-                                          2,
-                                      height:
-                                          MediaQuery.of(context).size.height /
+                                  : weather == "Rainy"
+                                      ? Image.asset(
+                                          'asset/img/rainy.png',
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              18 *
+                                              2,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height /
                                               10 *
                                               2,
-                                    ),
+                                        )
+                                      : Image.asset(
+                                          'asset/img/loading.png',
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              18 *
+                                              2,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height /
+                                              10 *
+                                              2,
+                                        ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Text(
-                    '외부 온도',
+                    '실외 온도',
                     style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
@@ -134,7 +151,7 @@ class _OutdoorScreenState extends State<OutdoorScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Text(
-                    '외부 습도',
+                    '실외 습도',
                     style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
