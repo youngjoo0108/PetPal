@@ -30,6 +30,14 @@ class NotiScreenState extends State<NotiScreen> {
   ];
 
   @override
+  void initState() {
+    /*
+    --------------DB에서 알림 가져오는 로직 추가
+     */
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(

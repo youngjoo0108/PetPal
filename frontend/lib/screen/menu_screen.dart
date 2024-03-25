@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/component/service/user_service.dart';
 import 'package:frontend/const/colors.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'login_screen.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -11,6 +11,8 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
+  UserService userService = UserService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,20 +117,14 @@ class _MenuScreenState extends State<MenuScreen> {
 
   void _onMenuItemTap(String title) {
     if (title == "로그아웃") {
-      _logout();
+      userService.logout().then((_) {
+        // 로그아웃 후 로그인 화면으로 이동
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      });
     }
-    // 다른 메뉴 항목에 대한 조건 분기를 여기에 추가할 수 있습니다.
-  }
-
-  void _logout() async {
-    const storage = FlutterSecureStorage();
-    await storage.delete(key: "isLoggedIn"); // 로그인 상태를 삭제합니다.
-
-    // 로그아웃 후 로그인 화면으로 이동합니다.
-    if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-    );
+    // 다른 메뉴 항목에 대한 조건 분기 추가
   }
 
   Widget _buildDivider() => const Divider(height: 1, thickness: 1);

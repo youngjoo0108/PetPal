@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<Map<String, dynamic>> fetchWeather(String city) async {
-  const apiKey = '64fe59603aa2261ee6110c1e5521c971';
+  final apiKey = dotenv.env['OPENWEATHERMAP_API_KEY'];
+  if (apiKey == null) {
+    throw Exception('API key not found');
+  }
   final requestUrl =
       'https://api.openweathermap.org/data/2.5/weather?q=$city&appid=$apiKey';
   final response = await http.get(Uri.parse(requestUrl));
