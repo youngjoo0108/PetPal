@@ -25,7 +25,7 @@ public class UserService {
 
     public Optional<UserDto> findById(Long userId){
         // 엔티티를 DTO로 변환하여 반환
-        return userRepository.findById(userId)
+        return userRepository.findByUserId(userId)
                 .map(user -> new UserDto(user.getUserId(), user.getEmail(), user.getPlatform(), user.getRefreshToken()));
     }
 
@@ -36,7 +36,7 @@ public class UserService {
     }
 
     public void update(UserDto userDto){
-        User user = userRepository.findById(userDto.getId())
+        User user = userRepository.findByUserId(userDto.getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user.setEmail(userDto.getEmail());
         user.setPlatform(userDto.getPlatform());
@@ -45,7 +45,7 @@ public class UserService {
     }
 
     public void updateRefreshToken(UserDto userDto){
-        User user = userRepository.findById(userDto.getId())
+        User user = userRepository.findByUserId(userDto.getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user.setRefreshToken(userDto.getRefreshToken());
         userRepository.save(user);
