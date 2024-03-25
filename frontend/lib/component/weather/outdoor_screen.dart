@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/component/service/fetch_weather.dart';
+import 'package:frontend/service/fetch_weather.dart';
 // import 'package:frontend/component/weather_screen.dart';
 // import 'package:frontend/component/weather_text.dart';
 import 'package:frontend/const/colors.dart';

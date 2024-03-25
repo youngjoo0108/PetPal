@@ -7,7 +7,7 @@ class UserService {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
   // 카카오톡 로그인
-  Future<void> loginWithKakao() async {
+  Future<bool> loginWithKakao() async {
     try {
       try {
         // 카카오톡을 통한 로그인 시도
@@ -23,9 +23,11 @@ class UserService {
        */
 
       await secureStorage.write(key: "isLoggedIn", value: "true");
+      return true;
       // 추가적으로 사용자 정보를 받아와서 처리하는 로직을 여기에 구현할 수 있습니다.
     } catch (error) {
       print(error.toString());
+      return false;
     }
   }
 

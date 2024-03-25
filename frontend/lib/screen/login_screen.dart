@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/component/service/user_service.dart';
+import 'package:frontend/const/global_alert_dialog.dart';
+import 'package:frontend/service/user_service.dart';
 import 'package:frontend/const/colors.dart';
 import 'package:frontend/screen/main_screen.dart';
 
@@ -37,11 +38,29 @@ class LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 10), // 로고와 로그인 버튼 사이의 간격을 조정합니다.
             // 카카오 로그인 이미지 버튼
             GestureDetector(
-              onTap: () => userService.loginWithKakao().then((_) {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const MainScreen()),
-                );
-              }),
+              onTap: () async {
+                bool isSuccess = await userService.loginWithKakao();
+                if (isSuccess) {
+                  // 로그인 성공 알림
+                  GlobalAlertDialog.show(
+                    context,
+                    title: "로그인 성공",
+                    message: "환영합니다!",
+                  ).then((_) {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                          builder: (context) => const MainScreen()),
+                    );
+                  });
+                } else {
+                  // 로그인 실패 알림
+                  GlobalAlertDialog.show(
+                    context,
+                    title: "로그인 실패",
+                    message: "다시 시도해주세요.",
+                  );
+                }
+              },
               child: Image.asset('asset/img/kakaoLogin.png'),
             ),
           ],
