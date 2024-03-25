@@ -1,6 +1,7 @@
 package com.ssafy.petpal.auth.service;
 
 import com.ssafy.petpal.auth.dto.KakaoInfoDto;
+import com.ssafy.petpal.auth.filter.JwtFilter;
 import com.ssafy.petpal.user.dto.UserDto;
 import com.ssafy.petpal.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,6 @@ import java.util.Map;
 @Slf4j
 public class KakaoOauthService {
     private final UserService userService;
-
     public KakaoOauthService(UserService userService) {
         this.userService = userService;
     }
@@ -24,7 +24,7 @@ public class KakaoOauthService {
         return WebClient.create()
                 .get()
                 .uri("https://kapi.kakao.com/v2/user/me")
-                .headers(httpHeaders -> httpHeaders.setBearerAuth(accessToken))
+                .headers(httpHeaders -> httpHeaders.setBearerAuth(accessToken.substring(7)))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                 .block();
