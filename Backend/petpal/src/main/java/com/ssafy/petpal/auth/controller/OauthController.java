@@ -31,6 +31,7 @@ public class OauthController {
         switch (provider) {
             case "kakao":
                 String accessToken = oauthService.loginWithKakao(oauthRequestDto.getAccessToken(), response);
+                log.error("access Token : " + accessToken);
                 oauthResponseDto.setAccessToken(accessToken);
         }
         return oauthResponseDto;
