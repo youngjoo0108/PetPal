@@ -5,6 +5,7 @@ from nav_msgs.msg import Odometry, OccupancyGrid
 from math import pi,cos,sin
 import tf2_ros
 import geometry_msgs.msg
+from std_msgs.msg import Int32, Int32MultiArray, MultiArrayLayout, MultiArrayDimension
 import time
 import numpy as np
 
@@ -28,22 +29,27 @@ class odom(Node):
 
         self.map_sub = self.create_subscription(OccupancyGrid,'map',self.map_callback,1) #tt
         self.odom_sub = self.create_subscription(Odometry,'odom',self.odom_callback,1)
-
+        self.test_pub = self.create_publisher(Int32MultiArray, 'route', 1)
 
         # 로봇의 pose를 저장해 publish 할 메시지 변수 입니다.
         self.odom_msg=Odometry()
         self.map_msg=OccupancyGrid() # tt
 
-        self.map_size_x=350
-        self.map_size_y=350
+        self.test_msg = Int32MultiArray()
+
+        self.map_size_x=700
+        self.map_size_y=700
         self.map_resolution=0.05
-        self.map_offset_x=-8-8.75
-        self.map_offset_y=-4-8.75
+        # self.map_offset_x=-8-8.75
+        # self.map_offset_y=-4-8.75
+        self.is_param = False
 
         self.map_to_grid = np.zeros((self.map_size_x, self.map_size_y))
 
         time_period = 0.5
         self.timer = self.create_timer(time_period, self.timer_callback)
+
+        self.start = [-1, -1]
 
 
     def pose_to_grid_cell(self,x,y):
@@ -66,14 +72,34 @@ class odom(Node):
 
 
     def odom_callback(self, msg):
+        if self.is_param == False:
+            self.is_param = True
+
+            self.map_offset_x= msg.pose.pose.position.x - (self.map_size_x*self.map_resolution*0.5)
+            self.map_offset_y= msg.pose.pose.position.y - (self.map_size_y*self.map_resolution*0.5)
+
         self.odom_msg = msg
 
     def timer_callback(self):
+        if self.is_param == False:
+            return
+
         x = self.odom_msg.pose.pose.position.x
         y = self.odom_msg.pose.pose.position.y
         cell_x, cell_y = self.pose_to_grid_cell(x,y)
-        print(cell_x, cell_y, ' - ' ,self.map_to_grid[cell_x][cell_y])
+        #print(cell_x, cell_y, ' - ' ,self.map_to_grid[cell_x][cell_y])
+        self.start = self.check()
+        #print(self.start)
+        self.test_msg.data = [1,2,3,4]
+        self.test_pub.publish(self.test_msg)
 
+
+    def check(self):
+        for i in range(self.map_size_x):
+            for j in range(self.map_size_y):
+                if self.map_to_grid[i, j] == 0:
+                    return [i, j]
+        return [-1, -1]
 
         
 def main(args=None):

@@ -62,7 +62,7 @@ class IMGParser(Node):
     
     def capture_callback(self, msg):
         self.publisher_.publish(msg)
-        self.get_logger().info('Publishing Capture: "%s"' % msg.data)
+        # self.get_logger().info('Publishing Capture: "%s"' % msg.data)
         
 
     def img_callback(self, msg):
