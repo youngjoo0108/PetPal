@@ -58,6 +58,6 @@ public class SecurityConfig {
         // 아래 url은 filter 에서 제외
         return web ->
                 web.ignoring()
-                        .requestMatchers("/login/**", "/token/refresh", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/webjars/**");
+                        .requestMatchers("api/v1/login/**", "/api/v1/token/refresh", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/webjars/**");
     }
 }
