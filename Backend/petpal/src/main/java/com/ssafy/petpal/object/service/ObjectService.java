@@ -23,8 +23,9 @@ public class ObjectService {
         ObjectEntity object = ObjectEntity.builder()
                 .imageId(objectRegisterDto.getImageId())
                 .objectType(objectRegisterDto.getObjectType())
-                .cordinate(objectRegisterDto.getCoordinate())
+                .cordinate(ObjectRegisterDto.locationToPoint(objectRegisterDto.getCoordinate()))
                 .build();
+
         ObjectEntity objectEntity = objectRepository.save(object);
         // 오브젝트의 타입 ex( 0: 처리대상, 1: 가전, etc...)
         int type =objectEntity.getObjectType();

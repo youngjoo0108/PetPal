@@ -15,19 +15,11 @@ public class Image {
     @Column(name = "image_id")
     private Long id;
 
-    @Column(name = "image_path")
-    private String imagePath;
-
-    @Column(name = "image_original_name")
-    private String imageOriginalName;
-
-    @Column(name = "image_changed_name")
-    private String imageChangedName;
+    @Column(name = "filename")
+    private String filename;
 
     @Builder
-    public Image(String imagePath, String imageOriginalName, String imageChangedName){
-        this.imagePath = imagePath;
-        this.imageOriginalName = imageOriginalName;
-        this.imageChangedName = imageChangedName;
+    public Image(String filename){
+        this.filename= filename;
     }
 }
