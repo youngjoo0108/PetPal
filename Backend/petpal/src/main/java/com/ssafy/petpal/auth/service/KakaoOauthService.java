@@ -39,6 +39,7 @@ public class KakaoOauthService {
                 .email(kakaoInfoDto.getEmail())
                 .platform("kakao")
                 .build();
+        log.error(userDto.toString() + " UserDto 확인");
         if(userService.findById(userDto.getId()).isPresent()) {
             userService.update(userDto);
         } else {

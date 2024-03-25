@@ -1,13 +1,11 @@
 package com.ssafy.petpal.user.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@ToString
 @AllArgsConstructor
 public class UserDto {
     private Long id;
