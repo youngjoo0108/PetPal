@@ -3,12 +3,14 @@ package com.ssafy.petpal.auth.service;
 import com.ssafy.petpal.auth.dto.KakaoInfoDto;
 import com.ssafy.petpal.user.dto.UserDto;
 import com.ssafy.petpal.user.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
 @Service
+@Slf4j
 public class KakaoOauthService {
     private final UserService userService;
 
@@ -18,6 +20,7 @@ public class KakaoOauthService {
 
     // 카카오Api 호출해서 AccessToken으로 유저정보 가져오기
     public Map<String, Object> getUserAttributesByToken(String accessToken){
+        log.error("gdgd" + accessToken);
         return WebClient.create()
                 .get()
                 .uri("https://kapi.kakao.com/v2/user/me")
