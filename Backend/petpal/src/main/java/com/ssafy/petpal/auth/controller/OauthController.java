@@ -10,10 +10,12 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
@@ -24,6 +26,7 @@ public class OauthController {
     @PostMapping("/login/oauth/{provider}")
     public OauthResponseDto login(@PathVariable String provider, @RequestBody OauthRequestDto oauthRequestDto,
                                   HttpServletResponse response) {
+        log.error("[ExceptionHandlerFilter] errMsg : " + oauthRequestDto.getAccessToken());
         OauthResponseDto oauthResponseDto = new OauthResponseDto();
         switch (provider) {
             case "kakao":
