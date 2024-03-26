@@ -34,6 +34,7 @@ setup(
             'mapping=test_209.make_map:main',
             'setting=test_209.map_setting:main',
             'route=test_209.patrol_route:main',
+            'resize=test_209.resize_map:main',
 
             # path planning
             'dijkstra=test_209.dijkstra:main',
@@ -42,6 +43,7 @@ setup(
 
             # iot control
             'iotcontrol=test_209.iot_control:main',
+            'handcontrol=test_209.hand_control:main',
 
             # dog tracking
             'tracking=test_209.tracking:main',

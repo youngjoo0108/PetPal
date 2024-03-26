@@ -24,9 +24,9 @@ setup(
             'udp_to_pub = ssafy_bridge.udp_to_pub:main',
             'udp_to_cam = ssafy_bridge.udp_to_cam:main',
             'cam_viewer = ssafy_bridge.cam_viewer:main',
-            'udp_to_laser = ssafy_bridge.udp_to_laser:main'
-            
-            
+            'udp_to_laser = ssafy_bridge.udp_to_laser:main',
+            'state_check = ssafy_bridge.state_check:main',
+            'state_write = ssafy_bridge.state_write:main',
 
         ],
     },
