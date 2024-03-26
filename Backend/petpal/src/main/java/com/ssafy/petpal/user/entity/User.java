@@ -17,7 +17,7 @@ public class User {
     private Long id;
 
     private Long userId;
-    private String email;
+    private String nickname;
     private String platform;
     private String refreshToken;
 }

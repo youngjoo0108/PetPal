@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class UserDto {
     private Long id;
-    private String email;
+    private String nickname;
     private String platform;
     private String refreshToken;
 }

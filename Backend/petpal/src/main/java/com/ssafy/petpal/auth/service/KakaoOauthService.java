@@ -35,7 +35,7 @@ public class KakaoOauthService {
         KakaoInfoDto kakaoInfoDto = new KakaoInfoDto(userAttributesByToken);
         UserDto userDto = UserDto.builder()
                 .id(kakaoInfoDto.getId())
-                .email(kakaoInfoDto.getEmail())
+                .nickname(kakaoInfoDto.getNickname())
                 .platform("kakao")
                 .build();
         if(userService.findById(userDto.getId()).isPresent()) {

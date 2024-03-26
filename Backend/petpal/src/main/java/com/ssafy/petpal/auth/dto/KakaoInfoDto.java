@@ -9,10 +9,11 @@ import java.util.Map;
 @AllArgsConstructor
 public class KakaoInfoDto {
     private Long id;
-    private String email;
+    private String nickname;
 
     public KakaoInfoDto(Map<String, Object> attributes) {
         this.id = Long.valueOf(attributes.get("id").toString());
-        this.email = attributes.get("email") != null ? attributes.get("email").toString() : "";
+        Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
+        this.nickname = properties != null ? properties.get("nickname").toString() : "";
     }
 }

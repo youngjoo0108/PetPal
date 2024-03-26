@@ -16,7 +16,7 @@ public class UserService {
     public void save(UserDto userDto){
         User user = User.builder()
                 .userId(userDto.getId())
-                .email(userDto.getEmail())
+                .nickname(userDto.getNickname())
                 .platform(userDto.getPlatform())
                 .refreshToken(userDto.getRefreshToken())
                 .build();
@@ -26,19 +26,19 @@ public class UserService {
     public Optional<UserDto> findById(Long userId){
         // 엔티티를 DTO로 변환하여 반환
         return userRepository.findByUserId(userId)
-                .map(user -> new UserDto(user.getUserId(), user.getEmail(), user.getPlatform(), user.getRefreshToken()));
+                .map(user -> new UserDto(user.getUserId(), user.getNickname(), user.getPlatform(), user.getRefreshToken()));
     }
 
     public UserDto findByRefreshToken(String refreshToken){
         // 엔티티를 DTO로 변환하여 반환
         User user = userRepository.findByRefreshToken(refreshToken);
-        return new UserDto(user.getUserId(), user.getEmail(), user.getPlatform(), user.getRefreshToken());
+        return new UserDto(user.getUserId(), user.getNickname(), user.getPlatform(), user.getRefreshToken());
     }
 
     public void update(UserDto userDto){
         User user = userRepository.findByUserId(userDto.getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        user.setEmail(userDto.getEmail());
+        user.setNickname(userDto.getNickname());
         user.setPlatform(userDto.getPlatform());
         user.setRefreshToken(userDto.getRefreshToken());
         userRepository.save(user);
