@@ -30,7 +30,7 @@ public class ControlController {
 
     @MessageMapping("control.message.{userId}")
     public void sendMessage(@Payload String rawMessage, @DestinationVariable String userId) throws JsonProcessingException {
-        logger.info("Received message: {}", rawMessage);
+//        logger.info("Received message: {}", rawMessage);
         ControlDto controlDto = objectMapper.readValue(rawMessage, ControlDto.class);
         rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "user." + userId, controlDto);
     }
