@@ -30,9 +30,11 @@ public class OauthController {
         OauthResponseDto oauthResponseDto = new OauthResponseDto();
         switch (provider) {
             case "kakao":
-                String accessToken = oauthService.loginWithKakao(oauthRequestDto.getAccessToken(), response);
-                log.error("access Token : " + accessToken);
-                oauthResponseDto.setAccessToken(accessToken);
+                String[] arr = oauthService.loginWithKakao(oauthRequestDto.getAccessToken(), response);
+                log.error("access Token : " + arr[0]);
+                log.error("refresh Token : " + arr[1]);
+                oauthResponseDto.setAccessToken(arr[0]);
+                oauthResponseDto.setRefreshToken(arr[1]);
         }
         return oauthResponseDto;
     }

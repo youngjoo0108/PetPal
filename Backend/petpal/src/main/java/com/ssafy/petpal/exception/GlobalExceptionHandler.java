@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(RuntimeException ex) {
+    public ResponseEntity<ErrorResponse> handleException(Exception ex) {
         logger.error("[Exception] errMsg : " + ex.getMessage());
         return new ResponseEntity(
                 new ErrorResponse(ex.getMessage()),

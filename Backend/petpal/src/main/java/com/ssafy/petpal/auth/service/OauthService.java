@@ -18,13 +18,13 @@ public class OauthService {
     private final KakaoOauthService kakaoOauthService;
 
     //카카오 로그인
-    public String loginWithKakao(String accessToken, HttpServletResponse response) {
+    public String[] loginWithKakao(String accessToken, HttpServletResponse response) {
         UserDto userDto = kakaoOauthService.getUserProfileByToken(accessToken);
         return getTokens(userDto.getId(), response);
     }
 
     //access Token, refresh Token 생성
-    public String getTokens(Long id, HttpServletResponse response) {
+    public String[] getTokens(Long id, HttpServletResponse response) {
         final String accessToken = jwtTokenService.createAccessToken(id.toString());
         final String refreshToken = jwtTokenService.createRefreshToken();
         log.error(accessToken + " access << >> refresh " + refreshToken);
@@ -35,7 +35,9 @@ public class OauthService {
         userService.updateRefreshToken(userDto);
 
         jwtTokenService.addRefreshTokenToCookie(refreshToken, response);
-        return accessToken;
+        String[] arr = new String[2];
+        arr[0] = accessToken; arr[1] = refreshToken;
+        return arr;
     }
 
     // refresh Token -> access Token 새로 갱신
