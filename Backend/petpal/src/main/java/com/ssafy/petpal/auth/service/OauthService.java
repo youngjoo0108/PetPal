@@ -18,23 +18,22 @@ public class OauthService {
     private final KakaoOauthService kakaoOauthService;
 
     //카카오 로그인
-    public String[] loginWithKakao(String accessToken, HttpServletResponse response) {
+    public String[] loginWithKakao(String accessToken) {
         UserDto userDto = kakaoOauthService.getUserProfileByToken(accessToken);
-        return getTokens(userDto.getId(), response);
+        return getTokens(userDto.getId());
     }
 
     //access Token, refresh Token 생성
-    public String[] getTokens(Long id, HttpServletResponse response) {
+    public String[] getTokens(Long id) {
         final String accessToken = jwtTokenService.createAccessToken(id.toString());
         final String refreshToken = jwtTokenService.createRefreshToken();
-        log.error(accessToken + " access << >> refresh " + refreshToken);
+
         UserDto userDto = userService.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
 
         userDto.setRefreshToken(refreshToken);
         userService.updateRefreshToken(userDto);
 
-//        jwtTokenService.addRefreshTokenToCookie(refreshToken, response);
         String[] arr = new String[2];
         arr[0] = accessToken; arr[1] = refreshToken;
         return arr;
