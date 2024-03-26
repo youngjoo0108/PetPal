@@ -5,25 +5,65 @@ from rclpy.node import Node
 from std_msgs.msg import String
 import pika
 import json
+import os
 
-amqp_url = 'amqp://user:password@hostname/vhost' ### <<< 설정 필요함
-url_params = pika.URLParameters(amqp_url)
 
 class LogPublisher(Node):
 
     def __init__(self):
         super().__init__('_subscriber')
-        self.subscription = self.create_subscription(
-            String,
-            'ros_log',
-            self.listener_callback,
-            10)
-        self.subscription  # prevent unused variable warning
         
-        self.amqp_connection = pika.BlockingConnection(url_params)
-        self.amqp_channel = self.amqp_connection.channel()
+        try:
+            rabbitmq_user = os.environ.get('LOG_RABBITMQ_ID')
+            rabbitmq_password = os.environ.get('LOG_RABBITMQ_PW')
+            rabbitmq_host = os.environ.get('LOG_RABBITMQ_HOST')
+            rabbitmq_port = os.environ.get('LOG_RABBITMQ_PORT')
+            
+            print(rabbitmq_user)
+            print(rabbitmq_password)
+            print(rabbitmq_host)
+            print(rabbitmq_port)
+            
+            amqp_url = 'amqp://{user}:{password}@{hostname}:{port}/'.format(
+                user=rabbitmq_user,
+                password=rabbitmq_password,
+                hostname=rabbitmq_host,
+                port=rabbitmq_port
+            )
+            
+            print(amqp_url)
+            
+            url_params = pika.URLParameters(amqp_url)
+            print(url_params)
 
-        self.amqp_channel.queue_declare(queue='log_queue')
+            self.amqp_connection = pika.BlockingConnection(url_params)
+            self.amqp_channel = self.amqp_connection.channel()
+
+            self.amqp_channel.queue_declare(queue='log_queue')
+            
+            print('Log Publisher : connecting RabbitMQ Clear')
+            
+            test_data = {
+                "level": "INFO",
+                "message": "This is a log message from ROS2."
+            }
+            self.amqp_callback(test_data)
+        except Exception as e:
+            print('Log Publisher : connecting RabbitMQ Error')
+            print(e)
+            
+        
+        try:
+            self.subscription = self.create_subscription(
+                String,
+                'ros_log',
+                self.listener_callback,
+                10)
+            self.subscription  # prevent unused variable warning
+            print('Log Publisher : subscript inner log topic Clear')
+        except Exception as e:
+            print('Log Publisher : subscript inner log topic Error')
+            print(e)
 
 
     def amqp_callback(self, log_data): ### <<< log_data 설정 필요함
