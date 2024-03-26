@@ -6,10 +6,12 @@ import com.ssafy.petpal.user.dto.UserDto;
 import com.ssafy.petpal.user.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class OauthService {
     private final UserService userService;
     private final JwtTokenService jwtTokenService;
@@ -25,7 +27,7 @@ public class OauthService {
     public String getTokens(Long id, HttpServletResponse response) {
         final String accessToken = jwtTokenService.createAccessToken(id.toString());
         final String refreshToken = jwtTokenService.createRefreshToken();
-
+        log.error(accessToken + " access << >> refresh " + refreshToken);
         UserDto userDto = userService.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
 
