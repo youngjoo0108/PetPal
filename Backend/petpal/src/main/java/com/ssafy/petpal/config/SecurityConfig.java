@@ -55,9 +55,10 @@ public class SecurityConfig {
     }
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer(){
-        // 아래 url은 filter 에서 제외
-        return web ->
-                web.ignoring()
-                        .requestMatchers("api/v1/login/**", "/api/v1/token/refresh", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/webjars/**");
+        return web -> web.ignoring()
+                .requestMatchers("/api/v1/login/**", "/api/v1/token/refresh")
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/webjars/**")
+                .requestMatchers("/static/**", "/css/**", "/js/**", "/assets/**"); // 정적 리소스 경로 추가
     }
+
 }

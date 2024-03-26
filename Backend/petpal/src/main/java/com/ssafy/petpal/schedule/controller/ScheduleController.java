@@ -21,7 +21,7 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @GetMapping
-    public ResponseEntity<List<ScheduleDto>> getSchedule(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
+    public ResponseEntity<List<ScheduleDto>> getSchedule(){
         List<ScheduleDto> response = new ArrayList<>();
         ScheduleDto sd = new ScheduleDto();
         sd.setRoom("RoomName?"); sd.setAppliance("Schedule Api Test DTO");
