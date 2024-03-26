@@ -88,14 +88,4 @@ public class JwtTokenService implements InitializingBean {
             return false;
         }
     }
-
-    //클라이언트 쿠키에 refresh Token 저장
-//    public void addRefreshTokenToCookie(String refreshToken, HttpServletResponse response) {
-//        long age = refreshTokenExpirationInSeconds;
-//        Cookie cookie = new Cookie("refresh_token",refreshToken);
-//        cookie.setPath("/");
-//        cookie.setMaxAge((int) age);
-//        cookie.setHttpOnly(true);
-//        response.addCookie(cookie);
-//    }
 }

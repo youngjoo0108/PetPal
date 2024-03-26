@@ -26,7 +26,7 @@ public class OauthController {
     @PostMapping("/login/oauth/{provider}")
     public OauthResponseDto login(@PathVariable String provider, @RequestBody OauthRequestDto oauthRequestDto,
                                   HttpServletResponse response) {
-        log.error("[ExceptionHandlerFilter] errMsg : " + oauthRequestDto.getAccessToken());
+//        log.error("[ExceptionHandlerFilter] errMsg : " + oauthRequestDto.getAccessToken());
         OauthResponseDto oauthResponseDto = new OauthResponseDto();
         switch (provider) {
             case "kakao":

@@ -20,7 +20,6 @@ public class KakaoOauthService {
 
     // 카카오Api 호출해서 AccessToken으로 유저정보 가져오기
     public Map<String, Object> getUserAttributesByToken(String accessToken){
-        log.error("gdgd" + accessToken);
         return WebClient.create()
                 .get()
                 .uri("https://kapi.kakao.com/v2/user/me")
@@ -39,7 +38,6 @@ public class KakaoOauthService {
                 .email(kakaoInfoDto.getEmail())
                 .platform("kakao")
                 .build();
-        log.error(userDto.toString() + " UserDto 확인");
         if(userService.findById(userDto.getId()).isPresent()) {
             userService.update(userDto);
         } else {
