@@ -3,7 +3,8 @@ from rclpy.node import Node
 
 from std_msgs.msg import String
 import json
-from geometry_msgs.msg import Twist, PoseStamped
+from geometry_msgs.msg import Twist, PoseStamped, Point32
+from sensor_msgs.msg import LaserScan
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry, Path
 from std_msgs.msg import Int32
@@ -26,6 +27,8 @@ class TestTracking(Node):
         self.timer = self.create_timer(1, self.timer_callback)
         self.cmd_pub = self.create_publisher(Twist, 'cmd_vel', 10)
         self.tracking_pub = self.create_publisher(Int32, 'tracking_err', 10)
+
+        self.lidar_sub = self.create_subscription(LaserScan, '/scan', self.lidar_callback, 10)
 
         self.yolo_sub  # prevent unused variable warning
         self.goal_msg = PoseStamped()
@@ -51,6 +54,9 @@ class TestTracking(Node):
         self.turtlebot_to_dog_theta = 0.0
         self.turtlebot_to_dog_distance = 0.0
 
+        #lidar callback
+        
+
         # retry
 
         self.params_cam = {
@@ -67,6 +73,25 @@ class TestTracking(Node):
             "Y": 0,
             "Z": 0.19
         }
+
+
+    def lidar_callback(self, msg):
+        if self.is_dog == True:
+            possible_list = []
+            for angle, r in enumerate(msg.ranges):
+                if r < 2:
+                    possible_list.append((angle, r))
+            print(possible_list)
+        
+        # for angle,r in enumerate(msg.ranges):
+        #     lidar_point = Point32()
+
+        # if 0.0 < r < 12:
+        #     lidar_point.x = r*cos(angle*pi/180)
+        #     lidar_point.y = r*sin(angle*pi/180)
+        #     pcd_msg.points.append(lidar_point)
+    
+    
 
 
     def listener_callback(self, msg):
@@ -93,7 +118,8 @@ class TestTracking(Node):
                 # self.goal_x = self.robot_pose_x + x_lidar
                 # self.goal_y = self.robot_pose_y + y_lidar
                 # print(f"Transformed Lidar Coordinates: x={self.robot_pose_x}, y={self.robot_pose_y}")
-                print(f"x={self.robot_pose_x}, y={self.robot_pose_y} // x={self.goal_x}, y={self.goal_y}")
+                # print(f"x={self.robot_pose_x}, y={self.robot_pose_y} // x={self.goal_x}, y={self.goal_y}")
+                
 
 
 
