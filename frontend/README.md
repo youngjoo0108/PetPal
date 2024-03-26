@@ -1,6 +1,6 @@
-# frontend
+# About
 
-PETPAL frontend
+Frontend source of project PETPAL
 
 ## Structure
 ```
