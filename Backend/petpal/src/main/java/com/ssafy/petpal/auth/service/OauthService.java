@@ -34,7 +34,7 @@ public class OauthService {
         userDto.setRefreshToken(refreshToken);
         userService.updateRefreshToken(userDto);
 
-        jwtTokenService.addRefreshTokenToCookie(refreshToken, response);
+//        jwtTokenService.addRefreshTokenToCookie(refreshToken, response);
         String[] arr = new String[2];
         arr[0] = accessToken; arr[1] = refreshToken;
         return arr;
