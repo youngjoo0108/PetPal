@@ -11,9 +11,19 @@ import base64
 import logging
 import time
 
+from ros_log_package.RosLogPublisher import RosLogPublisher
+
+
 class WebSocketClientNode(Node):
     def __init__(self):
         super().__init__('websocket_client_node')
+        
+        self.ros_log_pub = None
+        try:
+            self.ros_log_pub = RosLogPublisher(self)
+        except Exception as e:
+            self.get_logger().error('Subscription initialization error: {}'.format(e))
+        
         try:
             self.video_subscription = self.create_subscription(
                 CompressedImage,
@@ -21,7 +31,7 @@ class WebSocketClientNode(Node):
                 self.video_callback,
                 10)
         except Exception as e:
-            self.get_logger().error('Subscription initialization error: {}'.format(e))
+            self.ros_log_pub.publish_log('Subscription initialization error: {}'.format(e))
              
         try:
             self.data_subscription = self.create_subscription(
@@ -30,7 +40,7 @@ class WebSocketClientNode(Node):
                 self.data_callback,
                 20)
         except Exception as e:
-            self.get_logger().error('Subscription initialization error: {}'.format(e))
+            self.ros_log_pub.publish_log('Subscription initialization error: {}'.format(e))
             
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop) # 변경: asyncio 이벤트 루프를 명시적으로 설정
@@ -50,13 +60,13 @@ class WebSocketClientNode(Node):
             sub_offer = stomper.subscribe("/exchange/control.exchange/user.1", "user.10")
             await self.websocket.send(sub_offer)
         except Exception as e:
-            self.get_logger().error('WebSocket connection error: {}'.format(e))
+            self.ros_log_pub.publish_log('WebSocket connection error: {}'.format(e))
             self.websocket = None # 변경: 연결 실패 시 websocket을 None으로 설정
             
     async def ensure_websocket_connected(self):
         if self.websocket is None or self.websocket.closed:
             await self.connect_websocket() # 변경: 웹소켓이 연결되지 않았거나 닫혀있으면 재연결 시도
-            print("connected", time.strftime('%X', time.localtime()))
+            self.ros_log_pub.publish_log(f"connected {time.strftime('%X', time.localtime())}")
             
     async def send_message(self, msg):
         await self.ensure_websocket_connected() # 변경: 메시지 전송 전에 웹소켓 연결 상태 확인
@@ -75,15 +85,13 @@ class WebSocketClientNode(Node):
             }
             await self.send_message(msg) # 변경: send_message 함수를 통해 메시지 전송
         except Exception as e:
-            self.get_logger().error('Sending video error: {}'.format(e))
+            self.ros_log_pub.publish_log('Sending video error: {}'.format(e))
             self.websocket = None # 변경: 오류 발생 시 websocket을 None으로 재설정하여 재연결 로직을 트리거
     
     async def send_data(self, data_msg):
         try:
             now = time.localtime()
             json_data = json.loads(data_msg)
-            # print(json_data)
-            # print(json_data['type'])
             
             msg = {
                 "type": json_data['type'], 
@@ -93,7 +101,7 @@ class WebSocketClientNode(Node):
             }
             await self.send_message(msg) # 변경: send_message 함수를 통해 메시지 전송
         except Exception as e:
-            self.get_logger().error('Sending video error: {}'.format(e))
+            self.ros_log_pub.publish_log('Sending video error: {}'.format(e))
             self.websocket = None
     
     def video_callback(self, msg):

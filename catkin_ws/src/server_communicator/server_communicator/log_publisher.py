@@ -74,7 +74,7 @@ class LogPublisher(Node):
         log_message = json.dumps(log_data)
         
         self.amqp_channel.basic_publish(exchange='', ### <<< 교환기 이름 정하고, 설정 필요함
-                                   routing_key='log_queue', ### <<< 메세지가 전달될 큐의 이름 교환기를 정한다면 필요 없을지도?
+                                   routing_key='ros2_level_log', ### <<< 메세지가 전달될 큐의 이름 교환기를 정한다면 필요 없을지도?
                                    body=log_message)
         self.get_logger().info('Log message sent to RabbitMQ: %s' % log_message)
 
