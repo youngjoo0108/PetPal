@@ -22,7 +22,7 @@ from std_msgs.msg import Float32,Int8MultiArray
 class Controller(Node):
 
     def __init__(self):
-        super().__init__('sub1_controller')
+        super().__init__('controller')
         ## 메시지 송신을 위한 PUBLISHER 생성
         # self.cmd_publisher = self.create_publisher(Twist, 'cmd_vel', 10)
         self.app_control_pub = self.create_publisher(Int8MultiArray, 'app_control', 10)
@@ -163,9 +163,9 @@ class Controller(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    sub1_controller = Controller()
-    rclpy.spin(sub1_controller)
-    sub1_controller.destroy_node()
+    controller = Controller()
+    rclpy.spin(controller)
+    controller.destroy_node()
     rclpy.shutdown()
 
 

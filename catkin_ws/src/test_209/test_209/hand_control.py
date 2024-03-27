@@ -1,4 +1,4 @@
-import rclpy
+import rclpy, time
 from rclpy.node import Node
 import os, time
 from ssafy_msgs.msg import TurtlebotStatus,HandControl
@@ -24,10 +24,11 @@ class Handcontrol(Node):
         super().__init__('hand_control')
                 
         ## 로직 1. publisher, subscriber 만들기
-        self.hand_control = self.create_publisher(HandControl, '/hand_control', 10)                
+        self.hand_control_pub = self.create_publisher(HandControl, '/hand_control', 10)                
+        # self.hand_control_sub = self.create_subscription(HandControl, '/hand_control', self. , 10)                
         self.turtlebot_status = self.create_subscription(TurtlebotStatus,'/turtlebot_status',self.turtlebot_status_cb,10)
 
-        self.timer = self.create_timer(1, self.timer_callback)
+        # self.timer = self.create_timer(1, self.timer_callback)
         
         ## 제어 메시지 변수 생성 
         self.hand_control_msg=HandControl()        
@@ -37,32 +38,41 @@ class Handcontrol(Node):
         self.is_turtlebot_status = False
         
 
-    def timer_callback(self):
-        # while True:
-            # 로직 2. 사용자 메뉴 구성
-            print('Select Menu [0: status_check, 1: preview, 2:pick_up, 3:put_down')
-            menu=input(">>")
-            if menu=='0' :
-                self.hand_control_status()
-            if menu=='1' :
-                self.hand_control_preview()               
-            if menu=='2' :
-                self.hand_control_pick_up()   
-            if menu=='3' :
-                self.hand_control_put_down()
-
+    # def timer_callback(self):
+        
+    #     print('Select Menu [0: status_check, 1: preview, 2:pick_up, 3:put_down')
+    #     menu=input(">>")
+    #     while True:
+    #         # 로직 2. 사용자 메뉴 구성
+    #         print(menu)
+    #         if menu=='0' :
+    #             self.hand_control_status()
+    #             break
+    #         if menu=='1' :
+    #             self.hand_control_preview()
+    #             break               
+    #         if menu=='2' :
+    #             self.hand_control_pick_up()
+    #             if self.turtlebot_status_msg.can_put == False:
+    #                 break
+    #             menu = '2'
+    #         if menu=='3' :
+    #             self.hand_control_put_down()
+    #             if self.turtlebot_status_msg.can_use_hand == False:
+    #                 break
+    #             menu == '3'
 
     def hand_control_status(self):
         # 로직 3. Hand Control Status 출력
         if self.is_turtlebot_status:
-            print(f"Turtlebot Status - lift: {self.turtlebot_status_msg.can_lift}, put: {self.turtlebot_status_msg.can_put}")
+            print(f"Turtlebot Status - can_lift: {self.turtlebot_status_msg.can_lift}, put: {self.turtlebot_status_msg.can_put}, is_lifted: {self.turtlebot_status_msg.can_use_hand}")
         else:
             print("Turtlebot status is not yet received.")
 
     def hand_control_preview(self):
         # 로직 4. Hand Control - Preview
         self.hand_control_msg.control_mode = 1  # 가정된 control_mode 값
-        self.hand_control.publish(self.hand_control_msg)
+        self.hand_control_pub.publish(self.hand_control_msg)
         print("Hand control preview mode activated.")
 
     def hand_control_pick_up(self):
@@ -70,21 +80,54 @@ class Handcontrol(Node):
         self.hand_control_msg.control_mode = 2  # 가정된 control_mode 값
         self.hand_control_msg.put_distance = 1.0
         self.hand_control_msg.put_height = 0.0
-        self.hand_control.publish(self.hand_control_msg)
+        # while self.turtlebot_status_msg.can_put == False:
+        self.hand_control_pub.publish(self.hand_control_msg)
+        # print('logic1')
+            
         print("Hand control pick-up mode activated.")
+        
 
     def hand_control_put_down(self):
         # 로직 6. Hand Control - Put down
         self.hand_control_msg.control_mode = 3  # 가정된 control_mode 값
         self.hand_control_msg.put_distance = 1.0
-        self.hand_control_msg.put_height = 0.0
-        self.hand_control.publish(self.hand_control_msg)
+        self.hand_control_msg.put_height = 0.5
+        # while self.turtlebot_status_msg.can_use_hand == True:
+        
+        self.hand_control_pub.publish(self.hand_control_msg)
         print("Hand control put-down mode activated.")
-
+        
 
     def turtlebot_status_cb(self,msg):
         self.is_turtlebot_status=True
         self.turtlebot_status_msg=msg
+
+        print('Select Menu [0: status_check, 1: preview, 2:pick_up, 3:put_down')
+        menu=input(">>")
+        # while True:
+            # 로직 2. 사용자 메뉴 구성
+        print(menu)
+        if menu=='0' :
+            self.hand_control_status()
+            
+        if menu=='1' :
+            self.hand_control_preview()
+                           
+        if menu=='2' :
+            while self.turtlebot_status_msg.can_lift == True:
+                print(self.turtlebot_status_msg.can_lift)
+                if self.turtlebot_status_msg.can_lift == False:
+                    break
+                self.hand_control_pick_up()
+
+                
+        if menu=='3' :
+            
+            while self.turtlebot_status_msg.can_use_hand == True:
+                print(self.turtlebot_status_msg.can_use_hand)
+                if self.turtlebot_status_msg.can_use_hand == False:
+                    break
+                self.hand_control_put_down()
         
 
 def main(args=None):
