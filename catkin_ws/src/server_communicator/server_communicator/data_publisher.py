@@ -1,94 +1,112 @@
-#It is for Send data to Server
 import rclpy
 from rclpy.node import Node
-
+from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import String
+import asyncio
+import websockets
+import threading
+import stomper
 import json
-import stomp
-import os
+import base64
+import logging
+import time
 
-
-class DataPublisher(Node):
-
+class WebSocketClientNode(Node):
     def __init__(self):
-        super().__init__('data_publisher')
-        self.subscription = self.create_subscription(
-            String,
-            'ros/data',
-            self.listener_callback,
-            10)
-        self.subscription  # prevent unused variable warning
+        super().__init__('websocket_client_node')
+        try:
+            self.video_subscription = self.create_subscription(
+                CompressedImage,
+                '/image_jpeg/compressed',
+                self.video_callback,
+                10)
+        except Exception as e:
+            self.get_logger().error('Subscription initialization error: {}'.format(e))
+             
+        try:
+            self.data_subscription = self.create_subscription(
+                String,
+                '/to_server/data',
+                self.data_callback,
+                20)
+        except Exception as e:
+            self.get_logger().error('Subscription initialization error: {}'.format(e))
+            
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.loop) # 변경: asyncio 이벤트 루프를 명시적으로 설정
         
+        self.ws_url = "wss://j10a209.p.ssafy.io/api/ws"
+        self.websocket = None
+        
+        threading.Thread(target=self.run_asyncio_loop, daemon=True).start() # 변경: 쓰레드 내에서 이벤트 루프 실행
+        
+    def run_asyncio_loop(self):
+        self.loop.run_forever()
+        
+    async def connect_websocket(self):
         try:
-            self.server_host = 'wss://{url}/api/ws'.format(
-                    url=os.environ.get('LOG_RABBITMQ_HOST')
-                )
-            self.user_id = 209
-            self.conn = stomp.Connection([(self.server_host, 6163)])
-            self.conn.set_listener('', MyListener())
-            self.conn.connect(wait=True)
-            print('Data Publisher : Connecting Stomp Clear')
+            self.websocket = await websockets.connect(self.ws_url, max_size=2**20, max_queue=2**5)
+            await self.websocket.send("CONNECT\naccept-version:1.0,1.1,2.0\n\n\x00\n")
+            sub_offer = stomper.subscribe("/exchange/control.exchange/user.1", "user.10")
+            await self.websocket.send(sub_offer)
         except Exception as e:
-            print('Data Publisher : Connecting Stomp Error')
-            print(e)
+            self.get_logger().error('WebSocket connection error: {}'.format(e))
+            self.websocket = None # 변경: 연결 실패 시 websocket을 None으로 설정
             
+    async def ensure_websocket_connected(self):
+        if self.websocket is None or self.websocket.closed:
+            await self.connect_websocket() # 변경: 웹소켓이 연결되지 않았거나 닫혀있으면 재연결 시도
+            print("connected", time.strftime('%X', time.localtime()))
             
+    async def send_message(self, msg):
+        await self.ensure_websocket_connected() # 변경: 메시지 전송 전에 웹소켓 연결 상태 확인
+        send = stomper.send("/pub/control.message.1", json.dumps(msg))
+        await self.websocket.send(send)
+        
+    async def send_video(self, video_image):
         try:
-            subscription_url = f"/exchange/control.exchange/user.{self.user_id}"
-            self.conn.subscribe(destination=subscription_url, id=1, ack='auto')
-            print('Data Publisher : Stomp Subscribe Clear')
-        except Exception as e:
-            print('Data Publisher : Stomp Subscribe Error')
-            print(e)
-            
-            
-        try:
-            test_data = {
-                "type" : "control",
-                "sender" : "##",
-                "message" : "@@@"
+            video_image_base64 = base64.b64encode(video_image).decode('utf-8')
+            now = time.localtime()
+            msg = {
+                "type": "video_streaming", 
+                "sender": "user_1",
+                "time": time.strftime('%X', now),
+                "message": video_image_base64
             }
-            self.send_message(json.dumps(test_data))
+            await self.send_message(msg) # 변경: send_message 함수를 통해 메시지 전송
         except Exception as e:
-            print('Data Publisher : Send Test Message Error')
-            print(e)
-
-    def listener_callback(self, msg):
-        self.get_logger().info('I heard: "%s"' % msg.data)
+            self.get_logger().error('Sending video error: {}'.format(e))
+            self.websocket = None # 변경: 오류 발생 시 websocket을 None으로 재설정하여 재연결 로직을 트리거
+    
+    async def send_data(self, data_msg):
         try:
-            self.send_message(msg)
-        except Exception as e:
-            self.get_logger().error(f"STOMP message send error: {e}")
+            now = time.localtime()
+            json_data = json.loads(data_msg)
+            # print(json_data)
+            # print(json_data['type'])
             
-
-    def send_message(self, message):
-        try:
-            destination_queue = f"/pub/control.message.{self.user_id}"
-            self.conn.send(body=message, destination=destination_queue)
-            print('Data Publisher : Send Message Clear')
+            msg = {
+                "type": json_data['type'], 
+                "sender": "user_1",
+                "time": time.strftime('%X', now),
+                "message": json_data['message']
+            }
+            await self.send_message(msg) # 변경: send_message 함수를 통해 메시지 전송
         except Exception as e:
-            print('Data Publisher : Send Message Error')
-            print(e)
+            self.get_logger().error('Sending video error: {}'.format(e))
+            self.websocket = None
+    
+    def video_callback(self, msg):
+        asyncio.run_coroutine_threadsafe(self.send_video(msg.data), self.loop) # 변경 없음
         
-    def __del__(self):
-        self.conn.disconnect()
+    def data_callback(self, msg):
+        asyncio.run_coroutine_threadsafe(self.send_data(msg.data), self.loop) # 변경 없음
         
-        
-class MyListener(stomp.ConnectionListener):
-    def on_error(self, frame):
-        print('Received an error: "%s"' % frame.body)
-
-    def on_message(self, frame):
-        print('Received a message: "%s"' % frame.body)
-
-
 def main(args=None):
     rclpy.init(args=args)
-    stomp_publisher = DataPublisher()
-    rclpy.spin(stomp_publisher)
-
-    stomp_publisher.conn.disconnect()
-    stomp_publisher.destroy_node()
+    websocket_client_node = WebSocketClientNode()
+    rclpy.spin(websocket_client_node)
+    websocket_client_node.destroy_node()
     rclpy.shutdown()
 
 if __name__ == '__main__':

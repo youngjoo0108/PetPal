@@ -59,6 +59,15 @@ class IMGParser(Node):
         except:
             print('init image subscription error')
             
+        # try:
+        #     self.publisher_data = self.create_publisher(String, '/to_server/data', 20)
+        # except:
+        #     print("init publisher data error")
+            
+            
+    # def test_data_publish(self, msg):
+    #     self.publisher_data.publish(msg)
+            
     
     def capture_callback(self, msg):
         self.publisher_.publish(msg)
@@ -130,11 +139,8 @@ class IMGParser(Node):
             
         # 로직 5. 이미지 출력 (cv2.imshow)       
         
-        re_img = cv2.resize(img_bgr, (0, 0), fx=2, fy=2, interpolation=cv2.INTER_NEAREST)
-
-        cv2.imshow("re_img", re_img)
-        # cv2.imshow("img_gray", img_gray)
-        # cv2.imshow("resize and gray", img_resize)       
+        # re_img = cv2.resize(img_bgr, (0, 0), fx=2, fy=2, interpolation=cv2.INTER_NEAREST)
+        # cv2.imshow("re_img", re_img)      
         
         cv2.waitKey(1)
 
