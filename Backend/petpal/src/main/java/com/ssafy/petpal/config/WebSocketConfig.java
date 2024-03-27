@@ -3,17 +3,21 @@ package com.ssafy.petpal.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
-
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
     @Value("${spring.rabbitmq.host}")
     private String host;
 
@@ -22,12 +26,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Value("${spring.rabbitmq.password}")
     private String password;
-
-    @Value("${rabbitmq.client.id}")
-    private String clientId;
-
-    @Value("{rabbitmq.client.pw}")
-    private String clientPw;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -46,8 +44,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/api/ws")
-                .setAllowedOriginPatterns("*");
-//        .withSockJS();
+        registry.addEndpoint("/api/ws").setAllowedOriginPatterns("*");
+        // .withSockJS();
+    }
+
+    @Override
+    public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
+        // Custom converter for JSON messages
+        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+        messageConverters.add(converter);
+        return false; // Keep the default converters as well
     }
 }
