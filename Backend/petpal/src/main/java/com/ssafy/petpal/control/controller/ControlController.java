@@ -35,6 +35,8 @@ public class ControlController {
         rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "user." + userId, controlDto);
     }
 
+
+
     @RabbitListener(queues = CONTROL_QUEUE_NAME)
     public void receive(ControlDto controlDto) {}
 }

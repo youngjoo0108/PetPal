@@ -8,5 +8,6 @@ import lombok.Setter;
 public class ControlDto {
     private String type;
     private String sender;
+    private String time;
     private String message;
 }
