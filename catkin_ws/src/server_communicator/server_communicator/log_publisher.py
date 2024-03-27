@@ -57,7 +57,7 @@ class LogPublisher(Node):
             self.subscription = self.create_subscription(
                 String,
                 'ros_log',
-                self.listener_callback,
+                self.log_callback,
                 10)
             self.subscription  # prevent unused variable warning
             print('Log Publisher : subscript inner log topic Clear')
@@ -79,7 +79,7 @@ class LogPublisher(Node):
         self.get_logger().info('Log message sent to RabbitMQ: %s' % log_message)
 
 
-    def listener_callback(self, msg):
+    def log_callback(self, msg):
         log_data = {"level": "INFO", "message": msg.data}  # msg.data를 직접 사용
         self.amqp_callback(log_data)  # 수정된 호출 방식
         self.get_logger().info('I heard: "%s"' % msg.data)
