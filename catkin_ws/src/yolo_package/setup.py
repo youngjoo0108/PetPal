@@ -22,7 +22,7 @@ setup(
         'console_scripts': [
             'yolo = yolo_package.yolo:main',
             'yolo_sub = yolo_package.yolo_subscriber:main',
-            # 'save_camera = yolo_package.save_camera:main',
+            'save_camera = yolo_package.save_camera:main',
         ],
     },
 )

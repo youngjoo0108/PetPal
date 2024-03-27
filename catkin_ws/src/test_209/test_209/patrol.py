@@ -18,19 +18,17 @@ class followTheCarrot(Node):
         self.status_sub = self.create_subscription(TurtlebotStatus, 'turtlebot_status', self.status_callback, 10)
         self.path_sub = self.create_subscription(Path, '/local_path', self.path_callback, 10)
         self.lidar_sub = self.create_subscription(LaserScan, '/scan', self.lidar_callback, 10)
-        self.error_sub = self.create_subscription(Int32, '/err', self.error_callback, 1)
         self.patrol_pub = self.create_publisher(Int32, 'patrol', 1)
 
         time_period = 0.05
         self.timer = self.create_timer(time_period, self.timer_callback)
 
-        self.error_type = 0
         self.is_odom = False
         self.is_path = False
         self.is_status = False
         self.is_lidar = False
         self.collision = False
-        self.goal = False
+
         self.odom_msg = Odometry()
         self.patrol_msg = Int32()
 
@@ -56,106 +54,84 @@ class followTheCarrot(Node):
                 self.cmd_msg.linear.x = 0.2
                 self.cmd_msg.angular.z = 0.0
 
-    def error_callback(self, msg):
-        self.error_type = msg.data
-
     def timer_callback(self):
-        if self.goal:
-            return
+        if self.is_status and self.is_odom == True and self.is_path == True and self.is_lidar == True:
+            if len(self.path_msg.poses) > 2:
+                self.is_look_forward_point = False
+                self.patrol_msg.data = 0
+                self.patrol_pub.publish(self.patrol_msg)
 
-        if self.error_type == 1 or self.error_type == 4: # astar 에러/목적지 너무 가까움
-            self.cmd_msg.linear.x = 0.0
-            self.cmd_msg.angular.z = 0.2
+                robot_pose_x = self.odom_msg.pose.pose.position.x
+                robot_pose_y = self.odom_msg.pose.pose.position.y
+                lateral_error = sqrt(pow(self.path_msg.poses[0].pose.position.x - robot_pose_x,2)+pow(self.path_msg.poses[0].pose.position.y - robot_pose_y,2))
 
-        elif self.error_type == 2: # 현재 위치 장애물과 너무 가까움
-            self.lidar_check_move()
+                self.lfd = (self.status_msg.twist.linear.x + lateral_error)*0.5
 
-        # elif self.error_type == 3:
-        #     self.lidar_check_move()
+                if self.lfd < self.min_lfd:
+                    self.lfd = self.min_lfd
+                if self.lfd > self.max_lfd:
+                    self.lfd = self.max_lfd
 
-        elif self.error_type == 100: # 탐색 완료
-            self.cmd_msg.linear.x = 0.0
-            self.cmd_msg.angular.z = 0.0
-            self.goal = True
+                min_dis = float('inf')
 
-        else:
-            if self.is_status and self.is_odom == True and self.is_path == True and self.is_lidar == True:
-                if len(self.path_msg.poses) > 2:
-                    self.is_look_forward_point = False
-                    self.patrol_msg.data = 0
-                    self.patrol_pub.publish(self.patrol_msg)
+                for num, waypoint in enumerate(self.path_msg.poses):
+                    self.current_point = waypoint.pose.position
 
-                    robot_pose_x = self.odom_msg.pose.pose.position.x
-                    robot_pose_y = self.odom_msg.pose.pose.position.y
-                    lateral_error = sqrt(pow(self.path_msg.poses[0].pose.position.x - robot_pose_x,2)+pow(self.path_msg.poses[0].pose.position.y - robot_pose_y,2))
+                    dis = sqrt(pow(self.path_msg.poses[0].pose.position.x - self.current_point.x, 2) + pow(self.path_msg.poses[0].pose.position.y - self.current_point.y, 2))
+                    if abs(dis-self.lfd) < min_dis:
+                        min_dis = abs(dis-self.lfd)
+                        self.forward_point = self.current_point
+                        self.is_look_forward_point = True
 
-                    self.lfd = (self.status_msg.twist.linear.x + lateral_error)*0.5
+                if self.is_look_forward_point:
+                    global_forward_point = [self.forward_point.x, self.forward_point.y, 1]
 
-                    if self.lfd < self.min_lfd:
-                        self.lfd = self.min_lfd
-                    if self.lfd > self.max_lfd:
-                        self.lfd = self.max_lfd
+                trans_matrix = np.array([
+                    [cos(self.robot_yaw), -sin(self.robot_yaw), robot_pose_x],
+                    [sin(self.robot_yaw), cos(self.robot_yaw), robot_pose_y],
+                    [0,0,1]
+                ])
 
-                    min_dis = float('inf')
+                det_trans_matrix = np.linalg.inv(trans_matrix)
+                local_forward_point = det_trans_matrix.dot(global_forward_point)
+                theta = -atan2(local_forward_point[1], local_forward_point[0])
 
-                    for num, waypoint in enumerate(self.path_msg.poses):
-                        self.current_point = waypoint.pose.position
-
-                        dis = sqrt(pow(self.path_msg.poses[0].pose.position.x - self.current_point.x, 2) + pow(self.path_msg.poses[0].pose.position.y - self.current_point.y, 2))
-                        if abs(dis-self.lfd) < min_dis:
-                            min_dis = abs(dis-self.lfd)
-                            self.forward_point = self.current_point
-                            self.is_look_forward_point = True
-
-                    if self.is_look_forward_point:
-                        global_forward_point = [self.forward_point.x, self.forward_point.y, 1]
-
-                    trans_matrix = np.array([
-                        [cos(self.robot_yaw), -sin(self.robot_yaw), robot_pose_x],
-                        [sin(self.robot_yaw), cos(self.robot_yaw), robot_pose_y],
-                        [0,0,1]
-                    ])
-
-                    det_trans_matrix = np.linalg.inv(trans_matrix)
-                    local_forward_point = det_trans_matrix.dot(global_forward_point)
-                    theta = -atan2(local_forward_point[1], local_forward_point[0])
-
-                    if self.collision:
-                        if theta < 0:
-                            self.cmd_msg.linear.x = 0.0
-                            self.cmd_msg.angular.z = -0.2
-                        else:
-                            self.cmd_msg.linear.x = 0.0
-                            self.cmd_msg.angular.z = 0.2
-                    
+                if self.collision:
+                    if theta < 0:
+                        self.cmd_msg.linear.x = 0.0
+                        self.cmd_msg.angular.z = -0.2
                     else:
-                        if theta > 1.5 or theta < -1.5:
-                            self.cmd_msg.linear.x = 0.0
-                            self.cmd_msg.angular.z = theta/2
-
-                        elif 0.7 < theta < 1.5 or -1.5 < theta < -0.7:
-                            self.cmd_msg.linear.x = 0.2
-                            self.cmd_msg.angular.z = theta/3
-                        
-                        elif 0.2 < theta <= 0.7 or -0.7 <= theta < -0.2:
-                            self.cmd_msg.linear.x = 0.5
-                            self.cmd_msg.angular.z = theta/4
-
-                        else:
-                            if 0.2 < self.lidar_msg.ranges[0]/5 < 1.0:
-                                self.cmd_msg.linear.x = self.lidar_msg.ranges[0]/5
-                            elif self.lidar_msg.ranges[0]/5 > 1.0:
-                                self.cmd_msg.linear.x = 1.0
-                            else:
-                                self.cmd_msg.linear.x = 0.2
-                            #self.cmd_msg.linear.x = min(1.0, self.lidar_msg.ranges[0]/5)
-                            self.cmd_msg.angular.z = theta/5
-
+                        self.cmd_msg.linear.x = 0.0
+                        self.cmd_msg.angular.z = 0.2
+                
                 else:
-                    self.cmd_msg.linear.x = 0.0
-                    self.cmd_msg.angular.z = 0.0
-                    self.patrol_msg.data = 1
-                    self.patrol_pub.publish(self.patrol_msg)
+                    if theta > 1.5 or theta < -1.5:
+                        self.cmd_msg.linear.x = 0.0
+                        self.cmd_msg.angular.z = theta/2
+
+                    elif 0.7 < theta < 1.5 or -1.5 < theta < -0.7:
+                        self.cmd_msg.linear.x = 0.2
+                        self.cmd_msg.angular.z = theta/3
+                    
+                    elif 0.2 < theta <= 0.7 or -0.7 <= theta < -0.2:
+                        self.cmd_msg.linear.x = 0.5
+                        self.cmd_msg.angular.z = theta/4
+
+                    else:
+                        if 0.2 < self.lidar_msg.ranges[0]/5 < 1.0:
+                            self.cmd_msg.linear.x = self.lidar_msg.ranges[0]/5
+                        elif self.lidar_msg.ranges[0]/5 > 1.0:
+                            self.cmd_msg.linear.x = 1.0
+                        else:
+                            self.cmd_msg.linear.x = 0.2
+                        #self.cmd_msg.linear.x = min(1.0, self.lidar_msg.ranges[0]/5)
+                        self.cmd_msg.angular.z = theta/5
+
+            else:
+                self.cmd_msg.linear.x = 0.0
+                self.cmd_msg.angular.z = 0.0
+                self.patrol_msg.data = 1
+                self.patrol_pub.publish(self.patrol_msg)
         
         self.cmd_pub.publish(self.cmd_msg)
   
