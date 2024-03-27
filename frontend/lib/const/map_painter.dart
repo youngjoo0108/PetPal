@@ -16,8 +16,9 @@ class MapPainter extends CustomPainter {
     final startTime = DateTime.now();
     logger.d('Rendering Started at $startTime');
 
-    double cellWidth = width / column;
-    double cellHeight = height / row;
+    // 캔버스 실제 높이와 너비에 맞게 cell size 조정
+    double cellWidth = size.width / column;
+    double cellHeight = size.height / row;
 
     Paint paint = Paint();
     for (int i = 0; i < row; i++) {
@@ -47,37 +48,3 @@ class MapPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-
-// class MapPainter extends CustomPainter {
-//   final List<List<int>> mapData;
-//   final double width;
-//   final double height;
-
-//   MapPainter(this.mapData, this.width, this.height);
-
-//   @override
-//   void paint(Canvas canvas, Size size) {
-//     double cellWidth = width / 700;
-//     double cellHeight = height / 700;
-
-//     Paint paint = Paint();
-//     for (int i = 0; i < 700; i++) {
-//       for (int j = 0; j < 700; j++) {
-//         if (mapData[i][j] <= 33) {
-//           paint.color = Colors.white;
-//         } else if (mapData[i][j] <= 66) {
-//           paint.color = Colors.grey;
-//         } else {
-//           paint.color = Colors.black;
-//         }
-//         canvas.drawRect(
-//           Rect.fromLTWH(j * cellWidth, i * cellHeight, cellWidth, cellHeight),
-//           paint,
-//         );
-//       }
-//     }
-//   }
-
-//   @override
-//   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-// }
