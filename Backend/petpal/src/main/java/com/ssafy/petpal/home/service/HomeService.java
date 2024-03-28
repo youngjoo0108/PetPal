@@ -21,7 +21,7 @@ public class HomeService {
 
     public void createHome(HomeRequestDTO homeRequestDTO) {
         log.info("23");
-        User user = userRepository.findByUserId(homeRequestDTO.getUserId())
+        User user = userRepository.findById(homeRequestDTO.getUserId())
                 .orElseThrow(IllegalArgumentException::new);
 
         log.info("26 " + user.getNickname());
