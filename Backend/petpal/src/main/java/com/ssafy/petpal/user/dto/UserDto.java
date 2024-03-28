@@ -12,4 +12,6 @@ public class UserDto {
     private String nickname;
     private String platform;
     private String refreshToken;
+
+    private String fcmToken;
 }
