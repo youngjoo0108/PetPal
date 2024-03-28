@@ -7,6 +7,7 @@ from std_msgs.msg import Int32
 from squaternion import Quaternion
 from math import atan2, sqrt, pi
 import numpy as np
+from ros_log_package.RosLogPublisher import RosLogPublisher
 
 class PurePursuit(Node):
     def __init__(self):
@@ -32,15 +33,25 @@ class PurePursuit(Node):
         self.goal = [184, 224]
 
         self.lookahead_distance = 0.5 
-        self.timer = self.create_timer(0.1, self.timer_callback)  
+        self.timer = self.create_timer(0.1, self.timer_callback)
+
+        # log
+        self.ros_log_pub = None
+        try:
+            self.ros_log_pub = RosLogPublisher(self)
+        except Exception as e:
+            self.get_logger().error('Subscription initialization error: {}'.format(e))
+
 
     def odom_callback(self, msg):
         self.is_odom = True
         self.odom_msg = msg
 
+
     def path_callback(self, msg):
         self.is_path = True
         self.path_msg = msg
+
 
     def goal_callback(self,msg):
         if msg.header.frame_id=='map':
@@ -48,10 +59,12 @@ class PurePursuit(Node):
             goal_y=msg.pose.position.y
         self.goal = [goal_x, goal_y]
 
+
     def check_collision(self, msg):
         for angle,r in enumerate(msg.ranges):
             if angle < 20 or angle > 340:
                 if 0.0 < r < 0.2:
+                    self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit : collsion occur')
                     return True
         return False
     
@@ -59,8 +72,8 @@ class PurePursuit(Node):
     def tracking_err_callback(self, msg):
         self.tracking_err_msg = msg
         self.is_tracking_err = True
-        # print(self.tracking_err_msg)
     
+
     def lidar_callback(self, msg):
         self.lidar_msg = msg
 
@@ -70,35 +83,40 @@ class PurePursuit(Node):
 
 
     def timer_callback(self):
+
         if self.is_tracking_err and self.tracking_err_msg.data < 5:
             cmd_msg = Twist()
+           
             if self.tracking_err_msg.data == 4:
-                print('err4')
                 cmd_msg.linear.x = -1.0
                 cmd_msg.angular.z = 0.0
                 self.cmd_pub.publish(cmd_msg)
+                self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance too short')
+            
             if self.tracking_err_msg.data == 1:
-                print('err1')
                 cmd_msg.linear.x = 0.0
                 cmd_msg.angular.z = 0.0
                 self.cmd_pub.publish(cmd_msg)
                 self.tracking_err_msg.data = False
+                self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, stop')
+            
             elif self.tracking_err_msg.data == 2:
-                print('err2')
                 cmd_msg.linear.x = 0.0
                 cmd_msg.angular.z = 0.05
                 self.cmd_pub.publish(cmd_msg)
+                self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, move clockwise')
+           
             else:
-                print('err3')
                 cmd_msg.linear.x = 0.0
                 cmd_msg.angular.z = -0.05
                 self.cmd_pub.publish(cmd_msg)
+                self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, move counterclockwise')
+            
             self.is_tracking_err = False
-            # self.cmd_pub.publish(cmd_msg)
             return
+        
         else:
-            if self.tracking_err_msg.data == 5:
-                print('err5')
+
             if self.is_odom and self.is_path:
                 path_points = [pose.pose.position for pose in self.path_msg.poses]
                 robot_pose_x = self.odom_msg.pose.pose.position.x
@@ -169,7 +187,6 @@ class PurePursuit(Node):
                                 cmd_msg.linear.x = 1.0
                             else:
                                 cmd_msg.linear.x = 0.2
-                            #self.cmd_msg.linear.x = min(1.0, self.lidar_msg.ranges[0]/5)
                             cmd_msg.angular.z = -theta/5
 
 

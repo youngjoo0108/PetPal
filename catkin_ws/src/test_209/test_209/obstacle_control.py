@@ -7,7 +7,7 @@ from squaternion import Quaternion
 from nav_msgs.msg import Odometry, Path, OccupancyGrid
 from geometry_msgs.msg import Twist, PoseStamped, Point32
 from ssafy_msgs.msg import TurtlebotStatus,HandControl
-
+from ros_log_package.RosLogPublisher import RosLogPublisher
 
 
 class ObstacleControl(Node):
@@ -56,6 +56,14 @@ class ObstacleControl(Node):
         self.obstacle_goal_y = 10.7
         self.obstacle_lifted_x = 0.0
         self.obstacle_lifted_y = 0.0
+
+
+        # log
+        self.ros_log_pub = None
+        try:
+            self.ros_log_pub = RosLogPublisher(self)
+        except Exception as e:
+            self.get_logger().error('Subscription initialization error: {}'.format(e))
 
 
     def obstacle_callback(self, msg):
@@ -117,17 +125,16 @@ class ObstacleControl(Node):
 
         self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
         self.goal_pub.publish(self.goal_msg)
+        self.ros_log_pub.publish_log('DEBUG', 'Tracking Obstacle')
 
     
     def timer_callback(self):
         # 갖다 놓는 로직
         if self.is_obstacle:
-            print('obstacle = true')
             if self.is_lifted:
                 # 골까지 주행
-                print('islifted true')
                 if not self.is_obstacle_goal:
-                    print('go to goal')
+                    
                     self.goal_msg.pose.position.x = self.obstacle_goal_x
                     self.goal_msg.pose.position.y = self.obstacle_goal_y
                     
@@ -140,15 +147,16 @@ class ObstacleControl(Node):
 
                     self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
                     self.goal_pub.publish(self.goal_msg)
+                    self.ros_log_pub.publish_log('DEBUG', 'Go goalpoint with Obstacle')
+
                 else:
-                    # 골 근처 오면 놓기
+                    
                     cnt = 0
                     while cnt < 5:
                         self.hand_control_put_down()
                         cnt += 1
                     
                     if self.turtlebot_status_msg.can_use_hand == False:
-                        print(f'go back to position {self.obstacle_lifted_x} {self.obstacle_lifted_y}')
                         self.goal_msg.pose.position.x = self.obstacle_lifted_x
                         self.goal_msg.pose.position.y = self.obstacle_lifted_y
                         
@@ -161,51 +169,30 @@ class ObstacleControl(Node):
 
                         self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
                         self.goal_pub.publish(self.goal_msg)
-
+                        self.ros_log_pub.publish_log('obscontrol', 'Obstacle control success')
                         self.is_lifted = False
                         self.is_obstacle = False
 
             else:
-                print(f'not lifted isobstasclegoal : {self.is_obstacle_goal}')
                 if self.is_obstacle and not self.is_obstacle_goal:
-                    print('start pick up')
                     # 들어야함
                     self.hand_control_pick_up()
-                    print(f'lifted: {self.is_lifted} goal?: {self.is_obstacle_goal} obstacle: {self.is_obstacle}')
-                    print(f'turtlebot canlift {self.turtlebot_status_msg.can_lift} canput{self.turtlebot_status_msg.can_put} using hand {self.turtlebot_status_msg.can_use_hand}')
+                   
                     if self.turtlebot_status_msg.can_use_hand == True:
                         print('is here?')
                         self.obstacle_lifted_x = self.robot_pose_x
                         self.obstacle_lifted_y = self.robot_pose_y
 
                         self.is_lifted = True
-                        # self.is_obstacle = False
+                        self.ros_log_pub.publish_log('DEBUG', 'Pickup Obstacle Success')
 
     
-
-    def hand_control_status(self):
-
-        if self.is_turtlebot_status:
-            print(f"Turtlebot Status - can_lift: {self.turtlebot_status_msg.can_lift}, put: {self.turtlebot_status_msg.can_put}, is_lifted: {self.turtlebot_status_msg.can_use_hand}")
-        else:
-            print("Turtlebot status is not yet received.")
-
-
-    def hand_control_preview(self):
-
-        self.hand_control_msg.control_mode = 1  
-        self.hand_control_pub.publish(self.hand_control_msg)
-        print("Hand control preview mode activated.")
-
-
     def hand_control_pick_up(self):
         self.hand_control_msg.control_mode = 2 
         self.hand_control_msg.put_distance = 1.0
         self.hand_control_msg.put_height = 0.0
         self.hand_control_pub.publish(self.hand_control_msg)
-  
-        print("Hand control pick-up mode activated.")
-        
+          
 
     def hand_control_put_down(self):
 
@@ -213,8 +200,6 @@ class ObstacleControl(Node):
         self.hand_control_msg.put_distance = 1.0
         self.hand_control_msg.put_height = 0.5
         self.hand_control_pub.publish(self.hand_control_msg)
-
-        print("Hand control put-down mode activated.")
         
 
     def turtlebot_status_cb(self,msg):

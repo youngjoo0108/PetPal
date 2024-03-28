@@ -10,18 +10,13 @@ from nav_msgs.msg import Odometry, Path, OccupancyGrid
 from std_msgs.msg import Int32
 import pprint
 import numpy as np
-
+from ros_log_package.RosLogPublisher import RosLogPublisher
 
 class Tracking(Node):
 
     def __init__(self):
         super().__init__('minimal_subscriber')
-        self.yolo_sub = self.create_subscription(
-            String,
-            'captured_object',
-            self.listener_callback,
-            10)
-
+        self.yolo_sub = self.create_subscription(String,'captured_object',self.listener_callback, 10)
         self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
         self.timer = self.create_timer(0.1, self.timer_callback)
@@ -40,7 +35,7 @@ class Tracking(Node):
         self.is_dog = False
 
         self.last_dog_seen_time = 0.0  
-        self.dog_seen_timeout = 3.0
+        self.dog_seen_timeout = 5.0
 
         self.robot_pose_x = 0.0
         self.robot_pose_y = 0.0
@@ -53,8 +48,13 @@ class Tracking(Node):
         self.dog_y_in_camera = 0.0
         self.turtlebot_to_dog_theta = 0.0
         self.turtlebot_to_dog_distance = 0.0
-
-
+        
+        # log
+        self.ros_log_pub = None
+        try:
+            self.ros_log_pub = RosLogPublisher(self)
+        except Exception as e:
+            self.get_logger().error('Subscription initialization error: {}'.format(e))
     
 
     def listener_callback(self, msg):
@@ -70,8 +70,8 @@ class Tracking(Node):
                 right_bottom_x, right_bottom_y = map(float, right_bottom.split('-'))
 
                 self.dog_height = right_bottom_y - left_top_y
-                self.dog_x_in_camera = 160 - (left_top_x + right_bottom_x) / 2.0   # 카메라 중심으로부터의 x 거리
-                self.dog_y_in_camera = 240 - (left_top_y + right_bottom_y) / 2.0 # 카메라 바닥으로부터의 y 거리
+                self.dog_x_in_camera = 160 - (left_top_x + right_bottom_x) / 2.0     # 카메라 중심으로부터의 x 거리
+                self.dog_y_in_camera = 240 - (left_top_y + right_bottom_y) / 2.0     # 카메라 바닥으로부터의 y 거리
                 
                 self.dog_distance_in_camera = np.sqrt(self.dog_x_in_camera ** 2 + self.dog_y_in_camera ** 2)
 
@@ -82,11 +82,7 @@ class Tracking(Node):
                 self.goal_y = self.robot_pose_y + (self.turtlebot_to_dog_distance -1.5) * np.sin(self.robot_yaw + self.turtlebot_to_dog_theta)
                 self.goal_yaw = self.turtlebot_to_dog_theta + self.robot_yaw
 
-                # self.get_logger().info(f'theta: {self.turtlebot_to_dog_theta}, Dog distance: {self.turtlebot_to_dog_distance}, Goal X: {self.goal_x}, Goal Y: {self.goal_y}')
-                # self.get_logger().info(f'theta: {self.turtlebot_to_dog_theta}, dog_x: {self.dog_x_in_camera}, dog_y : {self.dog_y_in_camera}')
-                
          
-
     def odom_callback(self, msg):
         self.is_odom = True
         self.odom_msg = msg
@@ -102,16 +98,12 @@ class Tracking(Node):
     def timer_callback(self):
         current_time = time.time()
         if self.is_dog and (current_time - self.last_dog_seen_time) > self.dog_seen_timeout:
-            # 마지막으로 강아지가 감지된 후 일정 시간이 지났다면
-            self.is_dog = False  # 강아지가 더 이상 감지되지 않음으로 표시
-            print("강아지 감지 시간 초과 - 강아지가 없습니다.")
+            self.is_dog = False 
+            self.ros_log_pub.publish_log('DEBUG', 'Subscription tracking: Cannot find Dog for 5 seconds')
             return
 
-        # 강아지가 감지되지 않은 경우 메시지를 발행하지 않음
         if not self.is_dog:
-            print("강아지가 감지되지 않았습니다.")
-            # self.tracking_err_msg.data = None
-            # self.tracking_pub.publish(self.tracking_err_msg)
+            # print("강아지가 감지되지 않았습니다.")
             return  
         else:
             self.tracking_dog()
@@ -119,30 +111,31 @@ class Tracking(Node):
 
     def tracking_dog(self):
         if self.turtlebot_to_dog_distance < 1.3 or self.dog_height > 120:
-            print('short')
+
             if self.turtlebot_to_dog_distance < 0.7 or self.dog_height > 150:
+
                 self.tracking_err_msg.data = 4
                 self.tracking_pub.publish(self.tracking_err_msg)
-                print('logic0')
+                
             else:
                 if -100 < self.dog_x_in_camera < 100:
-                    print('logic1')
+
                     self.tracking_err_msg.data = 1
-                    # self.tracking_err_msg.data = None
                     self.tracking_pub.publish(self.tracking_err_msg)
                     return
                     
                 elif -160 < self.dog_x_in_camera <= -100:
-                    print('logic2')
+
                     self.tracking_err_msg.data = 2
                     self.tracking_pub.publish(self.tracking_err_msg)
                     
 
                 elif 100 <= self.dog_x_in_camera < 160:
-                    print('logic3')
+
                     self.tracking_err_msg.data = 3
                     self.tracking_pub.publish(self.tracking_err_msg)
         else:
+            
             self.goal_msg.pose.position.x = self.goal_x
             self.goal_msg.pose.position.y = self.goal_y
             print(f'tracing {self.goal_x} {self.goal_y} {self.turtlebot_to_dog_distance}')
@@ -158,6 +151,7 @@ class Tracking(Node):
 
             self.tracking_err_msg.data = 5
             self.tracking_pub.publish(self.tracking_err_msg)
+
         return
 
 
