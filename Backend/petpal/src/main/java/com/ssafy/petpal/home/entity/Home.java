@@ -18,6 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Home {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "home_id")
     private Long id;
 
