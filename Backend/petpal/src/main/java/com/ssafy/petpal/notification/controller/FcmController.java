@@ -1,6 +1,5 @@
 package com.ssafy.petpal.notification.controller;
 
-import com.ssafy.petpal.notification.dto.FcmMessageDto;
 import com.ssafy.petpal.notification.dto.NotificationRequestDto;
 import com.ssafy.petpal.notification.service.FcmService;
 import lombok.extern.slf4j.Slf4j;

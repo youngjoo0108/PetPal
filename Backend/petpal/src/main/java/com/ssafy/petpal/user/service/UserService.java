@@ -19,6 +19,7 @@ public class UserService {
                 .nickname(userDto.getNickname())
                 .platform(userDto.getPlatform())
                 .refreshToken(userDto.getRefreshToken())
+                .fcmToken(userDto.getFcmToken())
                 .build();
         userRepository.save(user);
     }
@@ -41,6 +42,7 @@ public class UserService {
         user.setNickname(userDto.getNickname());
         user.setPlatform(userDto.getPlatform());
         user.setRefreshToken(userDto.getRefreshToken());
+        user.setFcmToken(userDto.getFcmToken());
         userRepository.save(user);
     }
 
