@@ -26,13 +26,13 @@ public class UserService {
     public Optional<UserDto> findById(Long userId){
         // 엔티티를 DTO로 변환하여 반환
         return userRepository.findByUserId(userId)
-                .map(user -> new UserDto(user.getUserId(), user.getNickname(), user.getPlatform(), user.getRefreshToken()));
+                .map(user -> new UserDto(user.getUserId(), user.getNickname(), user.getPlatform(), user.getRefreshToken(), user.getFcmToken()));
     }
 
     public UserDto findByRefreshToken(String refreshToken){
         // 엔티티를 DTO로 변환하여 반환
         User user = userRepository.findByRefreshToken(refreshToken);
-        return new UserDto(user.getUserId(), user.getNickname(), user.getPlatform(), user.getRefreshToken());
+        return new UserDto(user.getUserId(), user.getNickname(), user.getPlatform(), user.getRefreshToken(), user.getFcmToken());
     }
 
     public void update(UserDto userDto){
