@@ -17,12 +17,12 @@ class ssafy_bridge(Node):
 
         self.subscription = self.create_subscription(Twist,'cmd_vel',self.listener_callback,10)
         self.hand_sub = self.create_subscription(HandControl,'hand_control',self.hand_callback,10)
-        self.app_control_subscriber= self.create_subscription(Int8MultiArray,'app_control',self.app_control_callback,10)
+        #self.app_control_subscriber= self.create_subscription(Int8MultiArray,'app_control',self.app_control_callback,10)
 
 
 
         self.ctrl_cmd=erp_udp_sender(dst_ip,7601)
-        self.app_control=app_control_sender(dst_ip,7901)
+        #self.app_control=app_control_sender(dst_ip,7901)
 
         self.hand_control=handControlSender(dst_ip,8101)
       

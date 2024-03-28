@@ -22,8 +22,8 @@ class ssafy_bridge(Node):
         self.envir_udp=erp_udp_parser(self.envir_publisher,user_ip, 7802,'envir_status')
 
         #application
-        self.app_status_publisher = self.create_publisher(Int8MultiArray, 'app_status', 10)
-        self.app_udp=erp_udp_parser(self.app_status_publisher,user_ip, 8002,'app_status')
+        # self.app_status_publisher = self.create_publisher(Int8MultiArray, 'app_status', 10)
+        # self.app_udp=erp_udp_parser(self.app_status_publisher,user_ip, 8002,'app_status')
 
         #turtlebot status
         self.ego_status_publisher = self.create_publisher(TurtlebotStatus, 'turtlebot_status', 10)
