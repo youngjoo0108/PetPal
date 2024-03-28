@@ -21,11 +21,14 @@ public class HomeController {
     private final HomeService homeService;
 
     @PostMapping
-    public ResponseEntity<Void> postHome(HomeRequestDTO homeRequestDTO ){
+    public ResponseEntity<String> postHome(HomeRequestDTO homeRequestDTO ){
         try{
             homeService.createHome(homeRequestDTO);
             return ResponseEntity.ok(null);
-        }catch (Exception e){
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.ok(e.getMessage());
+        }
+        catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
