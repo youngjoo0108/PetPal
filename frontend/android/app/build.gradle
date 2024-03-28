@@ -49,14 +49,6 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-
-        // .env 파일에서 변수 읽기
-        // def envFile = rootProject.file("../.env")
-        // if (envFile.exists()) {
-        //     def Properties envProps = new Properties()
-        //     envProps.load(new FileInputStream(envFile))
-        //     manifestPlaceholders = [kakaoAppKey: envProps['KAKAO_API_KEY']]
-        // }
     }
 
     buildTypes {

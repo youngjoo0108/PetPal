@@ -44,7 +44,9 @@ dependencies:
   # .env 파일 읽는 라이브러리
   flutter_dotenv: ^5.0.2
   logger: ^1.4.0
-
+  stomp_dart_client: ^1.0.3
+  firebase_messaging: ^14.7.21
+  firebase_core: ^2.27.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
