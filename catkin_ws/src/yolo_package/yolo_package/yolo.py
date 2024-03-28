@@ -113,6 +113,7 @@ class IMGParser(Node):
         detection = results[0]  # 탐지된 객체 정보
         
         puppy_list = []
+        knife_list = []
 
         for data in detection.boxes.data.tolist(): # data : [xmin, ymin, xmax, ymax, confidence_score, class_id]
             # print(data)
@@ -130,8 +131,20 @@ class IMGParser(Node):
                 dog_data = time_str + '/' + class_list[label] + '/'+str(round(confidence, 2)) + '%' + '/' + str(xmin) + '-' + str(ymin) + '/' + str(xmax) + '-' + str(ymax)
                 puppy_list.append(dog_data)
 
+            if(class_list[label] == 'Knife'):
+                #2024-03-15-12-50-23/Desk/82.3%/0.1234-0.8743/0.4352-0.7657
+                knife_data = time_str + '/' + class_list[label] + '/'+str(round(confidence, 2)) + '%' + '/' + str(xmin) + '-' + str(ymin) + '/' + str(xmax) + '-' + str(ymax)
+                knife_list.append(knife_data)
+
         if(len(puppy_list) != 0):
-            topic_data = {'list': puppy_list}
+            topic_data = {'dog_list': puppy_list}
+            json_str = json.dumps(topic_data)
+            msg = String()
+            msg.data = json_str
+            self.capture_callback(msg)
+
+        if(len(knife_list) != 0):
+            topic_data = {'knife_list': knife_list}
             json_str = json.dumps(topic_data)
             msg = String()
             msg.data = json_str
@@ -139,8 +152,8 @@ class IMGParser(Node):
             
         # 로직 5. 이미지 출력 (cv2.imshow)       
         
-        # re_img = cv2.resize(img_bgr, (0, 0), fx=2, fy=2, interpolation=cv2.INTER_NEAREST)
-        # cv2.imshow("re_img", re_img)      
+        re_img = cv2.resize(img_bgr, (0, 0), fx=2, fy=2, interpolation=cv2.INTER_NEAREST)
+        cv2.imshow("re_img", re_img)      
         
         cv2.waitKey(1)
 

@@ -44,7 +44,8 @@ setup(
             # iot control
             'iotcontrol=test_209.iot_control:main',
             'handcontrol=test_209.hand_control:main',
-
+            'obscontrol=test_209.obstacle_control:main',
+            
             # dog tracking
             'tracking=test_209.tracking:main',
             'tt=test_209.tracking_test:main',
