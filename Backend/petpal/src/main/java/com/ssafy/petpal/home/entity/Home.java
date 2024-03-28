@@ -4,10 +4,10 @@ import com.ssafy.petpal.object.entity.Appliance;
 import com.ssafy.petpal.schedule.entity.Schedule;
 import com.ssafy.petpal.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +28,7 @@ public class Home {
     @Column(name = "home_nickname")
     private String homeNickname;
 
+    @CreatedDate
     @Column(name = "home_created_at")
     private LocalDateTime createdAt;
 
