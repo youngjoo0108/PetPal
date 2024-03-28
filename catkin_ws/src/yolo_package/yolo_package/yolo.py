@@ -12,6 +12,8 @@ from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import String
 import json
 
+from ros_log_package.RosLogPublisher import RosLogPublisher
+
 # image parser 노드는 이미지를 받아서 opencv 의 imshow로 윈도우창에 띄우는 역할을 합니다.
 # 이를 resize나 convert를 사용하여 이미지를 원하는대로 바꿔보세요.
 
@@ -40,6 +42,12 @@ class IMGParser(Node):
 
     def __init__(self):
         super().__init__(node_name='image_convertor')
+        
+        self.ros_log_pub = None
+        try:
+            self.ros_log_pub = RosLogPublisher(self)
+        except Exception as e:
+            self.get_logger().error('ERROR', 'Subscription initialization error: {}'.format(e))
         
         try:
             self.publisher_ = self.create_publisher(String, 'captured_object', 10)
@@ -123,8 +131,10 @@ class IMGParser(Node):
 
             xmin, ymin, xmax, ymax = int(data[0]), int(data[1]), int(data[2]), int(data[3])
             label = int(data[5])
-            cv2.rectangle(img_bgr, (xmin, ymin), (xmax, ymax), GREEN, 2)
-            cv2.putText(img_bgr, class_list[label]+' '+str(round(confidence, 2)) + '%', (xmin, ymin), cv2.FONT_ITALIC, 0.5, WHITE, 1)
+            # cv2.rectangle(img_bgr, (xmin, ymin), (xmax, ymax), GREEN, 2)
+            # cv2.putText(img_bgr, class_list[label]+' '+str(round(confidence, 2)) + '%', (xmin, ymin), cv2.FONT_ITALIC, 0.5, WHITE, 1)
+            
+            self.ros_log_pub.publish_log('YOLO', f'{time_str}/{class_list[label]}/{str(round(confidence, 2))}%/{str(xmin)}-{str(ymin)}/{str(xmax)}-{str(ymax)}')
             
             if(class_list[label] == 'Dog'):
                 #2024-03-15-12-50-23/Desk/82.3%/0.1234-0.8743/0.4352-0.7657
@@ -162,16 +172,12 @@ def main(args=None):
 
     ## 노드 초기화 : rclpy.init 은 node의 이름을 알려주는 것으로, ROS master와 통신을 가능하게 해줍니다.
     rclpy.init(args=args)
-    
-    print('step 1')
 
     ## 메인에 돌릴 노드 클래스 정의 
     image_parser = IMGParser()
-    print('step 2')
 
     ## 노드 실행 : 노드를 셧다운하기 전까지 종료로부터 막아주는 역할을 합니다
     rclpy.spin(image_parser)
-    print('step 3')
 
 
 if __name__ == '__main__':

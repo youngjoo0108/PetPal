@@ -44,8 +44,6 @@ async def connect():
 
                     if message_data.get("type") == "video_streaming":
                         display_image_from_base64(message_data['message'])
-                    else:
-                        print(message_data)
                 except json.JSONDecodeError as e:
                     print(f"JSON decode error: {e}")
                 except ValueError as e:

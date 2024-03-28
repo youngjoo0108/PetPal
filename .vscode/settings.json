@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./catkin_ws/src/ros_log",
+        "./catkin_ws/src/ros_log_package"
+    ]
+}
