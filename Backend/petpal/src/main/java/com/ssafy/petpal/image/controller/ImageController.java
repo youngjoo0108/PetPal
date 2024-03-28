@@ -56,7 +56,7 @@ public class ImageController {
     *  controller에 구현하는 것보단 "service단에 구현"해서 내부적으로 notification 로직에서 사용하도록 하는 것이 적합
     * */
     @GetMapping
-    public ResponseEntity<String> getPreSignedURL(@RequestParam("filename") String filename){
+    public ResponseEntity<String> getPreSignedDownloadURL(@RequestParam("filename") String filename){
         String downloadURL = imageService.generateURL(filename, HttpMethod.GET);
         return ResponseEntity.ok(downloadURL);
     }

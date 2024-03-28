@@ -29,6 +29,7 @@ public class HomeController {
             return ResponseEntity.ok(e.getMessage());
         }
         catch (Exception e){
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
