@@ -59,8 +59,8 @@ class Tracking(Node):
 
     def listener_callback(self, msg):
         data = json.loads(msg.data)
-        if 'list' in data:
-            for dog in data['list']:
+        if 'dog_list' in data:
+            for dog in data['dog_list']:
                 self.is_dog = True
                 self.last_dog_seen_time = time.time()
 
@@ -78,8 +78,8 @@ class Tracking(Node):
                 self.turtlebot_to_dog_theta = np.arctan2(self.dog_x_in_camera * 3, self.dog_y_in_camera * 4)
                 self.turtlebot_to_dog_distance = self.dog_distance_in_camera / (self.dog_height * np.cos(self.turtlebot_to_dog_theta))  
 
-                self.goal_x = self.robot_pose_x + (self.turtlebot_to_dog_distance - 1) * np.cos(self.robot_yaw + self.turtlebot_to_dog_theta)
-                self.goal_y = self.robot_pose_y + (self.turtlebot_to_dog_distance -1) * np.sin(self.robot_yaw + self.turtlebot_to_dog_theta)
+                self.goal_x = self.robot_pose_x + (self.turtlebot_to_dog_distance - 1.5) * np.cos(self.robot_yaw + self.turtlebot_to_dog_theta)
+                self.goal_y = self.robot_pose_y + (self.turtlebot_to_dog_distance -1.5) * np.sin(self.robot_yaw + self.turtlebot_to_dog_theta)
                 self.goal_yaw = self.turtlebot_to_dog_theta + self.robot_yaw
 
                 # self.get_logger().info(f'theta: {self.turtlebot_to_dog_theta}, Dog distance: {self.turtlebot_to_dog_distance}, Goal X: {self.goal_x}, Goal Y: {self.goal_y}')
@@ -118,34 +118,34 @@ class Tracking(Node):
 
 
     def tracking_dog(self):
-        if self.turtlebot_to_dog_distance < 2.0:
+        if self.turtlebot_to_dog_distance < 1.3 or self.dog_height > 120:
             print('short')
             if self.turtlebot_to_dog_distance < 0.7 or self.dog_height > 150:
                 self.tracking_err_msg.data = 4
                 self.tracking_pub.publish(self.tracking_err_msg)
                 print('logic0')
             else:
-                if 100 < self.dog_x_in_camera < 220:
+                if -100 < self.dog_x_in_camera < 100:
                     print('logic1')
                     self.tracking_err_msg.data = 1
                     # self.tracking_err_msg.data = None
                     self.tracking_pub.publish(self.tracking_err_msg)
                     return
                     
-                elif 0 < self.dog_x_in_camera <= 100:
+                elif -160 < self.dog_x_in_camera <= -100:
                     print('logic2')
                     self.tracking_err_msg.data = 2
                     self.tracking_pub.publish(self.tracking_err_msg)
                     
 
-                elif 220 <= self.dog_x_in_camera < 320:
+                elif 100 <= self.dog_x_in_camera < 160:
                     print('logic3')
                     self.tracking_err_msg.data = 3
                     self.tracking_pub.publish(self.tracking_err_msg)
         else:
             self.goal_msg.pose.position.x = self.goal_x
             self.goal_msg.pose.position.y = self.goal_y
-            print(f'tracing {self.goal_x} {self.goal_y}')
+            print(f'tracing {self.goal_x} {self.goal_y} {self.turtlebot_to_dog_distance}')
             q = Quaternion.from_euler(0, 0, self.goal_yaw)
 
             self.goal_msg.pose.orientation.x = q.x

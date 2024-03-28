@@ -74,7 +74,7 @@ class PurePursuit(Node):
             cmd_msg = Twist()
             if self.tracking_err_msg.data == 4:
                 print('err4')
-                cmd_msg.linear.x = -0.2
+                cmd_msg.linear.x = -1.0
                 cmd_msg.angular.z = 0.0
                 self.cmd_pub.publish(cmd_msg)
             if self.tracking_err_msg.data == 1:
@@ -82,16 +82,16 @@ class PurePursuit(Node):
                 cmd_msg.linear.x = 0.0
                 cmd_msg.angular.z = 0.0
                 self.cmd_pub.publish(cmd_msg)
-                self.tracking_err_msg.data = None
+                self.tracking_err_msg.data = False
             elif self.tracking_err_msg.data == 2:
                 print('err2')
                 cmd_msg.linear.x = 0.0
-                cmd_msg.angular.z = -0.01
+                cmd_msg.angular.z = 0.05
                 self.cmd_pub.publish(cmd_msg)
             else:
                 print('err3')
                 cmd_msg.linear.x = 0.0
-                cmd_msg.angular.z = 0.01
+                cmd_msg.angular.z = -0.05
                 self.cmd_pub.publish(cmd_msg)
             self.is_tracking_err = False
             # self.cmd_pub.publish(cmd_msg)
