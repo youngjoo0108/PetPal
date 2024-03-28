@@ -3,13 +3,19 @@ package com.ssafy.petpal.schedule.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalTime;
+
 @Getter
 @Setter
 public class ScheduleDto {
-    private String room;
-    private String appliance;
-    private String date;
-    private String time;
-    private String action;
-    private boolean isActive;
+    private Long roomId;
+    private Long homeId;
+
+    private Long applianceId;
+    private String day;
+    private LocalTime time;
+    private String taskType;
+
+    private boolean isRepeat;
+    private boolean isActive; // 스케줄 자체의 상태
 }

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "target_object_home")
+@Table(name = "Targets")
 public class Target {
 
 

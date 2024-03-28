@@ -1,14 +1,17 @@
 package com.ssafy.petpal.object.entity;
 
+import com.ssafy.petpal.home.entity.Home;
+import com.ssafy.petpal.room.entity.Room;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Point;
 
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "appliance_object_home")
+@Table(name = "Appliances")
 public class Appliance {
 
 
@@ -17,16 +20,34 @@ public class Appliance {
     @Column(name = "appliance_id")
     private Long id;
 
-    @Column(name = "home_id")
-    private Long homeId;
+    @Column(name = "appliance_name")
+    private String applianceName;
 
-    @Column(name = "object_id")
-    private Long objectId;
+    @Column(name = "appliance_uuid")
+    private String applianceUUID;
+
+    @Column(name = "cordinate")
+    Point coordinate;
+
+    @OneToOne
+    @JoinColumn(name = "object_id")
+    private ObjectEntity objectEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    private Room room;
+
+
+    @ManyToOne
+    @JoinColumn(name = "home_id")
+    private Home home;
 
     @Builder
-    public Appliance(Long homeId, Long objectId){
-        this.homeId = homeId;
-        this.objectId = objectId;
+    public Appliance(String applianceName, String applianceUUID, Room room, Home home){
+        this.applianceName = applianceName;
+        this.applianceUUID = applianceUUID;
+        this.home = home;
+        this.room = room;
     }
 
 

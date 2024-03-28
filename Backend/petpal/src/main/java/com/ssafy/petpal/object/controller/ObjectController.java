@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/object")
+@RequestMapping("/api/v1/objects")
 public class ObjectController {
     private final ObjectService objectService;
     @PostMapping

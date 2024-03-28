@@ -21,8 +21,8 @@ public class ObjectEntity {
     @Column(name = "image_id")
     Long imageId;
 
-    @Column(name = "object_type")
-    int objectType;
+//    @Column(name = "object_type")
+//    int objectType;
 
     @Column(name = "cordinate")
     Point cordinate;
@@ -31,9 +31,9 @@ public class ObjectEntity {
 
 
     @Builder
-    public ObjectEntity(Long imageId, int objectType, Point cordinate) {
+    public ObjectEntity(Long imageId, /*int objectType,*/ Point cordinate) {
         this.imageId = imageId;
-        this.objectType = objectType;
+//        this.objectType = objectType;
         this.cordinate = cordinate;
     }
 
