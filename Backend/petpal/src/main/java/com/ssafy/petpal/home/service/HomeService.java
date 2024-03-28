@@ -21,14 +21,15 @@ public class HomeService {
 
     public void createHome(HomeRequestDTO homeRequestDTO) {
         log.info("23");
-        User user = userRepository.findByUserId(homeRequestDTO.getUserId())
+        User user = userRepository.findById(homeRequestDTO.getUserId())
                 .orElseThrow(IllegalArgumentException::new);
-        log.info("26");
+
+        log.info("26 " + user.getNickname());
         Home home = Home.builder()
                 .homeNickname(homeRequestDTO.getHomeNickname())
                 .user(user)
                 .build();
-        log.info("31");
+        log.info("31 " + home.getHomeNickname());
         homeRepository.save(home);
         log.info("33");
     }
