@@ -1,6 +1,7 @@
 package com.ssafy.petpal.object.entity;
 
 import ch.qos.logback.classic.spi.LoggingEventVO;
+import com.ssafy.petpal.common.BaseEntity;
 import com.ssafy.petpal.home.entity.Home;
 import com.ssafy.petpal.image.entity.Image;
 import jakarta.persistence.*;
@@ -16,7 +17,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 @Table(name = "Targets")
-public class Target {
+public class Target extends BaseEntity {
 
 
     @Id
@@ -35,9 +36,7 @@ public class Target {
     @Column(name = "coordinate")
     private Point coordinate;
 
-    @CreatedDate
-    @Column(name = "created_at")
-    private LocalDate createdAt;
+
 
 
     @Builder

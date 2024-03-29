@@ -1,5 +1,6 @@
 package com.ssafy.petpal.room.entity;
 
+import com.ssafy.petpal.common.BaseEntity;
 import com.ssafy.petpal.home.entity.Home;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "Rooms")
 @NoArgsConstructor
 @Getter
-public class Room {
+public class Room extends BaseEntity {
 
 
     @Id

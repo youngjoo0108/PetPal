@@ -32,6 +32,9 @@ public class TargetService {
                 .build();
         //TODO: Target용 Repository 생성해놓고 save()
         targetRepository.save(target);
+
+        // 알림 서비스 호출
+
     }
 
 }

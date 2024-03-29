@@ -42,6 +42,7 @@ public class ImageController {
         // 실제 s3에 저장될 객체의 이름
         String filename = UUID.randomUUID()+"."+extension;
         // 해당 객체에 대한 UPLOAD만을 위한 URL 생성
+        System.out.println(filename);
         String uploadURL = imageService.generateURL(filename,HttpMethod.PUT);
 
         // 해당 객체이름으로 Image 테이블에 추가

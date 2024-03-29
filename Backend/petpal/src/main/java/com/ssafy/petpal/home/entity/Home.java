@@ -1,5 +1,6 @@
 package com.ssafy.petpal.home.entity;
 
+import com.ssafy.petpal.common.BaseEntity;
 import com.ssafy.petpal.object.entity.Appliance;
 import com.ssafy.petpal.schedule.entity.Schedule;
 import com.ssafy.petpal.user.entity.User;
@@ -16,7 +17,7 @@ import java.util.List;
 @Table(name = "Homes")
 @Getter
 @NoArgsConstructor
-public class Home {
+public class Home extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +31,6 @@ public class Home {
     @Column(name = "home_nickname")
     private String homeNickname;
 
-    @Column(name = "home_created_at")
-    private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "home")
     private List<Appliance> appliances;

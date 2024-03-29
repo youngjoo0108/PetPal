@@ -1,5 +1,6 @@
 package com.ssafy.petpal.schedule.entity;
 
+import com.ssafy.petpal.common.BaseEntity;
 import com.ssafy.petpal.home.entity.Home;
 import com.ssafy.petpal.object.entity.Appliance;
 import jakarta.persistence.*;
@@ -12,7 +13,7 @@ import java.time.LocalTime;
 @Entity(name = "Schedules")
 @Getter
 @NoArgsConstructor
-public class Schedule {
+public class Schedule extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

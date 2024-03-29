@@ -1,5 +1,6 @@
 package com.ssafy.petpal.object.entity;
 
+import com.ssafy.petpal.common.BaseEntity;
 import com.ssafy.petpal.home.entity.Home;
 import com.ssafy.petpal.room.entity.Room;
 import jakarta.persistence.*;
@@ -12,7 +13,7 @@ import org.locationtech.jts.geom.Point;
 @Getter
 @NoArgsConstructor
 @Table(name = "Appliances")
-public class Appliance {
+public class Appliance extends BaseEntity {
 
 
     @Id

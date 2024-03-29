@@ -20,6 +20,7 @@ public class TargetController {
     public ResponseEntity<Void> postObject(@RequestBody TargetRegisterDto targetRegisterDto){
         log.info("Successfully parse Coordinate value if this is not null: "+targetRegisterDto.getCoordinate().getX());
         objectService.createTarget(targetRegisterDto);
+
         return ResponseEntity.ok(null);
     }
 }
