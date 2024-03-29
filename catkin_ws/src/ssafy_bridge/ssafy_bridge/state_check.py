@@ -50,10 +50,13 @@ class control_tower(Node) :
         super().__init__('control_tower')
 
         self.reqeust_sub = self.create_subscription(String, '/request', self.reqeust_callback, 20)
+        self.fsm_pub = self.create_publisher(String, 'fsm', 10)
 
         self.current_process = None
         self.current_state = "stay"
         self.last_state = None
+
+        self.fsm_msg = String()
 
         # while True:
         #     state = self.read_robot_state()
@@ -94,6 +97,8 @@ class control_tower(Node) :
                 self.current_state = FSM[self.current_state][msg.data]
             
             self.launch_file_for_state(self.current_state)
+            self.fsm_msg = self.current_state
+            self.fsm_pub.publish(self.fsm_msg)
 
 
 def main(args=None):
