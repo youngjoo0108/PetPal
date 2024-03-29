@@ -102,13 +102,13 @@ _Node Name : iot_control.py_
 
 - Map Setting : 예외 발생할 경우 error_type 인지/판단 후 경우를 나누어 제어
 
-  - error 1 : 목적지가 현재 위치와 너무 가깝거나/목적지 계산 에러
+  - Problem 1 : 목적지가 현재 위치와 너무 가깝거나/목적지 계산 에러
     &rarr; 제자리 회전 하면서 lidar 센서 데이터 업데이트 하면서 목적지 다시 계산하여 해결
 
-  - error 2 : 출발 위치가 장애물과 너무 인접하여 구분이 하기 힘든 에러
+  - Problem 2 : 출발 위치가 장애물과 너무 인접하여 구분이 하기 힘든 에러
     &rarr; lidar 데이터로 전진/후진 판단 후 장애물에서 이동하여 해결
 
-  - error 3 : 너무 오랜 시간 한 자리에 머무른 채 상태 변화 X
+  - Problem 3 : 너무 오랜 시간 한 자리에 머무른 채 상태 변화 X
     &rarr; 초기 시작 지점을 목적지로 설정하여 자리 이동하여 해결
 
 - make_map/load_map
@@ -127,7 +127,7 @@ _Node Name : tracking.py_
 ### 1. 각도 측정
 
 - 카메라 화면 중앙 아래 부분과 강아지를 나타내는 박스의 중앙점 사이 거리 측정
-- Error
+- Problem
   - Fov 값이 60인데 측정한 값은 대략 90도 정도 범위가 나옴
   - 측정한 각도값의 레이더 정보를 받아 왔을 때, 장애물이 없다고 판단되는 오류 발생
 - Solve
@@ -138,7 +138,7 @@ _Node Name : tracking.py_
 
 ### 2. 거리 측정
 
-- Error
+- Problem
   - 이미지 상 가로 길이는 강아지의 앞, 옆 부분에 따라 오차가 크게 발생
 - Solve
 
@@ -152,7 +152,7 @@ _Node Name : tracking.py_
 
 - 측정한 각도와 거리, IMU 값(터틀봇의 현재 위치 및 각도)를 통해 강아지 위치 추정
 
-- Error
+- Problem
 
   - 강아지가 벽에 붙어 있는 경우 골 지점이 장애물로 판단 되어 경로 생성을 못하는 경우가 발생
 
@@ -180,3 +180,21 @@ _Node Name : patrol_route.py_
 ---
 
 # Week4
+
+## Obstacle control
+
+_Node Name : obstacle_control.py_
+
+- 장애물 판단 및 처리 로직
+  - tracking 개발에 사용했던 이미지 기반 3d 위치 좌표 설정을 활용해 장애물 위치 추정 및 주행
+  - 장애물 들어올린 후 현관을 goal 지점으로 설정해 주행
+  - goal 지점에 장애물 보관
+- 장애물 처리 후 장애물이 있던 위치로 재 이동(순찰 로직을 이어 하기 위함)
+
+- Problem
+  - 한번에 물체를 집어 올리거나 내려놓는 로직이 수행이 안됨 (소켓 문제로 예상)
+  - goal 지점에 도달했을 때, 잡고 놓는 동작을 무한으로 반복하는 에러 발생
+
+- Solve
+  - 터틀봇의 상태를 체크하며 수행할 로직을 처리할때 까지 time callback 으로 명령 publish
+  - is_obstacle, is_obstacle_goal 상태 함수를 발행하고 관리하여 goal지점에서 장애물을 놓는 순간 is_obstacle을 False로 관리 및 is_obstacle_goal 에서 인지한 장애물은 판단 과정에서 제거함 
