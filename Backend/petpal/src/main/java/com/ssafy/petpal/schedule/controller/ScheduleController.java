@@ -24,7 +24,7 @@ public class ScheduleController {
 
 
     @PostMapping
-    public ResponseEntity<Void> postSchedule(@RequestBody ScheduleDto scheduleDto){
+    public ResponseEntity<Void> postSchedule(ScheduleDto scheduleDto){
         try{
             scheduleService.createSchedule(scheduleDto);
             return ResponseEntity.ok(null);

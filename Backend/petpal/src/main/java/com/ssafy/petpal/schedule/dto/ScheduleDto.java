@@ -10,8 +10,8 @@ import java.time.LocalTime;
 public class ScheduleDto {
     private Long roomId;
     private Long homeId;
-
     private Long applianceId;
+
     private String day;
     private LocalTime time;
     private String taskType;
