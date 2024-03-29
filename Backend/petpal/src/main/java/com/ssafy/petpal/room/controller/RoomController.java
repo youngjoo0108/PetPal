@@ -8,12 +8,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/rooms")
 public class RoomController {
+    static String[] STR_ARR = {"거실","주방","침실1","침실2","침실3","화장실"};
     private final RoomService roomService;
 
     @PostMapping
@@ -24,6 +26,11 @@ public class RoomController {
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @GetMapping("/default")
+    public ResponseEntity<String[]> getDefaultRooms(){
+        return ResponseEntity.ok(STR_ARR);
     }
 
     @GetMapping
