@@ -38,7 +38,7 @@ public class ApplianceController {
         }
     }
 
-    @GetMapping("/{roomId}")
+    @GetMapping("/room/{roomId}")
     public ResponseEntity<List<Appliance>> getApplianceListByRoomId(@PathVariable Long roomId){
         try{
             List<Appliance> list =applianceService.fetchAllApplianceByRoomId(roomId);
@@ -53,7 +53,7 @@ public class ApplianceController {
         return ResponseEntity.ok(STR_ARR);
     }
 
-    @GetMapping("/{homeId}")
+    @GetMapping("/home/{homeId}")
     public ResponseEntity<List<Appliance>> getApplianceListByHomeId(@PathVariable Long homeId){
         try{
             List<Appliance> list = applianceService.fetchAllApplianceByHomeId(homeId);
