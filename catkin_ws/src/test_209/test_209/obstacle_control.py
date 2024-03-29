@@ -99,6 +99,7 @@ class ObstacleControl(Node):
 
 
     def odom_callback(self, msg):
+        
         self.is_odom = True
         self.odom_msg = msg
         q = Quaternion(msg.pose.pose.orientation.w , msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z)
@@ -192,6 +193,7 @@ class ObstacleControl(Node):
 
     
     def hand_control_pick_up(self):
+
         self.hand_control_msg.control_mode = 2 
         self.hand_control_msg.put_distance = 1.0
         self.hand_control_msg.put_height = 0.0
@@ -207,6 +209,7 @@ class ObstacleControl(Node):
         
 
     def turtlebot_status_cb(self,msg):
+
         self.is_turtlebot_status=True
         self.turtlebot_status_msg=msg
 

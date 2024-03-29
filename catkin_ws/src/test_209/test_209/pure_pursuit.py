@@ -84,10 +84,10 @@ class PurePursuit(Node):
 
 
     def timer_callback(self):
-        if  self.is_goal:
+        if not self.is_fsm or self.is_goal:
             return
 
-        if self.is_tracking_err:
+        if self.fsm_msg.data == "tracking" and self.is_tracking_err:
             cmd_msg = Twist()
            
             if self.tracking_err_msg.data == 4:
@@ -196,7 +196,8 @@ class PurePursuit(Node):
                                 cmd_msg.linear.x = 1.0
                             else:
                                 cmd_msg.linear.x = 0.2
-                            cmd_msg.angular.z = theta/5
+                            cmd_msg.angular.z = -theta/5
+
 
                 else:
                     cmd_msg.linear.x = 0.0
