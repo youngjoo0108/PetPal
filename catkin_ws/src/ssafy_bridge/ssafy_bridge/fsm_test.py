@@ -11,7 +11,7 @@ state_launch_file_map = {
     'patrol': 'patrol.py',
     'stay': 'stay.py',
     'scan': 'scan.py',
-    'tracking' : 'tracking.py',
+    'tracking': 'tracking.py',
 }
 
 FSM = {

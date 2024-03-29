@@ -35,6 +35,7 @@ class PurePursuit(Node):
         self.lidar_msg = LaserScan()
         self.tracking_err_msg = Int32()
         self.scan_err_msg = Int32()
+        self.cmd_msg = Twist()
 
         self.lookahead_distance = 0.5
 
@@ -84,52 +85,53 @@ class PurePursuit(Node):
 
 
     def timer_callback(self):
-        if not self.is_fsm or self.is_goal:
-            return
+        # if not self.is_fsm or self.is_goal:
+        #     return
+        if self.fsm_msg.data == "stay":
+            self.cmd_msg.linear.x = 0.0
+            self.cmd_msg.angular.z = 0.0
 
-        if self.fsm_msg.data == "tracking" and self.is_tracking_err:
-            cmd_msg = Twist()
+        elif self.fsm_msg.data == "tracking" and self.is_tracking_err:
            
             if self.tracking_err_msg.data == 4:
-                cmd_msg.linear.x = -1.0
-                cmd_msg.angular.z = 0.0
-                self.cmd_pub.publish(cmd_msg)
+                self.cmd_msg.linear.x = -1.0
+                self.cmd_msg.angular.z = 0.0
+                #self.cmd_pub.publish(self.cmd_msg)
                 self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance too short')
             
             if self.tracking_err_msg.data == 1:
-                cmd_msg.linear.x = 0.0
-                cmd_msg.angular.z = 0.0
-                self.cmd_pub.publish(cmd_msg)
+                self.cmd_msg.linear.x = 0.0
+                self.cmd_msg.angular.z = 0.0
+                #self.cmd_pub.publish(self.cmd_msg)
                 self.tracking_err_msg.data = False
                 self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, stop')
             
             elif self.tracking_err_msg.data == 2:
-                cmd_msg.linear.x = 0.0
-                cmd_msg.angular.z = 0.05
-                self.cmd_pub.publish(cmd_msg)
+                self.cmd_msg.linear.x = 0.0
+                self.cmd_msg.angular.z = 0.05
+                #self.cmd_pub.publish(self.cmd_msg)
                 self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, move clockwise')
            
             else:
-                cmd_msg.linear.x = 0.0
-                cmd_msg.angular.z = -0.05
-                self.cmd_pub.publish(cmd_msg)
+                self.cmd_msg.linear.x = 0.0
+                self.cmd_msg.angular.z = -0.05
+                #self.cmd_pub.publish(self.cmd_msg)
                 self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, move counterclockwise')
             
             self.is_tracking_err = False
-            return
 
         elif self.fsm_msg.data == "scan" and self.scan_err_msg.data != 0:
-            if self.error_type == 1 or self.error_type == 4:
+            if self.scan_err_msg.data == 1 or self.scan_err_msg.data == 4:
                 self.cmd_msg.linear.x = 0.0
                 self.cmd_msg.angular.z = 0.2
 
-            elif self.error_type == 2:
+            elif self.scan_err_msg.data == 2:
                 self.lidar_check_move()
 
-            # elif self.error_type == 3:
+            # elif self.scan_err_msg.data == 3:
             #     self.lidar_check_move()
 
-            elif self.error_type == 100:
+            elif self.scan_err_msg.data == 100:
                 self.cmd_msg.linear.x = 0.0
                 self.cmd_msg.angular.z = 0.0
                 self.is_goal = True
@@ -141,8 +143,6 @@ class PurePursuit(Node):
                 robot_pose_y = self.odom_msg.pose.pose.position.y
 
                 lookahead_point = self.find_lookahead_point(path_points, robot_pose_x, robot_pose_y)
-
-                cmd_msg = Twist()  # cmd_msg를 여기서 초기화
             
                 if lookahead_point is not None:
                     robot_orientation_q = self.odom_msg.pose.pose.orientation
@@ -156,17 +156,17 @@ class PurePursuit(Node):
                     #     start_time = time.time()  # 현재 시간 기록
                     #     while True:
                     #         if time.time() - start_time < 1:  # 1초 동안 실행
-                    #             cmd_msg.linear.x = -0.3
+                    #             self.cmd_msg.linear.x = -0.3
                     #             # print('후진중!!')
                     #         else:
-                    #             cmd_msg.linear.x = 0.0
-                    #             self.cmd_pub.publish(cmd_msg)
+                    #             self.cmd_msg.linear.x = 0.0
+                    #             self.cmd_pub.publish(self.cmd_msg)
 
                     #             break
-                    #         self.cmd_pub.publish(cmd_msg)
+                    #         self.cmd_pub.publish(self.cmd_msg)
 
-                    #     cmd_msg.linear.x = 0.0
-                    #     self.cmd_pub.publish(cmd_msg)
+                    #     self.cmd_msg.linear.x = 0.0
+                    #     self.cmd_pub.publish(self.cmd_msg)
                     
                     if self.collision:
                         if theta < 0:
@@ -178,36 +178,35 @@ class PurePursuit(Node):
 
                     else:
                         if theta > 1.5 or theta < -1.5:
-                            cmd_msg.linear.x = 0.0
-                            cmd_msg.angular.z = theta/2
+                            self.cmd_msg.linear.x = 0.0
+                            self.cmd_msg.angular.z = theta/2
 
                         elif 0.7 < theta < 1.5 or -1.5 < theta < -0.7:
-                            cmd_msg.linear.x = 0.2
-                            cmd_msg.angular.z = theta/3
+                            self.cmd_msg.linear.x = 0.2
+                            self.cmd_msg.angular.z = theta/3
                         
                         elif 0.2 < theta <= 0.7 or -0.7 <= theta < -0.2:
-                            cmd_msg.linear.x = 0.5
-                            cmd_msg.angular.z = theta/4
+                            self.cmd_msg.linear.x = 0.5
+                            self.cmd_msg.angular.z = theta/4
 
                         else:
                             if 0.2 < self.lidar_msg.ranges[0]/5 < 1.0:
-                                cmd_msg.linear.x = self.lidar_msg.ranges[0]/5
+                                self.cmd_msg.linear.x = self.lidar_msg.ranges[0]/5
                             elif self.lidar_msg.ranges[0]/5 > 1.0:
-                                cmd_msg.linear.x = 1.0
+                                self.cmd_msg.linear.x = 1.0
                             else:
-                                cmd_msg.linear.x = 0.2
-                            cmd_msg.angular.z = -theta/5
-
+                                self.cmd_msg.linear.x = 0.2
+                            self.cmd_msg.angular.z = theta/5
 
                 else:
-                    cmd_msg.linear.x = 0.0
-                    cmd_msg.angular.z = 0.0
+                    self.cmd_msg.linear.x = 0.0
+                    self.cmd_msg.angular.z = 0.0
                     if self.fsm_msg.data == "patrol":
                         patrol_msg = Int32()
                         patrol_msg.data = 1
                         self.patrol_pub.publish(patrol_msg)
 
-                self.cmd_pub.publish(cmd_msg)
+        self.cmd_pub.publish(self.cmd_msg)
 
 
     def find_lookahead_point(self, path_points, robot_position_x, robot_position_y):
