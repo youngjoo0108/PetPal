@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/service/user_service.dart';
+import 'package:frontend/component/menu/room_management.dart';
+import 'package:frontend/controller/menu_tab_controller.dart';
 import 'package:frontend/const/colors.dart';
 import 'login_screen.dart';
 
@@ -11,7 +12,25 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  UserService userService = UserService();
+  MenuTabController menuTabController = MenuTabController();
+
+  @override
+  void initState() {
+    super.initState();
+    // 콜백 함수를 포함하여 MenuTabController 초기화
+    menuTabController = MenuTabController(
+      onAddRoom: () {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const RoomManagement(), // '방 추가' 화면으로 전환
+        ));
+      },
+      onLogout: () {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => const LoginScreen(), // 로그아웃 후 로그인 화면으로 전환
+        ));
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +76,10 @@ class _MenuScreenState extends State<MenuScreen> {
                     _buildMenuItem(Icons.android, "기기 등록"),
                     _buildDivider(),
                     _buildMenuItem(Icons.home_outlined, "홈 스캔"),
+                    _buildDivider(),
+                    _buildMenuItem(Icons.meeting_room_outlined, "방 관리"),
+                    _buildDivider(),
+                    _buildMenuItem(Icons.cloud_download_outlined, "가전 관리"),
                   ],
                 ),
               ),
@@ -111,20 +134,8 @@ class _MenuScreenState extends State<MenuScreen> {
     return ListTile(
       leading: Icon(icon),
       title: Text(title),
-      onTap: () => _onMenuItemTap(title),
+      onTap: () => menuTabController.tabItem(title),
     );
-  }
-
-  void _onMenuItemTap(String title) {
-    if (title == "로그아웃") {
-      userService.logout().then((_) {
-        // 로그아웃 후 로그인 화면으로 이동
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
-      });
-    }
-    // 다른 메뉴 항목에 대한 조건 분기 추가
   }
 
   Widget _buildDivider() => const Divider(height: 1, thickness: 1);

@@ -66,6 +66,7 @@ class MapScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    logger.d("Rebuilding MapScreen");
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: ClipRRect(

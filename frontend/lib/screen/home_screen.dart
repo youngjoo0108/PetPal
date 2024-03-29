@@ -3,6 +3,9 @@ import 'package:frontend/component/stream/camera_screen.dart';
 import 'package:frontend/component/stream/map_screen.dart';
 import 'package:frontend/component/weather/weather_screen.dart';
 import 'package:frontend/const/colors.dart';
+import 'package:logger/logger.dart';
+
+final Logger logger = Logger();
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

@@ -27,34 +27,34 @@ class _ReserveScreenState extends State<ReserveScreen> {
 
   // 방과 가전의 예시 데이터
   final List<Room> rooms = [
-    Room(
-      name: '거실',
-      appliances: [
-        Appliance(name: '전등', imagePath: 'asset/img/light.png'),
-        Appliance(name: '커튼', imagePath: 'asset/img/curtains.png'),
-        Appliance(name: 'TV', imagePath: 'asset/img/tv.png'),
-        Appliance(name: '에어컨', imagePath: 'asset/img/airConditioner.png'),
-        Appliance(name: '공기청정기', imagePath: 'asset/img/purifier.png'),
-      ],
-    ),
-    Room(
-      name: '주방',
-      appliances: [
-        Appliance(name: '전등', imagePath: 'asset/img/light.png'),
-        Appliance(name: '커튼', imagePath: 'asset/img/curtains.png'),
-        Appliance(name: '세탁기', imagePath: 'asset/img/washingMachine.png'),
-      ],
-    ),
-    Room(
-      name: '침실',
-      appliances: [
-        Appliance(name: '전등', imagePath: 'asset/img/light.png'),
-        Appliance(name: '커튼', imagePath: 'asset/img/curtains.png'),
-        Appliance(name: 'TV', imagePath: 'asset/img/tv.png'),
-        Appliance(name: '에어컨', imagePath: 'asset/img/airConditioner.png'),
-        Appliance(name: '공기청정기', imagePath: 'asset/img/purifier.png'),
-      ],
-    ),
+    // Room(
+    //   name: '거실',
+    //   appliances: [
+    //     Appliance(name: '전등', imagePath: 'asset/img/light.png'),
+    //     Appliance(name: '커튼', imagePath: 'asset/img/curtains.png'),
+    //     Appliance(name: 'TV', imagePath: 'asset/img/tv.png'),
+    //     Appliance(name: '에어컨', imagePath: 'asset/img/airConditioner.png'),
+    //     Appliance(name: '공기청정기', imagePath: 'asset/img/purifier.png'),
+    //   ],
+    // ),
+    // Room(
+    //   name: '주방',
+    //   appliances: [
+    //     Appliance(name: '전등', imagePath: 'asset/img/light.png'),
+    //     Appliance(name: '커튼', imagePath: 'asset/img/curtains.png'),
+    //     Appliance(name: '세탁기', imagePath: 'asset/img/washingMachine.png'),
+    //   ],
+    // ),
+    // Room(
+    //   name: '침실',
+    //   appliances: [
+    //     Appliance(name: '전등', imagePath: 'asset/img/light.png'),
+    //     Appliance(name: '커튼', imagePath: 'asset/img/curtains.png'),
+    //     Appliance(name: 'TV', imagePath: 'asset/img/tv.png'),
+    //     Appliance(name: '에어컨', imagePath: 'asset/img/airConditioner.png'),
+    //     Appliance(name: '공기청정기', imagePath: 'asset/img/purifier.png'),
+    //   ],
+    // ),
   ];
 
   @override

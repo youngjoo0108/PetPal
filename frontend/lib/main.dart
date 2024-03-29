@@ -19,6 +19,9 @@ void main() async {
   KakaoSdk.init(nativeAppKey: '$kakaoApiKey'); // KAKAO SDK init
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   String? fcmToken = await FirebaseMessaging.instance.getToken();
+  FirebaseMessaging.instance
+      .requestPermission(badge: true, alert: true, sound: true);
+
   logger.e(fcmToken);
   runApp(MyApp());
 }

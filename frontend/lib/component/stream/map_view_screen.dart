@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/const/map_painter.dart';
+import 'package:logger/logger.dart';
+
+final Logger logger = Logger();
 
 class MapView extends StatefulWidget {
   final List<List<int>> mapData;
@@ -15,11 +18,20 @@ class MapView extends StatefulWidget {
 
 class _MapViewState extends State<MapView> {
   final double targetX = 100;
-
   final double targetY = 100;
+  // late double screenWidth;
+  // late double screenHeight;
+  late final MapPainter _mapPainter;
+
+  @override
+  void initState() {
+    super.initState();
+    _mapPainter = MapPainter(widget.mapData, 400, 400, 304, 250);
+  }
 
   @override
   Widget build(BuildContext context) {
+    logger.d("Rebuilding MapView");
     // 화면 너비와 높이를 계산
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
@@ -38,8 +50,7 @@ class _MapViewState extends State<MapView> {
       children: [
         CustomPaint(
           size: Size(screenWidth, screenHeight),
-          painter:
-              MapPainter(widget.mapData, screenWidth, screenHeight, 304, 250),
+          painter: _mapPainter,
         ),
         Positioned(
           left: imageX,

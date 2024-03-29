@@ -179,12 +179,6 @@ class _CreateReservationScreenState extends State<CreateReservationScreen> {
         action: selectedAction!,
         isActive: true,
       );
-      print(newReservation.room.name);
-      print(newReservation.appliance.name);
-      print(newReservation.date);
-      print(newReservation.time);
-      print(newReservation.action);
-      print(newReservation.isActive);
       /*
         ---------------------서버에 전달하는 로직 추가---------------------
        */

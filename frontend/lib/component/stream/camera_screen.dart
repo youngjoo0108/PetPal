@@ -53,6 +53,9 @@ class CameraScreenState extends State<CameraScreen> {
       destination: '/exchange/control.exchange/user.1',
       callback: (frame) {
         if (frame.body != null) {
+          /*
+          json.decode(frame.body!)['type'] == "video_streaming"인지 확인하는 로직 추가 
+          */
           final String? imageBase64 = json.decode(frame.body!)['message'];
           if (imageBase64 != null) {
             _imageQueue.add(base64Decode(imageBase64));
