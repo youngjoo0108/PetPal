@@ -8,9 +8,12 @@ import com.ssafy.petpal.object.repository.ApplianceRepository;
 import com.ssafy.petpal.room.entity.Room;
 import com.ssafy.petpal.room.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.ssafy.petpal.object.dto.TargetRegisterDto.locationToPoint;
 
 @Service
 @RequiredArgsConstructor
@@ -24,9 +27,11 @@ public class ApplianceService {
                 .orElseThrow(IllegalArgumentException::new);
         Room room = roomRepository.findById(applianceRegisterDTO.getRoomId())
                 .orElseThrow(IllegalArgumentException::new);
+        Point point = locationToPoint(applianceRegisterDTO.getCoordinate());
         Appliance appliance = Appliance.builder()
                 .applianceUUID(applianceRegisterDTO.getApplianceUUID())
                 .applianceName(applianceRegisterDTO.getApplianceName())
+                .coordinate(point)
                 .home(home)
                 .room(room)
                 .build();

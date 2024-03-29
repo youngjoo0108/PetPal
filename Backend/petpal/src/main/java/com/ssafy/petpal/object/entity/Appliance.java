@@ -27,7 +27,7 @@ public class Appliance extends BaseEntity {
     @Column(name = "appliance_uuid")
     private String applianceUUID;
 
-    @Column(name = "cordinate")
+    @Column(name = "coordinate")
     Point coordinate;
 
     @ManyToOne
@@ -40,9 +40,10 @@ public class Appliance extends BaseEntity {
     private Home home;
 
     @Builder
-    public Appliance(String applianceName, String applianceUUID, Room room, Home home){
+    public Appliance(String applianceName, String applianceUUID, Point coordinate, Room room, Home home){
         this.applianceName = applianceName;
         this.applianceUUID = applianceUUID;
+        this.coordinate = coordinate;
         this.home = home;
         this.room = room;
     }
