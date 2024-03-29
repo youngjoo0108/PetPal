@@ -28,6 +28,7 @@ setup(
             'follow=test_209.path_tracking:main',
             'purefollow=test_209.pure_pursuit:main',
             'patrol=test_209.patrol:main',
+            'stop=test_209.stop:main',
 
             # mapping
             'map=test_209.load_map:main',
