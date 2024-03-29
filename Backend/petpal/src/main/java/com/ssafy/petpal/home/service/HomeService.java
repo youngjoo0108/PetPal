@@ -19,19 +19,20 @@ public class HomeService {
     private final HomeRepository homeRepository;
     private final UserRepository userRepository;
 
-    public void createHome(HomeRequestDTO homeRequestDTO) {
+    public long createHome(HomeRequestDTO homeRequestDTO) {
         log.info("23");
-        User user = userRepository.findById(homeRequestDTO.getUserId())
+        User user = userRepository.findByUserId(homeRequestDTO.getUserId())
                 .orElseThrow(IllegalArgumentException::new);
 
         log.info("26 " + user.getNickname());
         Home home = Home.builder()
-                .homeNickname(homeRequestDTO.getHomeNickname())
+//                .homeNickname(homeRequestDTO.getHomeNickname())
                 .user(user)
                 .build();
-        log.info("31 " + home.getHomeNickname());
-        homeRepository.save(home);
+//        log.info("31 " + home.getHomeNickname());
+        Home returnHome = homeRepository.save(home);
         log.info("33");
+        return returnHome.getId();
     }
 
     public List<Home> fetchAllByUserId(Long userId) {

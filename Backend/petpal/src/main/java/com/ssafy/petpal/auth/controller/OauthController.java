@@ -6,6 +6,8 @@ import com.ssafy.petpal.auth.dto.RefreshTokenResponseDto;
 import com.ssafy.petpal.auth.service.OauthService;
 import com.ssafy.petpal.exception.CustomException;
 import com.ssafy.petpal.exception.ErrorCode;
+import com.ssafy.petpal.home.dto.HomeRequestDTO;
+import com.ssafy.petpal.home.service.HomeService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,6 +24,7 @@ import java.util.*;
 public class OauthController {
 
     private final OauthService oauthService;
+    private final HomeService homeService;
 
     @PostMapping("/login/oauth/{provider}")
     public OauthResponseDto login(@PathVariable String provider, @RequestBody OauthRequestDto oauthRequestDto,
@@ -31,8 +34,13 @@ public class OauthController {
         switch (provider) {
             case "kakao":
                 String[] arr = oauthService.loginWithKakao(oauthRequestDto.getAccessToken());
+
                 oauthResponseDto.setAccessToken(arr[0]);
                 oauthResponseDto.setRefreshToken(arr[1]);
+                if(homeService.fetchAllByUserId(Long.valueOf(arr[2])).isEmpty())
+                    oauthResponseDto.setHomeId(homeService.createHome(new HomeRequestDTO(Long.valueOf(arr[2]))));
+                else
+                    oauthResponseDto.setHomeId(homeService.fetchAllByUserId(Long.valueOf(arr[2])).get(0).getId());
         }
         return oauthResponseDto;
     }

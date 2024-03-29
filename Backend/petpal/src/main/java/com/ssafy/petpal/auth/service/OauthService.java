@@ -34,8 +34,8 @@ public class OauthService {
         userDto.setRefreshToken(refreshToken);
         userService.updateRefreshToken(userDto);
 
-        String[] arr = new String[2];
-        arr[0] = accessToken; arr[1] = refreshToken;
+        String[] arr = new String[3];
+        arr[0] = accessToken; arr[1] = refreshToken; arr[2] = String.valueOf(userDto.getId());
         return arr;
     }
 

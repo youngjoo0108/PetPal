@@ -28,8 +28,8 @@ public class Home extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "home_nickname")
-    private String homeNickname;
+//    @Column(name = "home_nickname")
+//    private String homeNickname;
 
 
     @OneToMany(mappedBy = "home")
@@ -39,8 +39,8 @@ public class Home extends BaseEntity {
     private List<Schedule> schedules;
 
     @Builder
-    public Home(User user, String homeNickname){
+    public Home(User user){
         this.user = user;
-        this.homeNickname = homeNickname;
+//        this.homeNickname = homeNickname;
     }
 }
