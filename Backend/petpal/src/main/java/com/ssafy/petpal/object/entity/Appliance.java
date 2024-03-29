@@ -29,10 +29,6 @@ public class Appliance {
     @Column(name = "cordinate")
     Point coordinate;
 
-    @OneToOne
-    @JoinColumn(name = "object_id")
-    private ObjectEntity objectEntity;
-
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
