@@ -201,7 +201,7 @@ class PurePursuit(Node):
                 else:
                     cmd_msg.linear.x = 0.0
                     cmd_msg.angular.z = 0.0
-                    if self.fsm_msg.data = "patrol":
+                    if self.fsm_msg.data == "patrol":
                         patrol_msg = Int32()
                         patrol_msg.data = 1
                         self.patrol_pub.publish(patrol_msg)
