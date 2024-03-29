@@ -21,12 +21,12 @@ def generate_launch_description():
         #     node_name = 'follow',
         #     output = 'screen',
         # ),
-        Node(
-            package = 'test_209',
-            node_executable = 'purefollow',
-            node_name = 'purefollow',
-            output = 'screen',
-        ),
+        # Node(
+        #     package = 'test_209',
+        #     node_executable = 'setting',
+        #     node_name = 'setting',
+        #     output = 'screen',
+        # ),
         Node(
             package = 'test_209',
             node_executable = 'mapping',
