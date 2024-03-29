@@ -16,7 +16,7 @@ import java.util.List;
 public class ApplianceController {
     private final ApplianceService applianceService;
 
-    static String[] STR_ARR = {"TV","Air Conditioner","Light","Curtain","Air Purifier"};
+    static String[] STR_ARR = {"TV","에어컨","전등","커튼","공기청정기"};
     @PostMapping
     public ResponseEntity<Void> postAppliance(ApplianceRegisterDTO applianceRegisterDTO){
         try{
@@ -28,7 +28,7 @@ public class ApplianceController {
     }
 
 
-    @GetMapping("/{applianceUUID}")
+    @GetMapping("/{appliacneId}")
     public ResponseEntity<Appliance> getApplianceByUUID(@PathVariable String applianceUUID){
         try{
             Appliance appliance = applianceService.fetchApplianceByUUID(applianceUUID);
@@ -62,6 +62,8 @@ public class ApplianceController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
 
 
 

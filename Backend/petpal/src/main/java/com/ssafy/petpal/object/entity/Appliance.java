@@ -21,8 +21,8 @@ public class Appliance extends BaseEntity {
     @Column(name = "appliance_id")
     private Long id;
 
-    @Column(name = "appliance_name")
-    private String applianceName;
+    @Column(name = "appliance_type")
+    private String applianceType;
 
     @Column(name = "appliance_uuid")
     private String applianceUUID;
@@ -40,8 +40,8 @@ public class Appliance extends BaseEntity {
     private Home home;
 
     @Builder
-    public Appliance(String applianceName, String applianceUUID, Point coordinate, Room room, Home home){
-        this.applianceName = applianceName;
+    public Appliance(String applianceType, String applianceUUID, Point coordinate, Room room, Home home){
+        this.applianceType = applianceType;
         this.applianceUUID = applianceUUID;
         this.coordinate = coordinate;
         this.home = home;

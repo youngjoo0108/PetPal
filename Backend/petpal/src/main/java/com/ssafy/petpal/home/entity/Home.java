@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,9 +25,8 @@ public class Home extends BaseEntity {
     @Column(name = "home_id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "userId")
+    private Long kakaoId;
 
 //    @Column(name = "home_nickname")
 //    private String homeNickname;
@@ -39,8 +39,8 @@ public class Home extends BaseEntity {
     private List<Schedule> schedules;
 
     @Builder
-    public Home(User user){
-        this.user = user;
+    public Home(Long kakaoId){
+        this.kakaoId = kakaoId;
 //        this.homeNickname = homeNickname;
     }
 }

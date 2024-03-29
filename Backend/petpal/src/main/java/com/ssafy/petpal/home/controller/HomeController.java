@@ -20,7 +20,7 @@ public class HomeController {
 
     private final HomeService homeService;
 
-    @PostMapping
+    @PostMapping// test용
     public ResponseEntity<String> postHome(HomeRequestDTO homeRequestDTO ){
         try{
             homeService.createHome(homeRequestDTO);

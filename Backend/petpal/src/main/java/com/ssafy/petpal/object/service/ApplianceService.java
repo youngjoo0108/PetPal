@@ -27,10 +27,17 @@ public class ApplianceService {
                 .orElseThrow(IllegalArgumentException::new);
         Room room = roomRepository.findById(applianceRegisterDTO.getRoomId())
                 .orElseThrow(IllegalArgumentException::new);
+
+//         ROS2로 메세지 발행
+//        http로 ROs야 맵데이터 다오
+//              response = request(ros주소);
+////         ROS2가 준 메세지 받기
+///
+        // mapRepository.save(map)
         Point point = locationToPoint(applianceRegisterDTO.getCoordinate());
         Appliance appliance = Appliance.builder()
                 .applianceUUID(applianceRegisterDTO.getApplianceUUID())
-                .applianceName(applianceRegisterDTO.getApplianceName())
+                .applianceType(applianceRegisterDTO.getApplianceType())
                 .coordinate(point)
                 .home(home)
                 .room(room)

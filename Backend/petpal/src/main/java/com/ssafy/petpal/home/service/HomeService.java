@@ -21,13 +21,12 @@ public class HomeService {
 
     public long createHome(HomeRequestDTO homeRequestDTO) {
         log.info("23");
-        User user = userRepository.findByUserId(homeRequestDTO.getUserId())
-                .orElseThrow(IllegalArgumentException::new);
+//        User user = userRepository.findByUserId(homeRequestDTO.getUserId())
+//                .orElseThrow(IllegalArgumentException::new);
 
-        log.info("26 " + user.getNickname());
         Home home = Home.builder()
 //                .homeNickname(homeRequestDTO.getHomeNickname())
-                .user(user)
+                .kakaoId(homeRequestDTO.getUserId())
                 .build();
 //        log.info("31 " + home.getHomeNickname());
         Home returnHome = homeRepository.save(home);
@@ -36,6 +35,6 @@ public class HomeService {
     }
 
     public List<Home> fetchAllByUserId(Long userId) {
-        return homeRepository.findByUserId(userId);
+        return homeRepository.findByKakaoId(userId);
     }
 }

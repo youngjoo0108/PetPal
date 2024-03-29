@@ -28,11 +28,22 @@ public class ControlController {
         this.objectMapper = objectMapper;
     }
 
-    @MessageMapping("control.message.{userId}")
-    public void sendMessage(@Payload String rawMessage, @DestinationVariable String userId) throws JsonProcessingException {
+    @MessageMapping("control.message.{homeId}")
+    public void sendMessage(@Payload String rawMessage, @DestinationVariable String homeId) throws JsonProcessingException {
 //        logger.info("Received message: {}", rawMessage);
         ControlDto controlDto = objectMapper.readValue(rawMessage, ControlDto.class);
-        rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "user." + userId, controlDto);
+        String type = controlDto.getType();
+        switch (type){
+            case "COMPLETE":
+                // ROS에서 입증한 실제 가전상태 데이터를 redis에 올린다.
+                // fcm 호출.
+                break;
+            case "ON":
+                break;
+            case "OFF":
+                break;
+        }
+        rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
     }
 
     @MessageMapping("scan.map.{homeId}")
@@ -44,8 +55,15 @@ public class ControlController {
                 rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
                 break;
             case "COMPLETE":
+                // 날것의 맵
+                // dtoMapper로 만들ㅇ서ㅓ
+                // mapService.createMap(dto)
+                // scan.map.{homeID} 메세지 발행(깎은 맵이 들어가있다)
 
                 break;
+            case "ROUTE":
+                // 경로 저장 repository
+
         }
     }
 

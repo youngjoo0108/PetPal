@@ -10,7 +10,8 @@ import org.locationtech.jts.geom.Point;
 @Getter
 public class ApplianceRegisterDTO {
 
-    private String applianceName;
+
+    private String applianceType;
 
     private String applianceUUID;
 
