@@ -17,15 +17,12 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final HomeRepository homeRepository;
     public void createRoom(RoomRegisterDTO roomRegisterDTO) {
-        System.out.println("1");
         Home home = homeRepository.findById(roomRegisterDTO.getHomeId())
                 .orElseThrow(IllegalArgumentException::new);
-        System.out.println("2"+ home.getHomeNickname());
         Room room  = Room.builder()
                 .roomName(roomRegisterDTO.getRoomName())
                 .home(home)
                 .build();
-        System.out.println("3"+ room.getRoomName());
         roomRepository.save(room);
     }
 
