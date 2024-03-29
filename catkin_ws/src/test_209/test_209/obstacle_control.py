@@ -36,6 +36,7 @@ class ObstacleControl(Node):
         self.is_odom = False
         self.is_lifted = False
         self.is_obstacle_goal = False
+        self.is_goal_setting = False
 
         self.robot_pose_x = 0.0
         self.robot_pose_y = 0.0
@@ -133,7 +134,7 @@ class ObstacleControl(Node):
         if self.is_obstacle:
             if self.is_lifted:
                 # 골까지 주행
-                if not self.is_obstacle_goal:
+                if not self.is_obstacle_goal and not self.is_goal_setting:
                     
                     self.goal_msg.pose.position.x = self.obstacle_goal_x
                     self.goal_msg.pose.position.y = self.obstacle_goal_y
@@ -149,7 +150,9 @@ class ObstacleControl(Node):
                     self.goal_pub.publish(self.goal_msg)
                     self.ros_log_pub.publish_log('DEBUG', 'Go goalpoint with Obstacle')
 
-                else:
+                    self.is_goal_setting = True
+
+                elif self.is_goal_setting and self.is_obstacle_goal:
                     
                     cnt = 0
                     while cnt < 5:
@@ -172,6 +175,7 @@ class ObstacleControl(Node):
                         self.ros_log_pub.publish_log('obscontrol', 'Obstacle control success')
                         self.is_lifted = False
                         self.is_obstacle = False
+                        self.is_goal_setting = False
 
             else:
                 if self.is_obstacle and not self.is_obstacle_goal:
@@ -179,7 +183,7 @@ class ObstacleControl(Node):
                     self.hand_control_pick_up()
                    
                     if self.turtlebot_status_msg.can_use_hand == True:
-                        print('is here?')
+                        
                         self.obstacle_lifted_x = self.robot_pose_x
                         self.obstacle_lifted_y = self.robot_pose_y
 

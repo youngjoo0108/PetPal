@@ -13,15 +13,11 @@ class PurePursuit(Node):
     def __init__(self):
         super().__init__('pure_pursuit_path_tracking')
         self.cmd_pub = self.create_publisher(Twist, 'cmd_vel', 10)
-        # self.cmd_sub = self.create_subscription(Twist, 'cmd_vel', self.check_velocity, 10)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
         self.path_sub = self.create_subscription(Path, '/local_path', self.path_callback, 10)
-        self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
-        self.goal_sub = self.create_subscription(PoseStamped,'goal_pose',self.goal_callback,15)
         self.lidar_sub = self.create_subscription(LaserScan, '/scan', self.lidar_callback, 10)
         self.tracking_sub = self.create_subscription(Int32, 'tracking_err', self.tracking_err_callback, 10)
-        self.goal_msg = PoseStamped()
-        self.goal_msg.header.frame_id = 'map'
+        self.timer = self.create_timer(0.05, self.timer_callback)
 
         self.collision = False
         self.is_odom = False
@@ -29,11 +25,10 @@ class PurePursuit(Node):
         self.is_tracking_err = False
         self.odom_msg = Odometry()
         self.path_msg = Path()
+        self.lidar_msg = LaserScan()
         self.tracking_err_msg = Int32()
-        self.goal = [184, 224]
 
-        self.lookahead_distance = 0.5 
-        self.timer = self.create_timer(0.1, self.timer_callback)
+        self.lookahead_distance = 0.5
 
         # log
         self.ros_log_pub = None
@@ -51,13 +46,6 @@ class PurePursuit(Node):
     def path_callback(self, msg):
         self.is_path = True
         self.path_msg = msg
-
-
-    def goal_callback(self,msg):
-        if msg.header.frame_id=='map':
-            goal_x=msg.pose.position.x
-            goal_y=msg.pose.position.y
-        self.goal = [goal_x, goal_y]
 
 
     def check_collision(self, msg):
@@ -122,7 +110,7 @@ class PurePursuit(Node):
                 robot_pose_x = self.odom_msg.pose.pose.position.x
                 robot_pose_y = self.odom_msg.pose.pose.position.y
 
-                closest_point, lookahead_point = self.find_lookahead_point(path_points, robot_pose_x, robot_pose_y)
+                lookahead_point = self.find_lookahead_point(path_points, robot_pose_x, robot_pose_y)
 
                 cmd_msg = Twist()  # cmd_msg를 여기서 초기화
             
@@ -143,22 +131,6 @@ class PurePursuit(Node):
 
                         cmd_msg.linear.x = 0.0
                         self.cmd_pub.publish(cmd_msg)
-            
-
-                        goal_x = self.goal[0]
-                        goal_y = self.goal[1]
-
-                        self.goal_msg.pose.position.x = goal_x
-                        self.goal_msg.pose.position.y = goal_y
-
-                        self.goal_msg.pose.orientation.x = 0.0
-                        self.goal_msg.pose.orientation.y = 0.0
-                        self.goal_msg.pose.orientation.z = 0.0
-                        self.goal_msg.pose.orientation.w = 1.0
-
-                        # print(self.goal)
-                        self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
-                        self.goal_pub.publish(self.goal_msg)
 
                     else:
                         robot_orientation_q = self.odom_msg.pose.pose.orientation
@@ -166,19 +138,19 @@ class PurePursuit(Node):
                         robot_yaw = robot_orientation_euler[2]
 
                         angle_to_target = atan2(lookahead_point.y - robot_pose_y, lookahead_point.x - robot_pose_x)
-                        theta = self.normalize_angle(angle_to_target - robot_yaw)
+                        theta = self.normalize_angle(angle_to_target - robot_yaw) * -1
 
                         if theta > 1.5 or theta < -1.5:
                             cmd_msg.linear.x = 0.0
-                            cmd_msg.angular.z = -theta/2
+                            cmd_msg.angular.z = theta/2
 
                         elif 0.7 < theta < 1.5 or -1.5 < theta < -0.7:
                             cmd_msg.linear.x = 0.2
-                            cmd_msg.angular.z = -theta/3
+                            cmd_msg.angular.z = theta/3
                         
                         elif 0.2 < theta <= 0.7 or -0.7 <= theta < -0.2:
                             cmd_msg.linear.x = 0.5
-                            cmd_msg.angular.z = -theta/4
+                            cmd_msg.angular.z = theta/4
 
                         else:
                             if 0.2 < self.lidar_msg.ranges[0]/5 < 1.0:
@@ -187,7 +159,7 @@ class PurePursuit(Node):
                                 cmd_msg.linear.x = 1.0
                             else:
                                 cmd_msg.linear.x = 0.2
-                            cmd_msg.angular.z = -theta/5
+                            cmd_msg.angular.z = theta/5
 
 
                 else:
@@ -206,7 +178,7 @@ class PurePursuit(Node):
                 closest_distance = distance
                 lookahead_point = point
 
-        return None, lookahead_point
+        return lookahead_point
 
 
     def normalize_angle(self, angle):
