@@ -4,6 +4,7 @@ import com.ssafy.petpal.schedule.dto.ScheduleDto;
 import com.ssafy.petpal.schedule.entity.Schedule;
 import com.ssafy.petpal.schedule.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("api/v1/schedules")
 
 public class ScheduleController {
@@ -26,6 +28,7 @@ public class ScheduleController {
     @PostMapping
     public ResponseEntity<Void> postSchedule(ScheduleDto scheduleDto){
         try{
+            log.info(scheduleDto.toString());
             scheduleService.createSchedule(scheduleDto);
             return ResponseEntity.ok(null);
         }catch (Exception e){
