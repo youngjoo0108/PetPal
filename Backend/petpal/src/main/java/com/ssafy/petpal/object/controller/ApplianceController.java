@@ -16,7 +16,7 @@ import java.util.List;
 public class ApplianceController {
     private final ApplianceService applianceService;
 
-
+    static String[] STR_ARR = {"TV","Air Conditioner","Light","Curtain","Air Purifier"};
     @PostMapping
     public ResponseEntity<Void> postAppliance(ApplianceRegisterDTO applianceRegisterDTO){
         try{
@@ -46,6 +46,11 @@ public class ApplianceController {
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @GetMapping("/default")
+    public ResponseEntity<String[]> getDefaultAppliance(){
+        return ResponseEntity.ok(STR_ARR);
     }
 
     @GetMapping("/{homeId}")
