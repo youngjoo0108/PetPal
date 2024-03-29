@@ -20,4 +20,9 @@ def generate_launch_description():
             node_executable = 'astarlocal',
             node_name = 'astarlocal',
         ),
+        Node(
+            package = 'test_209',
+            node_executable = 'purefollow',
+            node_name = 'purefollow',
+        ),
     ])
