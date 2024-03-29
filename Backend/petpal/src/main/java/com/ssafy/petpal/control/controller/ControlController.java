@@ -35,10 +35,23 @@ public class ControlController {
         rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "user." + userId, controlDto);
     }
 
+    @MessageMapping("scan.map.{userId}.{homeId}")
+    public void sendMessage(@Payload String rawMessage, @DestinationVariable String userId, @DestinationVariable String homeId) throws JsonProcessingException {
+        ControlDto controlDto = objectMapper.readValue(rawMessage, ControlDto.class);
+        String type = controlDto.getType();
+        switch (type){
+            case "SCAN":
+                rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "user." + userId, controlDto);
+                break;
+            case "COMPLETE":
+                break;
+        }
+    }
+
 
 
     @RabbitListener(queues = CONTROL_QUEUE_NAME)
     public void receive(ControlDto controlDto) {
-        logger.info(" log : " + controlDto);
+//        logger.info(" log : " + controlDto);
     }
 }
