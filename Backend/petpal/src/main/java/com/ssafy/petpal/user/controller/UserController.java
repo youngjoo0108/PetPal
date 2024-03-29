@@ -6,9 +6,8 @@ import com.ssafy.petpal.exception.ErrorCode;
 import com.ssafy.petpal.user.dto.UserDto;
 import com.ssafy.petpal.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,5 +26,11 @@ public class UserController {
             throw new CustomException(ErrorCode.NOT_EXIST_USER);
         }
         return userDto;
+    }
+
+    @PostMapping(value = "/fcm/{userId}")
+    public ResponseEntity<?> updateFCMToken(@PathVariable("userId") Long userId, @RequestBody String token){
+        userService.updateFCMToken(userId, token);
+        return ResponseEntity.ok().build();
     }
 }

@@ -52,4 +52,11 @@ public class UserService {
         user.setRefreshToken(userDto.getRefreshToken());
         userRepository.save(user);
     }
+
+    public void updateFCMToken(Long userId, String fcmToken){
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setFcmToken(fcmToken);
+        userRepository.save(user);
+    }
 }
