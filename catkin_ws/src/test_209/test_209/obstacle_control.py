@@ -72,7 +72,7 @@ class ObstacleControl(Node):
         if 'knife_list' in data and not self.turtlebot_status_msg.can_use_hand:
             for obstacle in data['knife_list']:
                 self.is_obstacle = True
-                # print(obstacle)
+                print(obstacle)
                 left_top = obstacle.split('/')[-2]
                 right_bottom = obstacle.split('/')[-1]
                 left_top_x, left_top_y = map(float, left_top.split('-'))
@@ -183,7 +183,7 @@ class ObstacleControl(Node):
                     self.hand_control_pick_up()
                    
                     if self.turtlebot_status_msg.can_use_hand == True:
-                        
+
                         self.obstacle_lifted_x = self.robot_pose_x
                         self.obstacle_lifted_y = self.robot_pose_y
 

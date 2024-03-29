@@ -4,7 +4,7 @@ import ros2pkg
 from geometry_msgs.msg import Twist,PoseStamped,Pose,TransformStamped
 from ssafy_msgs.msg import TurtlebotStatus
 from sensor_msgs.msg import Imu,LaserScan
-from std_msgs.msg import Float32
+from std_msgs.msg import Float32, Int32
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path,OccupancyGrid,MapMetaData
 from math import pi,cos,sin,sqrt
@@ -153,30 +153,16 @@ class Mapper(Node):
         '/scan',self.scan_callback,10)
         self.map_pub = self.create_publisher(OccupancyGrid, '/map', 1)
         self.status_sub = self.create_subscription(TurtlebotStatus, '/turtlebot_status', self.status_callback, 10)
+        self.end_sub = self.create_subscription(Int32, '/err', self.end_callback, 1)
 
         self.is_status = False
         
         self.map_msg=OccupancyGrid()
         self.map_msg.header.frame_id="map"
-
-        # self.map_size=int(params_map["MAP_SIZE"][0]\
-        #     /params_map["MAP_RESOLUTION"]*params_map["MAP_SIZE"][1]/params_map["MAP_RESOLUTION"])
-
-        # m = MapMetaData()
-        # m.resolution = params_map["MAP_RESOLUTION"]
-        # m.width = int(params_map["MAP_SIZE"][0]/params_map["MAP_RESOLUTION"])
-        # m.height = int(params_map["MAP_SIZE"][1]/params_map["MAP_RESOLUTION"])
-        # quat = np.array([0, 0, 0, 1])
-        # m.origin = Pose()
-
-        # m.origin.position.x = params_map["MAP_CENTER"][0] -8.75
-        # m.origin.position.y = params_map["MAP_CENTER"][1] -8.75
-        # self.map_meta_data = m
-
-        # self.map_msg.info=self.map_meta_data
-
-        # # 로직 2 : mapping 클래스 생성
-        # self.mapping = Mapping(params_map)
+    
+    def end_callback(self, msg):
+        if msg.data == 100:
+            pass # 순찰 루트 계산 후 중앙 노드로 scan_off 요청 보내기
 
     def status_callback(self, msg):
         if self.is_status == False:
@@ -239,14 +225,8 @@ class Mapper(Node):
             self.map_pub.publish(self.map_msg)
 
 
-def save_map(node,file_path):
+def save_map(node,file_path): # 서버 저장으로 추후에 변경
 
-    # 로직 12 : 맵 저장
-    # pkg_path =os.getcwd()
-    # back_folder='..'
-    # folder_name='map'
-    # file_name=file_path
-    # full_path=os.path.join(pkg_path,back_folder,folder_name,file_name)
     full_path = 'C:\\Users\\SSAFY\\Desktop\\\S10P22A209\\catkin_ws\\src\\test_209\\map\\map.txt'
     f=open(full_path,'w')
     data=''

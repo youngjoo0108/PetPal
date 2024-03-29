@@ -3,7 +3,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist, Point, PoseStamped
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry, Path
-from std_msgs.msg import Int32
+from std_msgs.msg import Int32, String
 from squaternion import Quaternion
 from math import atan2, sqrt, pi
 import numpy as np
@@ -12,21 +12,29 @@ from ros_log_package.RosLogPublisher import RosLogPublisher
 class PurePursuit(Node):
     def __init__(self):
         super().__init__('pure_pursuit_path_tracking')
+        self.fsm_sub = self.create_subscription(String, '/fsm', self.fsm_callback, 10)
         self.cmd_pub = self.create_publisher(Twist, 'cmd_vel', 10)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
         self.path_sub = self.create_subscription(Path, '/local_path', self.path_callback, 10)
         self.lidar_sub = self.create_subscription(LaserScan, '/scan', self.lidar_callback, 10)
         self.tracking_sub = self.create_subscription(Int32, 'tracking_err', self.tracking_err_callback, 10)
+        self.scan_sub = self.create_subscription(Int32, '/err', self.scan_err_callback, 10)
+        self.patrol_pub = self.create_publisher(Int32, 'patrol', 1)
         self.timer = self.create_timer(0.05, self.timer_callback)
 
         self.collision = False
+        self.is_fsm = False
         self.is_odom = False
         self.is_path = False
         self.is_tracking_err = False
+        self.is_goal = False
+
+        self.fsm_msg = String()
         self.odom_msg = Odometry()
         self.path_msg = Path()
         self.lidar_msg = LaserScan()
         self.tracking_err_msg = Int32()
+        self.scan_err_msg = Int32()
 
         self.lookahead_distance = 0.5
 
@@ -37,6 +45,9 @@ class PurePursuit(Node):
         except Exception as e:
             self.get_logger().error('Subscription initialization error: {}'.format(e))
 
+    def fsm_callback(self, msg):
+        self.is_fsm = True
+        self.fsm_msg = msg
 
     def odom_callback(self, msg):
         self.is_odom = True
@@ -61,6 +72,8 @@ class PurePursuit(Node):
         self.tracking_err_msg = msg
         self.is_tracking_err = True
     
+    def scan_err_callback(self, msg):
+        self.scan_err_msg = msg
 
     def lidar_callback(self, msg):
         self.lidar_msg = msg
@@ -71,8 +84,10 @@ class PurePursuit(Node):
 
 
     def timer_callback(self):
+        if  self.is_goal:
+            return
 
-        if self.is_tracking_err and self.tracking_err_msg.data < 5:
+        if self.is_tracking_err:
             cmd_msg = Twist()
            
             if self.tracking_err_msg.data == 4:
@@ -102,9 +117,24 @@ class PurePursuit(Node):
             
             self.is_tracking_err = False
             return
+
+        elif self.fsm_msg.data == "scan" and self.scan_err_msg.data != 0:
+            if self.error_type == 1 or self.error_type == 4:
+                self.cmd_msg.linear.x = 0.0
+                self.cmd_msg.angular.z = 0.2
+
+            elif self.error_type == 2:
+                self.lidar_check_move()
+
+            # elif self.error_type == 3:
+            #     self.lidar_check_move()
+
+            elif self.error_type == 100:
+                self.cmd_msg.linear.x = 0.0
+                self.cmd_msg.angular.z = 0.0
+                self.is_goal = True
         
         else:
-
             if self.is_odom and self.is_path:
                 path_points = [pose.pose.position for pose in self.path_msg.poses]
                 robot_pose_x = self.odom_msg.pose.pose.position.x
@@ -115,31 +145,38 @@ class PurePursuit(Node):
                 cmd_msg = Twist()  # cmd_msg를 여기서 초기화
             
                 if lookahead_point is not None:
+                    robot_orientation_q = self.odom_msg.pose.pose.orientation
+                    robot_orientation_euler = Quaternion(robot_orientation_q.w, robot_orientation_q.x, robot_orientation_q.y, robot_orientation_q.z).to_euler()
+                    robot_yaw = robot_orientation_euler[2]
+
+                    angle_to_target = atan2(lookahead_point.y - robot_pose_y, lookahead_point.x - robot_pose_x)
+                    theta = self.normalize_angle(angle_to_target - robot_yaw) * -1
+                    
+                    # if self.fsm_msg.data == "tracking" and self.collision:
+                    #     start_time = time.time()  # 현재 시간 기록
+                    #     while True:
+                    #         if time.time() - start_time < 1:  # 1초 동안 실행
+                    #             cmd_msg.linear.x = -0.3
+                    #             # print('후진중!!')
+                    #         else:
+                    #             cmd_msg.linear.x = 0.0
+                    #             self.cmd_pub.publish(cmd_msg)
+
+                    #             break
+                    #         self.cmd_pub.publish(cmd_msg)
+
+                    #     cmd_msg.linear.x = 0.0
+                    #     self.cmd_pub.publish(cmd_msg)
                     
                     if self.collision:
-                        start_time = time.time()  # 현재 시간 기록
-                        while True:
-                            if time.time() - start_time < 1:  # 1초 동안 실행
-                                cmd_msg.linear.x = -0.3
-                                # print('후진중!!')
-                            else:
-                                cmd_msg.linear.x = 0.0
-                                self.cmd_pub.publish(cmd_msg)
-
-                                break
-                            self.cmd_pub.publish(cmd_msg)
-
-                        cmd_msg.linear.x = 0.0
-                        self.cmd_pub.publish(cmd_msg)
+                        if theta < 0:
+                            self.cmd_msg.linear.x = 0.0
+                            self.cmd_msg.angular.z = -0.2
+                        else:
+                            self.cmd_msg.linear.x = 0.0
+                            self.cmd_msg.angular.z = 0.2
 
                     else:
-                        robot_orientation_q = self.odom_msg.pose.pose.orientation
-                        robot_orientation_euler = Quaternion(robot_orientation_q.w, robot_orientation_q.x, robot_orientation_q.y, robot_orientation_q.z).to_euler()
-                        robot_yaw = robot_orientation_euler[2]
-
-                        angle_to_target = atan2(lookahead_point.y - robot_pose_y, lookahead_point.x - robot_pose_x)
-                        theta = self.normalize_angle(angle_to_target - robot_yaw) * -1
-
                         if theta > 1.5 or theta < -1.5:
                             cmd_msg.linear.x = 0.0
                             cmd_msg.angular.z = theta/2
@@ -161,10 +198,13 @@ class PurePursuit(Node):
                                 cmd_msg.linear.x = 0.2
                             cmd_msg.angular.z = theta/5
 
-
                 else:
                     cmd_msg.linear.x = 0.0
                     cmd_msg.angular.z = 0.0
+                    if self.fsm_msg.data == "patrol":
+                        patrol_msg = Int32()
+                        patrol_msg.data = 1
+                        self.patrol_pub.publish(patrol_msg)
 
                 self.cmd_pub.publish(cmd_msg)
 
@@ -187,6 +227,19 @@ class PurePursuit(Node):
         while angle < -pi:
             angle += 2 * pi
         return angle
+
+    def lidar_check_move(self):
+        if self.lidar_msg.ranges[0] + self.lidar_msg.ranges[180] < 2.0:
+            self.cmd_msg.linear.x = 0.0
+            self.cmd_msg.angular.z = 0.2
+
+        else:
+            if self.lidar_msg.ranges[0] < self.lidar_msg.ranges[180]:
+                self.cmd_msg.linear.x = -0.2
+                self.cmd_msg.angular.z = 0.0
+            else:
+                self.cmd_msg.linear.x = 0.2
+                self.cmd_msg.angular.z = 0.0
 
 def main(args=None):
     rclpy.init(args=args)
