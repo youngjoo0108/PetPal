@@ -38,5 +38,7 @@ public class ControlController {
 
 
     @RabbitListener(queues = CONTROL_QUEUE_NAME)
-    public void receive(ControlDto controlDto) {}
+    public void receive(ControlDto controlDto) {
+        logger.info(" log : " + controlDto);
+    }
 }
