@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitConfig {
     private static final String CONTROL_QUEUE_NAME = "control.queue";
     private static final String CONTROL_EXCHANGE_NAME = "control.exchange";
-    private static final String ROUTING_KEY = "user.*";
+    private static final String ROUTING_KEY = "home.*";
 
     @Value("${spring.rabbitmq.username}")
     private String rabbitUser;
