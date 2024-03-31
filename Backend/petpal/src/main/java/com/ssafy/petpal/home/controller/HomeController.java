@@ -19,7 +19,7 @@ public class HomeController {
     private final HomeService homeService;
 
     @PostMapping// test용
-    public ResponseEntity<String> postHome(HomeRequestDTO homeRequestDTO ){
+    public ResponseEntity<String> postHome(@RequestBody HomeRequestDTO homeRequestDTO ){
         try{
             homeService.createHome(homeRequestDTO);
             return ResponseEntity.ok(null);
@@ -32,12 +32,12 @@ public class HomeController {
         }
     }
 
-    @GetMapping
-    public  ResponseEntity<List<Home>> getHomes(Long userId){
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<Home>> getHomes(@PathVariable Long userId) {
         try {
             List<Home> list = homeService.fetchAllByUserId(userId);
             return ResponseEntity.ok(list);
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

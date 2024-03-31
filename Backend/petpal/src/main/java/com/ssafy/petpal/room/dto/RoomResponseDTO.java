@@ -13,7 +13,7 @@ import lombok.Getter;
 @Data
 public class RoomResponseDTO {
 
-    private Long id;
+    private Long roomId;
 
     private String roomName;
 

@@ -19,17 +19,18 @@ public class ApplianceController {
 
     static String[] STR_ARR = {"TV","에어컨","전등","커튼","공기청정기"};
     @PostMapping
-    public ResponseEntity<Void> postAppliance(ApplianceRegisterDTO applianceRegisterDTO){
+    public ResponseEntity<Void> postAppliance(@RequestBody ApplianceRegisterDTO applianceRegisterDTO){
         try{
             applianceService.createAppliance(applianceRegisterDTO);
             return ResponseEntity.ok(null);
         }catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     // ROS에서 사용
-    @GetMapping("/{appliacneId}")
+    @GetMapping("/{appliacneUUID}")
     public ResponseEntity<ApplianceResponseDto> getApplianceByUUID(@PathVariable String applianceUUID){
         try{
             ApplianceResponseDto appliance = applianceService.fetchApplianceByUUID(applianceUUID);
