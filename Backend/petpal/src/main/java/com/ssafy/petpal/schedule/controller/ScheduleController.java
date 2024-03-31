@@ -1,6 +1,7 @@
 package com.ssafy.petpal.schedule.controller;
 import com.amazonaws.Response;
 import com.ssafy.petpal.schedule.dto.ScheduleDto;
+import com.ssafy.petpal.schedule.dto.ScheduleResponseDto;
 import com.ssafy.petpal.schedule.entity.Schedule;
 import com.ssafy.petpal.schedule.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
@@ -36,10 +37,10 @@ public class ScheduleController {
         }
     }
 
-    @GetMapping
-    public ResponseEntity<List<Schedule>> getSchedules(@RequestParam Long homeId){
+    @GetMapping("/{homeId}")
+    public ResponseEntity<List<ScheduleResponseDto>> getSchedules(@PathVariable Long homeId){
         try{
-            List<Schedule> list = scheduleService.fetchAllSchedules(homeId);
+            List<ScheduleResponseDto> list = scheduleService.fetchAllSchedules(homeId);
             return ResponseEntity.ok(list);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

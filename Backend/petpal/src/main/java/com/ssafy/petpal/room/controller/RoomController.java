@@ -1,6 +1,7 @@
 package com.ssafy.petpal.room.controller;
 
 import com.ssafy.petpal.room.dto.RoomRegisterDTO;
+import com.ssafy.petpal.room.dto.RoomResponseDTO;
 import com.ssafy.petpal.room.entity.Room;
 import com.ssafy.petpal.room.service.RoomService;
 import lombok.RequiredArgsConstructor;
@@ -34,9 +35,9 @@ public class RoomController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Room>> getRooms(Long homeId){
+    public ResponseEntity<List<RoomResponseDTO>> getRooms(Long homeId){
         try{
-            List<Room> list = roomService.fetchAllRoomById(homeId);
+            List<RoomResponseDTO> list = roomService.fetchAllRoomById(homeId);
             return ResponseEntity.ok(list);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

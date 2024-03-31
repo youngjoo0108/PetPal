@@ -49,6 +49,9 @@ dependencies {
 	//jackson2json에서 LocalDateTime을 handling 하기 위해
 	implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.4'
 
+	// 가전,반려,터틀봇 상태 추적 위한 redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	// aws s3
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 	// file upload

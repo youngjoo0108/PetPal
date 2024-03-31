@@ -1,6 +1,7 @@
 package com.ssafy.petpal.object.controller;
 
 import com.ssafy.petpal.object.dto.ApplianceRegisterDTO;
+import com.ssafy.petpal.object.dto.ApplianceResponseDto;
 import com.ssafy.petpal.object.entity.Appliance;
 import com.ssafy.petpal.object.service.ApplianceService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class ApplianceController {
         }
     }
 
-
+    // ROS에서 사용
     @GetMapping("/{appliacneId}")
     public ResponseEntity<Appliance> getApplianceByUUID(@PathVariable String applianceUUID){
         try{
@@ -39,9 +40,9 @@ public class ApplianceController {
     }
 
     @GetMapping("/room/{roomId}")
-    public ResponseEntity<List<Appliance>> getApplianceListByRoomId(@PathVariable Long roomId){
+    public ResponseEntity<List<ApplianceResponseDto>> getApplianceListByRoomId(@PathVariable Long roomId){
         try{
-            List<Appliance> list =applianceService.fetchAllApplianceByRoomId(roomId);
+            List<ApplianceResponseDto> list =applianceService.fetchAllApplianceByRoomId(roomId);
             return ResponseEntity.ok(list);
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -63,8 +64,14 @@ public class ApplianceController {
         }
     }
 
-
-
+//    @PutMapping("/status/{applianceId}")
+//    public ResponseEntity<Void> putApplianceStatus(@PathVariable Long applianceId){
+//        try{
+//            applianceService.updateApplianceStatus(applianceId);
+//        }catch (Exception e){
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
 
 
 }

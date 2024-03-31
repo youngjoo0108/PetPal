@@ -49,9 +49,7 @@ public class ImageService {
         Image image = Image.builder()
                 .filename(filename)
                 .build();
-        System.out.println("1");
         Image retrievedImage = imageRepository.save(image);
-        System.out.println(2);
         return retrievedImage.getId();
     }
 

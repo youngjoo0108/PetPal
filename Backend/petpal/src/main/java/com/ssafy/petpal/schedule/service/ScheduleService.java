@@ -5,6 +5,7 @@ import com.ssafy.petpal.home.repository.HomeRepository;
 import com.ssafy.petpal.object.entity.Appliance;
 import com.ssafy.petpal.object.repository.ApplianceRepository;
 import com.ssafy.petpal.schedule.dto.ScheduleDto;
+import com.ssafy.petpal.schedule.dto.ScheduleResponseDto;
 import com.ssafy.petpal.schedule.entity.Schedule;
 import com.ssafy.petpal.schedule.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class ScheduleService {
         scheduleRepository.save(schedule);
     }
 
-    public List<Schedule> fetchAllSchedules(Long homeId) {
+    public List<ScheduleResponseDto> fetchAllSchedules(Long homeId) {
         return scheduleRepository.findAllByHomeId(homeId);
     }
 }
