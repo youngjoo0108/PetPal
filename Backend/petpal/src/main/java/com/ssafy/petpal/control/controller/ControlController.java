@@ -58,6 +58,13 @@ public class ControlController {
         rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
     }
 
+    @MessageMapping("images.stream.{homeId}")
+    public void sendImagesData(@Payload String rawMessage, @DestinationVariable String homeId) throws JsonProcessingException {
+        ControlDto controlDto = objectMapper.readValue(rawMessage, ControlDto.class);
+        //type : IMAGE
+        rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
+    }
+
     @MessageMapping("scan.map.{homeId}")
     public void sendMapData(@Payload String rawMessage, @DestinationVariable String homeId) throws JsonProcessingException {
         ControlDto controlDto = objectMapper.readValue(rawMessage, ControlDto.class);
