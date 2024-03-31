@@ -34,7 +34,7 @@ data = class_txt.read()
 class_list = data.split('\n')
 class_txt.close()
 
-model = YOLO('C:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/src/yolo_package/model/my_model_maybe_small_knife.pt') 
+model = YOLO('C:/Users/SSAFY/Desktop/S10P22A209/catkin_ws/src/yolo_package/model/ms0401_2.pt') 
 
 
 

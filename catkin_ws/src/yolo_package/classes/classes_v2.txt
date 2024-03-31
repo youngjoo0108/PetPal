@@ -15,3 +15,7 @@ AirConditioner
 TV
 Washer
 Knife
+PenHolder
+BookPile
+Stapler
+Mug

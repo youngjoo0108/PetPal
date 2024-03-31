@@ -1,70 +1,105 @@
-
+import rclpy
+from rclpy.node import Node
+from sensor_msgs.msg import CompressedImage
+from std_msgs.msg import String
 import asyncio
 import websockets
+import threading
 import stomper
-import nest_asyncio
 import json
 import base64
-import cv2
-import numpy as np
+import logging
+import time
 
-nest_asyncio.apply()
+from ros_log_package.RosLogPublisher import RosLogPublisher
 
-msg = {"type":"control", "sender":"user_1", "message":"msg"}
 
-async def connect():
-    ws_url = f"wss://j10a209.p.ssafy.io/api/ws" 
-    async with websockets.connect(ws_url, max_size = 2**20, max_queue = 2**5) as websocket:
-        await websocket.send("CONNECT\naccept-version:1.0,1.1,2.0\n\n\x00\n")
-
-        sub_offer = stomper.subscribe("/exchange/control.exchange/user.1", "user.1")
-        await websocket.send(sub_offer)
-
-        # send = stomper.send("/pub/control.message.1", json.dumps(msg))
-        # await websocket.send(send)
+class WebSocketClientReceiveNode(Node):
+    def __init__(self):
+        super().__init__('websocket_client_receive_node')
         
-        while True:
-            # print("try")
-            message = await websocket.recv()
+        self.ros_log_pub = None
+        try:
+            self.ros_log_pub = RosLogPublisher(self)
+        except Exception as e:
+            self.get_logger().error('ERROR', 'Subscription initialization error: {}'.format(e))
+        
+        self.ws_url = "wss://j10a209.p.ssafy.io/api/ws"
+        self.websocket = None
+
+        self.loop = asyncio.new_event_loop()
+        threading.Thread(target=self.run_asyncio_loop, args=(self.loop,), daemon=True).start()
+
+        asyncio.run_coroutine_threadsafe(self.receive_messages(), self.loop)
+        
+    def run_asyncio_loop(self, loop):
+        asyncio.set_event_loop(loop)
+        loop.run_forever()
+        
+    async def connect_websocket(self):
+        try:
+            self.websocket = await websockets.connect(self.ws_url, max_size=2**20, max_queue=2**5)
+            await self.websocket.send("CONNECT\naccept-version:1.0,1.1,2.0\n\n\x00\n")
+            sub_offer = stomper.subscribe("/exchange/control.exchange/home.1", "user.2")
+            await self.websocket.send(sub_offer)
+        except Exception as e:
+            self.ros_log_pub.publish_log('ERROR', 'WebSocket connection error: {}'.format(e))
+            self.websocket = None # 변경: 연결 실패 시 websocket을 None으로 설정
             
-            if message:
-                try:                    
-                    message = message.rstrip('\0')
-                    
-                    json_start = message.find('{')
-
-                    # JSON 데이터만 추출합니다. (-1을 하지 않으면 마지막 괄호를 놓칠 수 있음)
-                    json_data = message[json_start:]
-                    
-                    # JSON 본문을 파싱합니다.
-                    message_data = json.loads(json_data)
-                    
-
-                    # print(f"Received message type: {message_data['type']}")
-
-                    if message_data.get("type") == "video_streaming":
-                        display_image_from_base64(message_data['message'])
-                except json.JSONDecodeError as e:
-                    print(f"JSON decode error: {e}")
-                except ValueError as e:
-                    print(f"Error processing message: {e}")
-            else:
-                print("Received an empty message.")
-
-
-def display_image_from_base64(base64_string):
-    # Base64 문자열을 바이트로 디코딩합니다.
-    img_bytes = base64.b64decode(base64_string)
+    async def ensure_websocket_connected(self):
+        if self.websocket is None or self.websocket.closed:
+            await self.connect_websocket() # 변경: 웹소켓이 연결되지 않았거나 닫혀있으면 재연결 시도
+            self.ros_log_pub.publish_log('INFO', f"connected {time.strftime('%X', time.localtime())}")
     
-    # 바이트 배열을 numpy 배열로 변환합니다.
-    np_arr = np.frombuffer(img_bytes, np.uint8)
+    # {
+        # 'type': 'yolo_data', 
+        # 'sender': 'user_1', 
+        # 'time': '13:50:20', 
+        # 'message': '{
+            # "list": [
+                # "13:50:20/Chair/0.94%/254-200/336-357",
+                # "13:50:20/Chair/0.82%/310-227/364-354",
+                # "13:50:20/Chair/0.79%/308-228/391-348"
+            # ]
+        # }'
+    # }
     
-    # numpy 배열을 이미지로 디코딩합니다.
-    img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-    
-    # 이미지를 화면에 표시합니다.
-    cv2.imshow('Received Image', img)
-    cv2.waitKey(1)  # 화면을 갱신하고, 키 입력을 대기합니다.
+    async def receive_messages(self):
+        while True:
+            try:
+                await self.ensure_websocket_connected()
+                
+                message = await self.websocket.recv()
+                # print(f"Received message: {message}")
+                
+                if message:
+                    try:
+                        message = message.rstrip('\0')
+                        json_start = message.find('{')
+                        json_data = message[json_start:]
+                        message_data = json.loads(json_data)
+                        
+                        if message_data.get('type') == "yolo_data":
+                            obj_list = json.loads(message_data['message'])
+                            obj_list = obj_list['list']
+                            
+                            for obj in obj_list:
+                                print(obj)
+                        else:
+                            print(message_data)
+                    except json.JSONDecodeError as e:
+                        print("JD:", e)
+            except Exception as e:
+                self.ros_log_pub.publish_log('ERROR', f'Receiving message error: {e}')
+                self.websocket = None  # 연결 오류 시 websocket을 None으로 재설정
+
+        
+def main(args=None):
+    rclpy.init(args=args)
+    websocket_client_node = WebSocketClientReceiveNode()
+    rclpy.spin(websocket_client_node)
+    websocket_client_node.destroy_node()
+    rclpy.shutdown()
 
 if __name__ == '__main__':
-    asyncio.get_event_loop().run_until_complete(connect())
+    main()
