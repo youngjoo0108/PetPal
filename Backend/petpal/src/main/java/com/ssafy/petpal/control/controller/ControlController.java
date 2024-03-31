@@ -2,6 +2,7 @@ package com.ssafy.petpal.control.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.petpal.control.dto.ApplianceContainer;
 import com.ssafy.petpal.control.dto.ControlDto;
 import com.ssafy.petpal.object.service.ApplianceService;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ public class ControlController {
     private final ObjectMapper objectMapper;
     private final StringRedisTemplate redisTemplate;
     private final ApplianceService applianceService;
-    private static final Logger logger = LoggerFactory.getLogger(ControlController.class);
+//    private static final Logger logger = LoggerFactory.getLogger(ControlController.class);
     private static final String CONTROL_QUEUE_NAME = "control.queue";
     private static final String CONTROL_EXCHANGE_NAME = "control.exchange";
 
@@ -41,8 +42,12 @@ public class ControlController {
             case "COMPLETE":
                 // ROS에서 입증한 실제 가전상태 데이터를 redis에 올린다.
 //                controlDto.getMessage() //parsing
-//                applianceService.updateApplianceStatus(homeId,applianceId,status);
-//
+                ApplianceContainer.Complete complete = objectMapper.readValue(controlDto.getMessage(),ApplianceContainer.Complete.class);
+                if(complete.getIsSuccess()){
+                    applianceService.updateApplianceStatus(homeId,complete.getApplianceId(),complete.getCurrentStatus());
+                }else{
+                    // 다시 발행
+                }
 //              fcm 호출.
                 break;
             case "ON":

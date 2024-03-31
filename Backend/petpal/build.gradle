@@ -58,7 +58,8 @@ dependencies {
 	implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
 	implementation 'commons-io:commons-io:2.15.1'
 	implementation 'javax.xml.bind:jaxb-api:2.3.0'
-
+	// control의 message 파싱 용도
+//	implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0'
 	// jpa 좌표객체 사용 위한 dependency
 	implementation 'org.hibernate.orm:hibernate-spatial:6.4.4.Final'
 

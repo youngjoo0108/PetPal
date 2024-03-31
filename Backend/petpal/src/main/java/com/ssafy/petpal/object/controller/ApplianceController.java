@@ -30,9 +30,9 @@ public class ApplianceController {
 
     // ROS에서 사용
     @GetMapping("/{appliacneId}")
-    public ResponseEntity<Appliance> getApplianceByUUID(@PathVariable String applianceUUID){
+    public ResponseEntity<ApplianceResponseDto> getApplianceByUUID(@PathVariable String applianceUUID){
         try{
-            Appliance appliance = applianceService.fetchApplianceByUUID(applianceUUID);
+            ApplianceResponseDto appliance = applianceService.fetchApplianceByUUID(applianceUUID);
             return ResponseEntity.ok(appliance);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -55,9 +55,9 @@ public class ApplianceController {
     }
 
     @GetMapping("/home/{homeId}")
-    public ResponseEntity<List<Appliance>> getApplianceListByHomeId(@PathVariable Long homeId){
+    public ResponseEntity<List<ApplianceResponseDto>> getApplianceListByHomeId(@PathVariable Long homeId){
         try{
-            List<Appliance> list = applianceService.fetchAllApplianceByHomeId(homeId);
+            List<ApplianceResponseDto> list = applianceService.fetchAllApplianceByHomeId(homeId);
             return ResponseEntity.ok(list);
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

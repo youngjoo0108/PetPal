@@ -3,13 +3,11 @@ package com.ssafy.petpal.home.controller;
 import com.ssafy.petpal.home.dto.HomeRequestDTO;
 import com.ssafy.petpal.home.entity.Home;
 import com.ssafy.petpal.home.service.HomeService;
+import com.ssafy.petpal.object.dto.Location;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -44,4 +42,41 @@ public class HomeController {
         }
     }
 
+    @GetMapping("/pet/{homeId}")
+    public ResponseEntity<Location> getPetCoordinate(@PathVariable Long homeId){
+        try{
+            return ResponseEntity.ok(homeService.fetchPetCoordinate(homeId,0));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping("/pet/{homeId}")
+    public ResponseEntity<Void> putPetCoordinate(@PathVariable Long homeId,Location coordinate){
+        try{
+            homeService.updatePetCoordinate(homeId,coordinate);
+            return ResponseEntity.ok(null);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/turtle/{homeId}")
+    public ResponseEntity<Location> getTurtleCoordinate(@PathVariable Long homeId){
+        try{
+            return ResponseEntity.ok(homeService.fetchTurtleCoordinate(homeId,0));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping("/turtle/{homeId}")
+    public ResponseEntity<Void> putTurtleCoordinate(@PathVariable Long homeId,Location coordinate){
+        try{
+            homeService.updateTurtleCoordinate(homeId,coordinate);
+            return ResponseEntity.ok(null);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
