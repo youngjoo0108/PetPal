@@ -24,7 +24,7 @@ public class Schedule extends BaseEntity {
     @JoinColumn(name = "home_id")
     private Home home;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "appliance_id")
     private Appliance appliance;
 //    @Column(name = "schedule_tsid")
