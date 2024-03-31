@@ -64,11 +64,14 @@ public class ApplianceController {
         }
     }
 
-//    @PutMapping("/status/{applianceId}")
-//    public ResponseEntity<Void> putApplianceStatus(@PathVariable Long applianceId){
+    // 테스트용
+//    @GetMapping("/status/{applianceId}")
+//    public ResponseEntity<String> putApplianceStatus(Long homeId, @PathVariable Long applianceId,String status){
 //        try{
-//            applianceService.updateApplianceStatus(applianceId);
+//            applianceService.updateApplianceStatus(homeId, applianceId, status);
+//            return ResponseEntity.ok(applianceService.getApplianceStatus(homeId,applianceId));
 //        }catch (Exception e){
+//            System.out.println(e.getMessage());
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 //        }
 //    }

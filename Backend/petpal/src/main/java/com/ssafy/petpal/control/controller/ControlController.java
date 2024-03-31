@@ -34,7 +34,7 @@ public class ControlController {
 
 
     @MessageMapping("control.message.{homeId}")
-    public void sendMessage(@Payload String rawMessage, @DestinationVariable String homeId) throws JsonProcessingException {
+    public void sendMessage(@Payload String rawMessage, @DestinationVariable Long homeId) throws JsonProcessingException {
 //        logger.info("Received message: {}", rawMessage);
         ControlDto controlDto = objectMapper.readValue(rawMessage, ControlDto.class);
         String type = controlDto.getType();

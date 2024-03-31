@@ -52,7 +52,9 @@ public class HomeController {
     }
 
     @PutMapping("/pet/{homeId}")
-    public ResponseEntity<Void> putPetCoordinate(@PathVariable Long homeId,Location coordinate){
+    public ResponseEntity<Void> putPetCoordinate(@PathVariable Long homeId, @RequestBody Location coordinate){
+        System.out.println("Adsd");
+        System.out.println(coordinate.toString());
         try{
             homeService.updatePetCoordinate(homeId,coordinate);
             return ResponseEntity.ok(null);
@@ -71,7 +73,7 @@ public class HomeController {
     }
 
     @PutMapping("/turtle/{homeId}")
-    public ResponseEntity<Void> putTurtleCoordinate(@PathVariable Long homeId,Location coordinate){
+    public ResponseEntity<Void> putTurtleCoordinate(@PathVariable Long homeId,@RequestBody Location coordinate){
         try{
             homeService.updateTurtleCoordinate(homeId,coordinate);
             return ResponseEntity.ok(null);

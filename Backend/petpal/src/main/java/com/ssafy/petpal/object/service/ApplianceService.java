@@ -82,23 +82,25 @@ public class ApplianceService {
         return list;
     }
 
-    public void updateApplianceStatus(String homeId, Long applianceId, String status) {
+    public void updateApplianceStatus(Long homeId, Long applianceId, String status) {
+
         redisTemplate.opsForValue().set("home:" + homeId + ":appliance:" + applianceId, status);
+
     }
 
-    public int getApplianceStatus(Long homeId, Long applianceId) {
+    public String getApplianceStatus(Long homeId, Long applianceId) {
         String key = "home:" + homeId + ":appliance:" + applianceId;
         String value = redisTemplate.opsForValue().get(key);
         if (value != null) {
             try {
-                return Integer.parseInt(value);
-            } catch (NumberFormatException e) {
+                return value;
+            } catch (Exception e) {
                 log.error("Invalid appliance status format for appliance " + applianceId, e);
-                return -1; // 상태를 알 수 없는 경우, 예: 잘못된 형식
+                return "NULL"; // 상태를 알 수 없는 경우, 예: 잘못된 형식
             }
         } else {
-            log.info("No status found for appliance " + applianceId + ", defaulting to -1");
-            return -1; // Redis에서 조회된 값이 null인 경우
+            log.info("No status found for appliance " + applianceId + ", defaulting to NULL");
+            return "NULL"; // Redis에서 조회된 값이 null인 경우
         }
     }
 }
