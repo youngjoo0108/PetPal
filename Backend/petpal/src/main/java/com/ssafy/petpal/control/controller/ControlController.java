@@ -58,11 +58,11 @@ public class ControlController {
         rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
     }
 
-    @MessageMapping("images.stream.{homeId}")
+    @MessageMapping("images.stream.{homeId}.images")
     public void sendImagesData(@Payload String rawMessage, @DestinationVariable String homeId) throws JsonProcessingException {
         ControlDto controlDto = objectMapper.readValue(rawMessage, ControlDto.class);
         //type : IMAGE
-        rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
+        rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId + ".images", controlDto);
     }
 
     @MessageMapping("scan.map.{homeId}")
@@ -75,7 +75,7 @@ public class ControlController {
                 break;
             case "COMPLETE":
                 // 날것의 맵
-                // dtoMapper로 만들ㅇ서ㅓ
+                // dtoMapper로 만들어서
                 // mapService.createMap(dto)
                 // scan.map.{homeID} 메세지 발행(깎은 맵이 들어가있다)
 
