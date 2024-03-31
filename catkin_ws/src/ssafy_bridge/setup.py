@@ -27,7 +27,9 @@ setup(
             'udp_to_laser = ssafy_bridge.udp_to_laser:main',
             'state_check = ssafy_bridge.state_check:main',
             'state_write = ssafy_bridge.state_write:main',
-
+            'iot_udp = ssafy_bridge.iot_udp:main',
+            'reqeust=ssafy_bridge.request_test:main',
+            'fsm=ssafy_bridge.fsm_test:main',
         ],
     },
 )

@@ -11,6 +11,7 @@ state_launch_file_map = {
     'patrol': 'patrol.py',
     'stay': 'stay.py',
     'scan': 'scan.py',
+    'tracking': 'tracking.py',
 }
 
 FSM = {
@@ -26,7 +27,7 @@ FSM = {
     "patrol" : {
         "patrol_off" : "stay",
         "tracking_on" : "search",
-        "interrupt_on" : "interrupt",
+        "interrupt_on" : "interrupt", 
     },
     "search" : {
         "tracking_off" : "stay",
@@ -49,7 +50,7 @@ class control_tower(Node) :
     def __init__(self):
         super().__init__('control_tower')
 
-        self.reqeust_sub = self.create_subscription(String, '/request', self.reqeust_callback, 20)
+        #self.reqeust_sub = self.create_subscription(String, '/request', self.reqeust_callback, 20)
         self.fsm_pub = self.create_publisher(String, 'fsm', 10)
 
         self.current_process = None
@@ -57,6 +58,12 @@ class control_tower(Node) :
         self.last_state = None
 
         self.fsm_msg = String()
+
+        while True:
+            menu=input('FSM 입력 : ')
+            self.fsm_msg.data = menu
+            self.fsm_pub.publish(self.fsm_msg)
+            self.launch_file_for_state(menu)
 
         # while True:
         #     state = self.read_robot_state()

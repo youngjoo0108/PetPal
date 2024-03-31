@@ -1,4 +1,4 @@
-import rclpy
+import rclpy, time
 import numpy as np
 from rclpy.node import Node
 import os
@@ -7,21 +7,9 @@ from squaternion import Quaternion
 from nav_msgs.msg import Odometry,OccupancyGrid,MapMetaData,Path
 from math import pi,cos,sin
 from collections import deque
+from ros_log_package.RosLogPublisher import RosLogPublisher
 
-# a_star 노드는  OccupancyGrid map을 받아 grid map 기반 최단경로 탐색 알고리즘을 통해 로봇이 목적지까지 가는 경로를 생성하는 노드입니다.
-# 로봇의 위치(/pose), 맵(/map), 목표 위치(/goal_pose)를 받아서 전역경로(/global_path)를 만들어 줍니다. 
-# goal_pose는 rviz2에서 2D Goal Pose 버튼을 누르고 위치를 찍으면 메시지가 publish 됩니다. 
-# 주의할 점 : odom을 받아서 사용하는데 기존 odom 노드는 시작했을 때 로봇의 초기 위치가 x,y,heading(0,0,0) 입니다. 로봇의 초기위치를 맵 상에서 로봇의 위치와 맞춰줘야 합니다. 
-# 따라서 sub2의 odom 노드를 수정해줍니다. turtlebot_status 안에는 정답데이터(절대 위치)가 있는데 그 정보를 사용해서 맵과 로봇의 좌표를 맞춰 줍니다.
 
-# 노드 로직 순서
-# 1. publisher, subscriber 만들기
-# 2. 파라미터 설정
-# 3. 맵 데이터 행렬로 바꾸기
-# 4. 위치(x,y)를 map의 grid cell로 변환
-# 5. map의 grid cell을 위치(x,y)로 변환
-# 6. goal_pose 메시지 수신하여 목표 위치 설정
-# 7. grid 기반 최단경로 탐색
 
 class A_star(Node):
 
@@ -55,13 +43,19 @@ class A_star(Node):
         self.dy = [0,1,-1,0,-1,1,-1,1]
         self.dCost = [1,1,1,1,1.414,1.414,1.414,1.414]
        
+       # logging
+        self.ros_log_pub = None
+        try:
+            self.ros_log_pub = RosLogPublisher(self)
+        except Exception as e:
+            self.get_logger().error('Subscription initialization error: {}'.format(e))
+
 
     def grid_update(self):
+
         self.is_grid_update=True
         
-        # 로직 3. 맵 데이터 행렬로 바꾸기
         self.map_to_grid = np.array(self.map_msg.data).reshape((self.map_size_x, self.map_size_y)).transpose()
-        # self.grid = np.where(self.map_to_grid == 0, 0, 1)  # Obstacle cells as 1, free space as 0
 
         for i in range(self.map_size_x):
             for j in range(self.map_size_y):
@@ -81,9 +75,6 @@ class A_star(Node):
 
     def pose_to_grid_cell(self,x,y):
 
-        # 로직 4. 위치(x,y)를 map의 grid cell로 변환 
-        # (테스트) pose가 (-8,-4)라면 맵의 중앙에 위치하게 된다. 따라서 map_point_x,y 는 map size의 절반인 (175,175)가 된다.
-        # pose가 (-16.75,12.75) 라면 맵의 시작점에 위치하게 된다. 따라서 map_point_x,y는 (0,0)이 된다.
         map_point_x = int((x - self.map_offset_x) / self.map_resolution)
         map_point_y = int((y - self.map_offset_y) / self.map_resolution)
         
@@ -92,10 +83,6 @@ class A_star(Node):
 
     def grid_cell_to_pose(self,grid_cell):
         
-        # 로직 5. map의 grid cell을 위치(x,y)로 변환
-        # (테스트) grid cell이 (175,175)라면 맵의 중앙에 위치하게 된다. 따라서 pose로 변환하게 되면 맵의 중앙인 (-8,-4)가 된다.
-        # grid cell이 (350,350)라면 맵의 제일 끝 좌측 상단에 위치하게 된다. 따라서 pose로 변환하게 되면 맵의 좌측 상단인 (0.75,6.25)가 된다.
-
         x = grid_cell[0] * self.map_resolution + self.map_offset_x
         y = grid_cell[1] * self.map_resolution + self.map_offset_y
 
@@ -120,21 +107,17 @@ class A_star(Node):
         
 
     def goal_callback(self,msg):
-        
+        start_time = time.time()
         if msg.header.frame_id=='map':
-            # 로직 6. goal_pose 메시지 수신하여 목표 위치 설정
             goal_x=msg.pose.position.x
             goal_y=msg.pose.position.y
             goal_cell_x, goal_cell_y =self.pose_to_grid_cell(goal_x, goal_y)
-            self.goal = (goal_cell_x, goal_cell_y)
-            # print(msg)
-            
+            self.goal = (goal_cell_x, goal_cell_y)            
 
             if self.is_map ==True and self.is_odom==True and self.is_param==True:
                 if self.is_grid_update==False :
                     self.grid_update()
 
-        
                 self.final_path=[]
 
                 x=self.odom_msg.pose.pose.position.x
@@ -153,6 +136,7 @@ class A_star(Node):
 
                 self.global_path_msg=Path()
                 self.global_path_msg.header.frame_id='map'
+                
                 for grid_cell in reversed(self.final_path):
                     tmp_pose=PoseStamped()
                     waypoint_x,waypoint_y=self.grid_cell_to_pose(grid_cell)
@@ -163,6 +147,10 @@ class A_star(Node):
             
                 if len(self.final_path)!=0 :
                     self.a_star_pub.publish(self.global_path_msg)
+
+                end_time = time.time()  
+                elapsed_time = end_time - start_time
+                self.ros_log_pub.publish_log('astar', f'Subscription astar success time: {elapsed_time}')
 
                     
     def heuristic(self, node, goal):
@@ -189,7 +177,7 @@ class A_star(Node):
             for i in range(8):
                 next = (current[0] + self.dx[i], current[1] + self.dy[i])
                 if 0 <= next[0] < self.GRIDSIZE and 0 <= next[1] < self.GRIDSIZE:
-                    if self.map_to_grid[next[0]][next[1]] < 50:  # If next is not an obstacle
+                    if self.map_to_grid[next[0]][next[1]] < 50: 
                         new_cost = self.cost[current[0]][current[1]] + self.dCost[i]
                         if self.cost[next[0]][next[1]] > new_cost:
                             heuristic_cost = new_cost + self.heuristic(next, self.goal)
@@ -203,8 +191,10 @@ class A_star(Node):
             while node != start:
                 self.final_path.append(node)
                 node = self.path[node[0]][node[1]]
+        else:
+            self.ros_log_pub.publish_log('DEBUG', 'Subscription initialization error: astar goal not found')
+
                 
-        
 def main(args=None):
     rclpy.init(args=args)
 

@@ -28,6 +28,7 @@ setup(
             'follow=test_209.path_tracking:main',
             'purefollow=test_209.pure_pursuit:main',
             'patrol=test_209.patrol:main',
+            'stop=test_209.stop:main',
 
             # mapping
             'map=test_209.load_map:main',
@@ -42,19 +43,23 @@ setup(
             'astarlocal=test_209.a_star_local:main',
 
             # iot control
-            'iotcontrol=test_209.iot_control:main',
+            'iot=test_209.iot_control:main',
             'handcontrol=test_209.hand_control:main',
-
+            'iot_test=test_209.iot_test:main',
+            'iot_room1=test_209.iot_room1:main',
+            'obscontrol=test_209.obstacle_control:main',
+            
             # dog tracking
             'tracking=test_209.tracking:main',
-            'tt=test_209.tracking_test:main',
+            'tracking_test=test_209.tracking_test:main',
             
             
             # etc(for test)
             'make=test_209.make_path:main',
             'path=test_209.path_node:main',
-            'drive=test_209.drive_test:main',
+            'drive_test=test_209.drive_test:main',
             'odomprint=test_209.odom_print:main',
+            'iot_user=test_209.iot_user_input:main',
         ],
     },
 )

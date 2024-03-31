@@ -29,6 +29,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ObjectInfo.msg"
   "msg/HandControl.msg"
   "msg/CustomObjectInfo.msg"
+  "msg/IotInfo.msg"
   DEPENDENCIES std_msgs geometry_msgs
  )
 

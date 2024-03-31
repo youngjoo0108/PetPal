@@ -218,7 +218,7 @@ class mapSetting(Node):
                 #print(next_x, next_y)
                 if self.map_to_grid[next_x][next_y] == 0:
                     Q.append((next_x, next_y))
-                elif 20 < self.map_to_grid[next_x][next_y] and self.map_to_grid[next_x][next_y] < 100:
+                elif 10 < self.map_to_grid[next_x][next_y] and self.map_to_grid[next_x][next_y] < 100:
                     self.target = [next_x, next_y]
                     return [now[0], now[1]]
     

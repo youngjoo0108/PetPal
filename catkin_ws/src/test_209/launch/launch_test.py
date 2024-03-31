@@ -23,8 +23,8 @@ def generate_launch_description():
         # ),
         # Node(
         #     package = 'test_209',
-        #     node_executable = 'purefollow',
-        #     node_name = 'purefollow',
+        #     node_executable = 'setting',
+        #     node_name = 'setting',
         #     output = 'screen',
         # ),
         Node(
@@ -32,12 +32,12 @@ def generate_launch_description():
             node_executable = 'mapping',
             node_name = 'mapping',
         ),
-        # Node(
-        #     package = 'test_209',
-        #     node_executable = 'astar',
-        #     node_name = 'astar',
-        #     output = 'screen' ,
-        # ),
+        Node(
+            package = 'test_209',
+            node_executable = 'astar',
+            node_name = 'astar',
+            output = 'screen' ,
+        ),
         Node(
             package = 'test_209',
             node_executable = 'astarlocal',
@@ -54,10 +54,4 @@ def generate_launch_description():
         #     node_executable = 'odomprint',
         #     node_name = 'odomprint',
         # ),
-        Node(
-            package = 'test_209',
-            node_executable = 'astar',
-            node_name = 'astar',
-            output = 'screen' ,
-        ),
     ])
