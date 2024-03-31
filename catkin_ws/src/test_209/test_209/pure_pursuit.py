@@ -110,13 +110,13 @@ class PurePursuit(Node):
                 self.cmd_msg.linear.x = 0.0
                 self.cmd_msg.angular.z = 0.05
                 #self.cmd_pub.publish(self.cmd_msg)
-                self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, move clockwise')
+                # self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, move clockwise')
            
             else:
                 self.cmd_msg.linear.x = 0.0
                 self.cmd_msg.angular.z = -0.05
                 #self.cmd_pub.publish(self.cmd_msg)
-                self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, move counterclockwise')
+                # self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, move counterclockwise')
             
             self.is_tracking_err = False
 
@@ -152,21 +152,21 @@ class PurePursuit(Node):
                     angle_to_target = atan2(lookahead_point.y - robot_pose_y, lookahead_point.x - robot_pose_x)
                     theta = self.normalize_angle(angle_to_target - robot_yaw) * -1
                     
-                    # if self.fsm_msg.data == "tracking" and self.collision:
-                    #     start_time = time.time()  # 현재 시간 기록
-                    #     while True:
-                    #         if time.time() - start_time < 1:  # 1초 동안 실행
-                    #             self.cmd_msg.linear.x = -0.3
-                    #             # print('후진중!!')
-                    #         else:
-                    #             self.cmd_msg.linear.x = 0.0
-                    #             self.cmd_pub.publish(self.cmd_msg)
+                    if self.fsm_msg.data == "tracking" and self.collision:
+                        start_time = time.time()  # 현재 시간 기록
+                        while True:
+                            if time.time() - start_time < 1:  # 1초 동안 실행
+                                self.cmd_msg.linear.x = -0.3
+                                # print('후진중!!')
+                            else:
+                                self.cmd_msg.linear.x = 0.0
+                                self.cmd_pub.publish(self.cmd_msg)
 
-                    #             break
-                    #         self.cmd_pub.publish(self.cmd_msg)
+                                break
+                            self.cmd_pub.publish(self.cmd_msg)
 
-                    #     self.cmd_msg.linear.x = 0.0
-                    #     self.cmd_pub.publish(self.cmd_msg)
+                        self.cmd_msg.linear.x = 0.0
+                        self.cmd_pub.publish(self.cmd_msg)
                     
                     if self.collision:
                         if theta < 0:

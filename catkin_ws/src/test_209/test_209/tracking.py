@@ -1,15 +1,12 @@
-import rclpy, time
-from rclpy.node import Node
+import rclpy, time, json
+import numpy as np
 
-from std_msgs.msg import String
-import json
+from rclpy.node import Node
 from geometry_msgs.msg import Twist, PoseStamped, Point32
 from sensor_msgs.msg import LaserScan
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry, Path, OccupancyGrid
-from std_msgs.msg import Int32
-import pprint
-import numpy as np
+from std_msgs.msg import Int32, String
 from ros_log_package.RosLogPublisher import RosLogPublisher
 
 class Tracking(Node):

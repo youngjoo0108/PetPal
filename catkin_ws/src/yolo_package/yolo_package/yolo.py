@@ -6,6 +6,8 @@ from ultralytics import YOLO
 import rclpy
 from rclpy.node import Node
 from rclpy.time import Time
+from nav_msgs.msg import Odometry
+from squaternion import Quaternion
 import datetime
 
 from sensor_msgs.msg import CompressedImage
@@ -67,12 +69,23 @@ class IMGParser(Node):
         except:
             print('init image subscription error')
             
-        # try:
-        #     self.publisher_data = self.create_publisher(String, '/to_server/data', 20)
-        # except:
-        #     print("init publisher data error")
+        try:
+            self.publisher_data = self.create_publisher(String, '/to_server/data', 20)
+        except:
+            print("init publisher data error")
+
+        try:
+            self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
+        except:
+            print("init odom subscription error")
             
-            
+        
+        self.is_odom = False
+        self.odom_msg = Odometry()
+
+        self.robot_pose_x = 0.0
+        self.robot_pose_y = 0.0
+
     # def test_data_publish(self, msg):
     #     self.publisher_data.publish(msg)
             
@@ -80,6 +93,9 @@ class IMGParser(Node):
     def capture_callback(self, msg):
         self.publisher_.publish(msg)
         # self.get_logger().info('Publishing Capture: "%s"' % msg.data)
+
+    def to_server_callback(self, msg):
+        self.publisher_data.publish(msg)
         
 
     def img_callback(self, msg):
@@ -117,7 +133,7 @@ class IMGParser(Node):
         # 문자열로 포매팅
         time_str = datetime_time.strftime('%Y-%m-%d-%H:%M:%S')
         
-        results = model(img_bgr)
+        results = model(img_bgr, verbose=False)
         detection = results[0]  # 탐지된 객체 정보
         
         puppy_list = []
@@ -153,6 +169,13 @@ class IMGParser(Node):
             msg.data = json_str
             self.capture_callback(msg)
 
+            # 발견 시 터틀봇 위치 서버 전송
+            last_found_topic_data = {'last_found_point' : (self.robot_pose_x, self.robot_pose_y)}
+            last_found_json_str = json.dumps(last_found_topic_data)
+            last_found_msg = String()
+            last_found_msg.data = last_found_json_str
+            self.to_server_callback(msg)
+
         if(len(knife_list) != 0):
             topic_data = {'knife_list': knife_list}
             json_str = json.dumps(topic_data)
@@ -166,6 +189,15 @@ class IMGParser(Node):
         cv2.imshow("re_img", re_img)      
         
         cv2.waitKey(1)
+
+
+    def odom_callback(self, msg):
+
+        self.is_odom = True
+        self.odom_msg = msg
+  
+        self.robot_pose_x = self.odom_msg.pose.pose.position.x
+        self.robot_pose_y = self.odom_msg.pose.pose.position.y
 
 
 def main(args=None):

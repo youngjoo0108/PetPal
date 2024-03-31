@@ -1,11 +1,10 @@
-import rclpy
+import rclpy, json, os
 import numpy as np
 from rclpy.node import Node
-import os
 from geometry_msgs.msg import Pose,PoseStamped
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,OccupancyGrid,MapMetaData,Path
-from std_msgs.msg import Int32
+from std_msgs.msg import Int32, String
 from math import pi,cos,sin, sqrt
 from collections import deque
 from queue import PriorityQueue
@@ -18,6 +17,9 @@ class patrolRoute(Node):
         self.odom_sub = self.create_subscription(Odometry,'/odom',self.odom_callback, 10)
         self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
         self.patrol_sub = self.create_subscription(Int32, '/patrol', self.patrol_callback, 10)
+        self.reqeust_pub = self.create_publisher(String, '/request', 20)
+        self.yolo_sub = self.create_subscription(String,'captured_object',self.yolo_callback, 10)
+
         self.timer = self.create_timer(0.5, self.timer_callback)
 
         # test
@@ -39,6 +41,9 @@ class patrolRoute(Node):
         self.dy = [-1,0,1,0,-1,1,-1,1]
         self.dCost = [1,1,1,1,1.414,1.414,1.414,1.414]
 
+        self.yolo_sub
+        self.request_msg = String()
+
         self.is_odom=False
         self.is_map=False
         self.is_make_list=False
@@ -51,7 +56,20 @@ class patrolRoute(Node):
         self.route = []
         self.count = 0
         self.new_grid = np.zeros((70,70))
+
     
+    def yolo_callback(self, msg):
+
+        data = json.loads(msg.data)
+        if data:
+            if 'dog_list' in data:
+                pass
+            elif 'knife_list' in data:
+                self.request_msg.data = 'interrupt_on'
+                self.reqeust_pub.publish(self.goal_msg)
+
+
+
     def patrol_callback(self, msg):
         if msg.data == 0:
             self.is_goal = False
@@ -63,9 +81,11 @@ class patrolRoute(Node):
                     self.idx = 0
                 self.is_goal = True
 
+
     def map_callback(self,msg):
         self.is_map = True
         self.map_msg = msg
+
 
     def odom_callback(self, msg):
         if self.is_param == False and self.is_map == True:
@@ -91,6 +111,7 @@ class patrolRoute(Node):
     #     f.close()
     #     print('done')
 
+
     def timer_callback(self):
         if self.is_param==False:
             return
@@ -105,7 +126,6 @@ class patrolRoute(Node):
         else:
             self.error_msg.data = 0
             self.error_pub.publish(self.error_msg)
-
 
         if self.is_map==True and self.is_odom==True:
             if self.is_make_list==False :
@@ -143,7 +163,8 @@ class patrolRoute(Node):
             self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
             self.goal_pub.publish(self.goal_msg)
 
-    def dijkstra(self, idx):
+
+    def bfs(self, idx):
         start = self.goal_list[idx]
         Q = deque()
         Q.append(start)
@@ -169,6 +190,7 @@ class patrolRoute(Node):
             else:
                 self.edges[idx, i] = self.cost[self.goal_list[i][0], self.goal_list[i][1]]
     
+
     def prim(self, num):
         que = PriorityQueue()
 
@@ -230,13 +252,14 @@ class patrolRoute(Node):
                             self.goal_list.append((x, y))
                             break
     
+
     def calc_route(self):
         goal_num = len(self.goal_list)
         self.edges = np.zeros((goal_num, goal_num))
 
         for i in range(goal_num):
             self.cost = np.array([[self.GRIDSIZE*self.GRIDSIZE for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)], dtype=float)
-            self.dijkstra(i)
+            self.bfs(i)
 
         self.prim(goal_num)
         
@@ -246,6 +269,7 @@ class patrolRoute(Node):
         map_point_y = int((y - self.map_offset_y) / self.map_resolution)
         
         return map_point_x,map_point_y
+
 
     def grid_cell_to_pose(self,grid_cell):
         x = grid_cell[0] * self.map_resolution + self.map_offset_x
