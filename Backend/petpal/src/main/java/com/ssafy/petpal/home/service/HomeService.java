@@ -12,6 +12,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
@@ -38,25 +39,27 @@ public class HomeService {
 
     public Location fetchPetCoordinate(Long homeId, int depth){
         if(depth==2){
-            return null;
+            return new Location(0.1,0.2);
         }
         String key = "home:" + homeId+":pet";
-        Object value = redisTemplate.opsForValue().get(key);
-        if (value != null) {
-            try {
-                return (Location) value;
-            } catch (Exception e) {
-                return null;
+        try{
+            Location value = (Location) redisTemplate.opsForValue().get(key);
+            if(value!=null){
+                return value;
+            } else {
+                log.info("No status found for pet. " + "Retry..."+depth);
+                return fetchPetCoordinate(homeId,depth+1);
             }
-        } else {
-            log.info("No status found for pet. " + "Retry..."+depth);
-            return fetchPetCoordinate(homeId,depth+1);
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return null;
         }
+
     }
 
     public void updatePetCoordinate(Long homeId, Location coordinate){
-
-        redisTemplate.opsForValue().set("home:" + homeId+":pet", coordinate);
+        String key = "home:"+homeId+":pet";
+        redisTemplate.opsForValue().set(key, coordinate);
     }
 
     public Location fetchTurtleCoordinate(Long homeId, int depth) {
@@ -64,17 +67,19 @@ public class HomeService {
             return null;
         }
         String key = "home:" + homeId+":turtle";
-        Object value = redisTemplate.opsForValue().get(key);
-        if (value != null) {
-            try {
-                return (Location) value;
-            } catch (Exception e) {
-                return null;
+        try{
+            Location value = (Location) redisTemplate.opsForValue().get(key);
+            if(value!=null){
+                return value;
+            }else {
+                log.info("No status found for turtle. " + "Retry..."+depth);
+                return fetchTurtleCoordinate(homeId,depth+1);
             }
-        } else {
-            log.info("No status found for turtle. " + "Retry..."+depth);
-            return fetchTurtleCoordinate(homeId,depth+1);
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return null;
         }
+
     }
 
     public void updateTurtleCoordinate(Long homeId, Location coordinate) {

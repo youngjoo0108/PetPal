@@ -1,6 +1,7 @@
 package com.ssafy.petpal.image.controller;
 
 import com.amazonaws.HttpMethod;
+import com.ssafy.petpal.image.dto.ImageRequestDto;
 import com.ssafy.petpal.image.dto.ImageResponseDTO;
 import com.ssafy.petpal.image.service.ImageService;
 import lombok.RequiredArgsConstructor;
@@ -38,9 +39,9 @@ public class ImageController {
 //    }
 
     @PostMapping
-    public ResponseEntity<ImageResponseDTO> postImage(@RequestParam String extension){
+    public ResponseEntity<ImageResponseDTO> postImage(@RequestBody ImageRequestDto imageRequestDto){
         // 실제 s3에 저장될 객체의 이름
-        String filename = UUID.randomUUID()+"."+extension;
+        String filename = imageRequestDto.getHomeId()+"/"+UUID.randomUUID()+"."+imageRequestDto.getExtension();
         // 해당 객체에 대한 UPLOAD만을 위한 URL 생성
         System.out.println(filename);
         String uploadURL = imageService.generateURL(filename,HttpMethod.PUT);
@@ -56,6 +57,7 @@ public class ImageController {
     /* 어차피 푸시알림 보내줄 때에 presigned 발급해서 알림에 함께 보내주면 되니까
     *  controller에 구현하는 것보단 "service단에 구현"해서 내부적으로 notification 로직에서 사용하도록 하는 것이 적합
     * */
+    // 사용하지 않을 컨트롤러.
     @GetMapping
     public ResponseEntity<String> getPreSignedDownloadURL(@RequestParam("filename") String filename){
         String downloadURL = imageService.generateURL(filename, HttpMethod.GET);

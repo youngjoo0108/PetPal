@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class RoomController {
     private final RoomService roomService;
 
     @PostMapping
-    public ResponseEntity<Void> postRoom(RoomRegisterDTO roomRegisterDTO){
+    public ResponseEntity<Void> postRoom(@RequestBody RoomRegisterDTO roomRegisterDTO){
         try{
             roomService.createRoom(roomRegisterDTO);
             return ResponseEntity.ok(null);
@@ -34,8 +35,8 @@ public class RoomController {
         return ResponseEntity.ok(STR_ARR);
     }
 
-    @GetMapping
-    public ResponseEntity<List<RoomResponseDTO>> getRooms(Long homeId){
+    @GetMapping("/{homeId}")
+    public ResponseEntity<List<RoomResponseDTO>> getRooms(@PathVariable Long homeId){
         try{
             List<RoomResponseDTO> list = roomService.fetchAllRoomById(homeId);
             return ResponseEntity.ok(list);

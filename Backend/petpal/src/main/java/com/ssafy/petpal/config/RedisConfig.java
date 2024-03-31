@@ -1,5 +1,6 @@
 package com.ssafy.petpal.config;
 
+import com.ssafy.petpal.object.dto.Location;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +25,7 @@ public class RedisConfig {
         template.setConnectionFactory(connectionFactory);
 
         // JSON 직렬화 방식 설정
-        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
+        Jackson2JsonRedisSerializer<Location> serializer = new Jackson2JsonRedisSerializer<>(Location.class);
         template.setValueSerializer(serializer);
         template.setKeySerializer(new StringRedisSerializer());
 

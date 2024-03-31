@@ -13,7 +13,7 @@ public class ApplianceResponseDto {
 
     private String applianceType;
 
-    private Integer applianceStatus;
+    private String applianceStatus;
 
     private Long homeId;
 
@@ -21,7 +21,7 @@ public class ApplianceResponseDto {
 
     private String roomName;
 
-    public void setApplianceStatus(int status){
+    public void setApplianceStatus(String status){
         this.applianceStatus = status;
     }
 
