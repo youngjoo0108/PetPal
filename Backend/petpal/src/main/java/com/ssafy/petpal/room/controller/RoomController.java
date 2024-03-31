@@ -20,7 +20,7 @@ public class RoomController {
     private final RoomService roomService;
 
     @PostMapping
-    public ResponseEntity<Void> postRoom(RoomRegisterDTO roomRegisterDTO){
+    public ResponseEntity<Void> postRoom(@RequestBody RoomRegisterDTO roomRegisterDTO){
         try{
             roomService.createRoom(roomRegisterDTO);
             return ResponseEntity.ok(null);
