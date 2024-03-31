@@ -4,7 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.petpal.control.dto.ApplianceContainer;
 import com.ssafy.petpal.control.dto.ControlDto;
+import com.ssafy.petpal.map.dto.MapDto;
+import com.ssafy.petpal.map.service.MapService;
 import com.ssafy.petpal.object.service.ApplianceService;
+import com.ssafy.petpal.route.dto.RouteDto;
+import com.ssafy.petpal.route.service.RouteService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.checkerframework.checker.units.qual.A;
@@ -27,7 +31,8 @@ public class ControlController {
     private final ObjectMapper objectMapper;
     private final StringRedisTemplate redisTemplate;
     private final ApplianceService applianceService;
-//    private static final Logger logger = LoggerFactory.getLogger(ControlController.class);
+    private final MapService mapService;
+    private final RouteService routeService;
     private static final String CONTROL_QUEUE_NAME = "control.queue";
     private static final String CONTROL_EXCHANGE_NAME = "control.exchange";
 
@@ -77,16 +82,16 @@ public class ControlController {
                 // 날것의 맵
                 // dtoMapper로 만들어서
                 // mapService.createMap(dto)
-                // scan.map.{homeID} 메세지 발행(깎은 맵이 들어가있다)
-
+                // 메세지 발행(깎은 맵이 들어가있다)
+                MapDto mapDto = mapService.createMap(homeId, controlDto.getMessage());
+                rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, mapDto);
                 break;
             case "ROUTE":
                 // 경로 저장 repository
-
+                RouteDto routeDto = routeService.saveRoute(homeId, controlDto.getMessage());
+                break;
         }
     }
-
-
 
     @RabbitListener(queues = CONTROL_QUEUE_NAME)
     public void receive(ControlDto controlDto) {
