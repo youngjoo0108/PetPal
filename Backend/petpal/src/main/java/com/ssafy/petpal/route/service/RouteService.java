@@ -27,6 +27,13 @@ public class RouteService {
         return routeDto;
     }
 
+    public RouteDto getRoute(String homeId) {
+        Long mapId = findMapIdByHomeId(Long.valueOf(homeId));
+        Route route = routeRepository.findByMapId(mapId)
+                .orElseThrow(() -> new RuntimeException("Route not found for mapId: " + mapId));
+        return new RouteDto(route.getMapId(), route.getData());
+    }
+
     public Long findMapIdByHomeId(Long homeId) {
         return mapRepository.findByHomeId(homeId)
                 .map(Map::getId)

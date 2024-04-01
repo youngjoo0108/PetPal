@@ -2,7 +2,9 @@ package com.ssafy.petpal.map.service;
 
 import com.ssafy.petpal.map.dto.MapDto;
 import com.ssafy.petpal.map.entity.Map;
+import com.ssafy.petpal.map.entity.OriginMap;
 import com.ssafy.petpal.map.repository.MapRepository;
+import com.ssafy.petpal.map.repository.OriginMapRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,8 @@ public class MapService {
 
     @Autowired
     private MapRepository mapRepository;
+
+    private OriginMapRepository originMapRepository;
     public MapDto createMap(String homeId, String rawMapData) {
         String[][] dataArray = new String[700][700];
         StringTokenizer tokenizer = new StringTokenizer(rawMapData);
@@ -29,6 +33,11 @@ public class MapService {
                 break;
             }
         }
+
+        OriginMap originMap = new OriginMap();
+        originMap.setHomeId(Long.valueOf(homeId));
+        originMap.setData(rawMapData);
+        originMapRepository.save(originMap);
 
         String[][] largestRectangle = findLargestRectangleContaining100(dataArray);
         return saveMapData(homeId, largestRectangle);
