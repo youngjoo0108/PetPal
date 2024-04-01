@@ -11,6 +11,10 @@ state_launch_file_map = {
     'patrol': 'patrol.py',
     'stay': 'stay.py',
     'scan': 'scan.py',
+    'tracking': 'tracking.py',
+    'search': 'search.py',
+    'iot': 'iot.py',
+    'obstacle': 'obstacle.py',
 }
 
 FSM = {
@@ -19,6 +23,8 @@ FSM = {
         "patrol_on" : "patrol",
         "tracking_on" : "search",
         "interrupt_on" : "interrupt",
+        "iot_on" : "iot",
+        "obstacle_on" : "obstacle",
     },
     "scan" : {
         "scan_off" : "stay",
@@ -27,18 +33,30 @@ FSM = {
         "patrol_off" : "stay",
         "tracking_on" : "search",
         "interrupt_on" : "interrupt",
+        "iot_on" : "iot",
+        "obstacle_on" : "obstacle",
     },
     "search" : {
         "tracking_off" : "stay",
         "patrol_on" : "patrol",
         "found" : "tracking",
         "interrupt_on" : "interrupt",
+        "iot_on" : "iot",
+        "obstacle_on" : "obstacle",
     },
     "tracking" : {
         "tracking_off" : "stay",
         "patrol_on" : "patrol",
         "lost" : "search",
         "interrupt_on" : "interrupt",
+        "iot_on" : "iot",
+        "obstacle_on" : "obstacle",
+    },
+    "iot" : {
+        "iot_off" : "check_last_state",
+    },
+    "obstacle" : {
+        "obstacle_off" : "check_last_state",
     },
     "interrupt" : {
         "interrupt_off" : "check_last_state",
@@ -49,7 +67,7 @@ class control_tower(Node) :
     def __init__(self):
         super().__init__('control_tower')
 
-        self.reqeust_sub = self.create_subscription(String, '/request', self.reqeust_callback, 20)
+        self.request_sub = self.create_subscription(String, '/request', self.request_callback, 20)
         self.fsm_pub = self.create_publisher(String, 'fsm', 10)
 
         self.current_process = None
@@ -57,6 +75,10 @@ class control_tower(Node) :
         self.last_state = None
 
         self.fsm_msg = String()
+
+        self.launch_file_for_state(self.current_state)
+        self.fsm_msg.data = self.current_state
+        self.fsm_pub.publish(self.fsm_msg)
 
         # while True:
         #     state = self.read_robot_state()
@@ -87,9 +109,11 @@ class control_tower(Node) :
             print(f"Launching {launch_file} for state '{state}'...")
             self.current_process = subprocess.Popen(["ros2", "launch", "test_209", launch_file])
     
-    def reqeust_callback(self, msg):
+    def request_callback(self, msg):
         if msg.data in FSM[self.current_state]:
             if FSM[self.current_state][msg.data] == "check_last_state":
+                if self.last_state == 'tracking':
+                    self.last_state = 'search'
                 self.current_state = self.last_state
                 self.last_state = "interrupt"
             else:
@@ -97,7 +121,7 @@ class control_tower(Node) :
                 self.current_state = FSM[self.current_state][msg.data]
             
             self.launch_file_for_state(self.current_state)
-            self.fsm_msg = self.current_state
+            self.fsm_msg.data = self.current_state
             self.fsm_pub.publish(self.fsm_msg)
 
 

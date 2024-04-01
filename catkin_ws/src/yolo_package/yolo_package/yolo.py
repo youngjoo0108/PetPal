@@ -56,6 +56,11 @@ class IMGParser(Node):
         except:
             print("init publisher error")
 
+        try:
+            self.request_pub = self.create_publisher(String, 'request', 10)
+        except:
+            print("init publisher error")
+
         # 로직 1. image subscriber 생성
         ## 아래와 같이 subscriber가 
         ## 미리 정의된 토픽 이름인 '/image_jpeg/compressed' 에서
@@ -176,12 +181,21 @@ class IMGParser(Node):
             last_found_msg.data = last_found_json_str
             self.to_server_callback(msg)
 
+            request_msg = String()
+            request_msg.data = "found"
+            self.request_pub.publish(request_msg)
+
         if(len(knife_list) != 0):
             topic_data = {'knife_list': knife_list}
             json_str = json.dumps(topic_data)
             msg = String()
             msg.data = json_str
             self.capture_callback(msg)
+
+            request_msg = String()
+            request_msg.data = "obstacle_on"
+            self.request_pub.publish(request_msg)
+
             
         # 로직 5. 이미지 출력 (cv2.imshow)       
         
