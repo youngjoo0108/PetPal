@@ -126,7 +126,7 @@ class ObstacleControl(Node):
 
         self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
         self.goal_pub.publish(self.goal_msg)
-        self.ros_log_pub.publish_log('DEBUG', 'Tracking Obstacle')
+        # self.ros_log_pub.publish_log('DEBUG', 'Tracking Obstacle')
 
     
     def timer_callback(self):
