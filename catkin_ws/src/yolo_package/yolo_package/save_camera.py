@@ -31,6 +31,7 @@ class IMGParser(Node):
 
     def __init__(self):
         super().__init__(node_name='image_convertor')
+        print(current_dir)
         
         self.last_save_time = 0
 

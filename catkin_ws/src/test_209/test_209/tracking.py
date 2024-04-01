@@ -1,15 +1,12 @@
-import rclpy, time
-from rclpy.node import Node
+import rclpy, time, json
+import numpy as np
 
-from std_msgs.msg import String
-import json
+from rclpy.node import Node
 from geometry_msgs.msg import Twist, PoseStamped, Point32
 from sensor_msgs.msg import LaserScan
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry, Path, OccupancyGrid
-from std_msgs.msg import Int32
-import pprint
-import numpy as np
+from std_msgs.msg import Int32, String
 from ros_log_package.RosLogPublisher import RosLogPublisher
 
 class Tracking(Node):
@@ -58,9 +55,12 @@ class Tracking(Node):
     
 
     def listener_callback(self, msg):
+
         data = json.loads(msg.data)
+
         if 'dog_list' in data:
             for dog in data['dog_list']:
+                
                 self.is_dog = True
                 self.last_dog_seen_time = time.time()
 
@@ -78,12 +78,13 @@ class Tracking(Node):
                 self.turtlebot_to_dog_theta = np.arctan2(self.dog_x_in_camera * 3, self.dog_y_in_camera * 4)
                 self.turtlebot_to_dog_distance = self.dog_distance_in_camera / (self.dog_height * np.cos(self.turtlebot_to_dog_theta))  
 
-                self.goal_x = self.robot_pose_x + (self.turtlebot_to_dog_distance - 1.5) * np.cos(self.robot_yaw + self.turtlebot_to_dog_theta)
-                self.goal_y = self.robot_pose_y + (self.turtlebot_to_dog_distance -1.5) * np.sin(self.robot_yaw + self.turtlebot_to_dog_theta)
+                self.goal_x = self.robot_pose_x + (self.turtlebot_to_dog_distance - 1.2) * np.cos(self.robot_yaw + self.turtlebot_to_dog_theta)
+                self.goal_y = self.robot_pose_y + (self.turtlebot_to_dog_distance -1.2) * np.sin(self.robot_yaw + self.turtlebot_to_dog_theta)
                 self.goal_yaw = self.turtlebot_to_dog_theta + self.robot_yaw
 
          
     def odom_callback(self, msg):
+
         self.is_odom = True
         self.odom_msg = msg
         q = Quaternion(msg.pose.pose.orientation.w , msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z)
@@ -92,12 +93,12 @@ class Tracking(Node):
         self.robot_pose_y = self.odom_msg.pose.pose.position.y
 
 
-   
-        
-
     def timer_callback(self):
+
         current_time = time.time()
+
         if self.is_dog and (current_time - self.last_dog_seen_time) > self.dog_seen_timeout:
+
             self.is_dog = False 
             self.ros_log_pub.publish_log('DEBUG', 'Subscription tracking: Cannot find Dog for 5 seconds')
             return
@@ -110,7 +111,8 @@ class Tracking(Node):
 
 
     def tracking_dog(self):
-        if self.turtlebot_to_dog_distance < 1.3 or self.dog_height > 120:
+
+        if self.turtlebot_to_dog_distance < 1.2 or self.dog_height > 120:
 
             if self.turtlebot_to_dog_distance < 0.7 or self.dog_height > 150:
 
@@ -138,7 +140,7 @@ class Tracking(Node):
             
             self.goal_msg.pose.position.x = self.goal_x
             self.goal_msg.pose.position.y = self.goal_y
-            print(f'tracing {self.goal_x} {self.goal_y} {self.turtlebot_to_dog_distance}')
+            # print(f'tracing {self.goal_x} {self.goal_y} {self.turtlebot_to_dog_distance}')
             q = Quaternion.from_euler(0, 0, self.goal_yaw)
 
             self.goal_msg.pose.orientation.x = q.x

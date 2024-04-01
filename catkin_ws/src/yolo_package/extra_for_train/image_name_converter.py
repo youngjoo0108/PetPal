@@ -22,7 +22,7 @@ def RandomName():
         new_name = name_list.pop(random.randrange(0, len(name_list)))
         
         # 새 파일 이름 설정 (예: "1.jpg")
-        new_file_name = f"{new_name}{extension}"
+        new_file_name = f"000{new_name}{extension}"
         new_file_path = os.path.join(target_folder, new_file_name)
         
         # 파일 이름 변경

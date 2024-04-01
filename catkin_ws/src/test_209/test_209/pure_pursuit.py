@@ -111,13 +111,13 @@ class PurePursuit(Node):
                 self.cmd_msg.linear.x = 0.0
                 self.cmd_msg.angular.z = 0.05
                 #self.cmd_pub.publish(self.cmd_msg)
-                self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, move clockwise')
+                # self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, move clockwise')
            
             else:
                 self.cmd_msg.linear.x = 0.0
                 self.cmd_msg.angular.z = -0.05
                 #self.cmd_pub.publish(self.cmd_msg)
-                self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, move counterclockwise')
+                # self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, move counterclockwise')
             
             self.is_tracking_err = False
 

@@ -27,7 +27,7 @@ FSM = {
     "patrol" : {
         "patrol_off" : "stay",
         "tracking_on" : "search",
-        "interrupt_on" : "interrupt",
+        "interrupt_on" : "interrupt", 
     },
     "search" : {
         "tracking_off" : "stay",

@@ -14,9 +14,9 @@ import time
 from ros_log_package.RosLogPublisher import RosLogPublisher
 
 
-class WebSocketClientNode(Node):
+class WebSocketClientSendNode(Node):
     def __init__(self):
-        super().__init__('websocket_client_node')
+        super().__init__('websocket_client_send_node')
         
         self.ros_log_pub = None
         try:
@@ -43,22 +43,22 @@ class WebSocketClientNode(Node):
             self.ros_log_pub.publish_log('ERROR', 'Subscription initialization error: {}'.format(e))
             
         self.loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(self.loop) # 변경: asyncio 이벤트 루프를 명시적으로 설정
+        threading.Thread(target=self.run_asyncio_loop, args=(self.loop,), daemon=True).start()
         
         self.ws_url = "wss://j10a209.p.ssafy.io/api/ws"
         self.websocket = None
         
-        threading.Thread(target=self.run_asyncio_loop, daemon=True).start() # 변경: 쓰레드 내에서 이벤트 루프 실행
         
-    def run_asyncio_loop(self):
-        self.loop.run_forever() 
+    def run_asyncio_loop(self, loop):
+        asyncio.set_event_loop(loop)
+        loop.run_forever()
         
     async def connect_websocket(self):
         try:
             self.websocket = await websockets.connect(self.ws_url, max_size=2**20, max_queue=2**5)
             await self.websocket.send("CONNECT\naccept-version:1.0,1.1,2.0\n\n\x00\n")
-            sub_offer = stomper.subscribe("/exchange/control.exchange/user.1", "user.10")
-            await self.websocket.send(sub_offer)
+            # sub_offer = stomper.subscribe("/exchange/control.exchange/user.1", "user.1")
+            # await self.websocket.send(sub_offer)
         except Exception as e:
             self.ros_log_pub.publish_log('ERROR', 'WebSocket connection error: {}'.format(e))
             self.websocket = None # 변경: 연결 실패 시 websocket을 None으로 설정
@@ -67,6 +67,8 @@ class WebSocketClientNode(Node):
         if self.websocket is None or self.websocket.closed:
             await self.connect_websocket() # 변경: 웹소켓이 연결되지 않았거나 닫혀있으면 재연결 시도
             self.ros_log_pub.publish_log('INFO', f"connected {time.strftime('%X', time.localtime())}")
+    
+    # {'type': 'yolo_data', 'sender': 'user_1', 'time': '13:50:20', 'message': '{"list": ["13:50:20/Chair/0.94%/254-200/336-357", "13:50:20/Chair/0.82%/310-227/364-354", "13:50:20/Chair/0.79%/308-228/391-348"]}'}
             
     async def send_message(self, msg):
         await self.ensure_websocket_connected() # 변경: 메시지 전송 전에 웹소켓 연결 상태 확인
@@ -83,7 +85,12 @@ class WebSocketClientNode(Node):
                 "time": time.strftime('%X', now),
                 "message": video_image_base64
             }
-            await self.send_message(msg) # 변경: send_message 함수를 통해 메시지 전송
+            
+            await self.ensure_websocket_connected() # 변경: 메시지 전송 전에 웹소켓 연결 상태 확인
+            send = stomper.send("/pub/images.stream.1.images", json.dumps(msg))
+            await self.websocket.send(send)
+            
+            # print("sended image")
         except Exception as e:
             self.ros_log_pub.publish_log('ERROR', 'Sending video error: {}'.format(e))
             self.websocket = None # 변경: 오류 발생 시 websocket을 None으로 재설정하여 재연결 로직을 트리거
@@ -112,7 +119,7 @@ class WebSocketClientNode(Node):
         
 def main(args=None):
     rclpy.init(args=args)
-    websocket_client_node = WebSocketClientNode()
+    websocket_client_node = WebSocketClientSendNode()
     rclpy.spin(websocket_client_node)
     websocket_client_node.destroy_node()
     rclpy.shutdown()

@@ -14,7 +14,7 @@ class YoloSubscriber(Node):
             'captured_object',
             self.listener_callback,
             10)
-        self.subscription  # prevent unused variable warning
+        self.subscription  # prevent unused variable+warning
 
     def listener_callback(self, msg):
         data = json.loads(msg.data)
