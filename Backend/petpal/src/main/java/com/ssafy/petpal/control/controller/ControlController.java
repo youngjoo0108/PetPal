@@ -45,7 +45,7 @@ public class ControlController {
     private final RouteService routeService;
     private final FcmService fcmService;
     private final HomeService homeService;
-    private final UserService userService;
+//    private final UserService userService;
     private final NotificationService notificationService;
 
     private static final String CONTROL_QUEUE_NAME = "control.queue";
@@ -78,7 +78,7 @@ public class ControlController {
                 String formattedTime = nowInKorea.format(formatter);
                 NotificationRequestDto notificationRequestDto
                         = new NotificationRequestDto(targetUserId, type, "선택하신 가전의 상태를 변경하였습니다.",
-                        formattedTime,"S3 Image Url");
+                        formattedTime,"");
                 fcmService.sendMessageTo(notificationRequestDto);
                 notificationService.saveNotification(notificationRequestDto); // DB에 저장
                 break;

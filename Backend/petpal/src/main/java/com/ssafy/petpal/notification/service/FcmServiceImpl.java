@@ -6,12 +6,14 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.ssafy.petpal.image.service.ImageService;
 import com.ssafy.petpal.notification.dto.FcmMessageDto;
 import com.ssafy.petpal.notification.dto.NotificationRequestDto;
 import com.ssafy.petpal.notification.service.FcmService;
 import com.ssafy.petpal.user.dto.UserDto;
 import com.ssafy.petpal.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,9 @@ public class FcmServiceImpl implements FcmService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ImageService imageService;
 
     @Override
     public int sendMessageTo(NotificationRequestDto notificationRequestDto) throws IOException {
