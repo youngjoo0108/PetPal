@@ -3,6 +3,7 @@ package com.ssafy.petpal.user.controller;
 import com.ssafy.petpal.auth.utils.SecurityUtil;
 import com.ssafy.petpal.exception.CustomException;
 import com.ssafy.petpal.exception.ErrorCode;
+import com.ssafy.petpal.user.dto.TokenDto;
 import com.ssafy.petpal.user.dto.UserDto;
 import com.ssafy.petpal.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +30,9 @@ public class UserController {
     }
 
     @PostMapping(value = "/fcm/{userId}")
-    public ResponseEntity<?> updateFCMToken(@PathVariable("userId") Long userId, @RequestBody String token){
-        userService.updateFCMToken(userId, token);
+    public ResponseEntity<?> updateFCMToken(@PathVariable("userId") Long userId, @RequestBody TokenDto tokenDto) {
+        userService.updateFCMToken(userId, tokenDto.getToken());
         return ResponseEntity.ok().build();
     }
+
 }
