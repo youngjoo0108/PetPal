@@ -49,6 +49,16 @@ public class ApplianceController {
         }
     }
 
+    @DeleteMapping("/{applianceId}")
+    public ResponseEntity<Void> deleteAppliance(@PathVariable Long applianceId){
+        try{
+            applianceService.deleteAppliance(applianceId);
+            return ResponseEntity.ok(null);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     // ROS에서 사용
     @GetMapping("/{appliacneUUID}")
     public ResponseEntity<ApplianceResponseDto> getApplianceByUUID(@PathVariable String applianceUUID){

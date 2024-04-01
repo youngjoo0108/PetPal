@@ -66,4 +66,14 @@ public class RoomController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @DeleteMapping("/{roomId}")
+    public ResponseEntity<Void> deleteAppliance(@PathVariable Long roomId){
+        try{
+            roomService.deleteRoom(roomId);
+            return ResponseEntity.ok(null);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

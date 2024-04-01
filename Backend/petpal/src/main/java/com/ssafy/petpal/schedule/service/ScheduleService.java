@@ -53,6 +53,7 @@ public class ScheduleService {
         Location location = new Location(coordinate.getX(), coordinate.getY()); // 이 부분은 Location 생성자나 팩토리 메소드가 적절히 정의되어 있어야 합니다.
 
         return new ScheduleActualResponseDto(
+                schedule.getId(),
                 schedule.getAppliance().getId(),
                 schedule.getAppliance().getApplianceType(),
                 location, // 변환된 Location 객체
@@ -66,4 +67,9 @@ public class ScheduleService {
         );
     }
 
+    public void deleteSchedule(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(IllegalArgumentException::new);
+        scheduleRepository.delete(schedule);
+    }
 }

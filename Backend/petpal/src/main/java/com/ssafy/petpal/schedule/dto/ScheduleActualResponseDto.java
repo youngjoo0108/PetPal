@@ -12,7 +12,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Getter
 public class ScheduleActualResponseDto {
-
+    private Long scheduleId;
     private Long applianceId;
 
     private String applianceType;

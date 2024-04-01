@@ -43,4 +43,13 @@ public class ScheduleController {
         }
     }
 
+    @DeleteMapping("/{scheduleId}")
+    public ResponseEntity<Void> deleteSchedule(@PathVariable Long scheduleId){
+        try{
+            scheduleService.deleteSchedule(scheduleId);
+            return ResponseEntity.ok(null);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
