@@ -1,5 +1,6 @@
 import rclpy
 from rclpy.node import Node
+from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path
@@ -25,6 +26,7 @@ class astarLocalpath(Node):
         self.local_path_pub = self.create_publisher(Path, 'local_path', 10)
         self.subscription = self.create_subscription(Path,'/global_path',self.path_callback,10)
         self.subscription = self.create_subscription(Odometry,'/odom',self.listener_callback,10)
+        self.fsm_sub = self.create_subscription(String, '/fsm', self.fsm_callback, 10)
         self.odom_msg=Odometry()
         self.is_odom=False
         self.is_path=False
@@ -48,6 +50,12 @@ class astarLocalpath(Node):
         # 로직 2. global_path 데이터 수신 후 저장
         self.is_path=True
         self.global_path_msg=msg
+
+    def fsm_callback(self, msg):
+        local_path_msg=Path()
+        local_path_msg.header.frame_id='/map'
+        local_path_msg.poses = []
+        self.local_path_pub.publish(local_path_msg)
 
         
     def timer_callback(self):

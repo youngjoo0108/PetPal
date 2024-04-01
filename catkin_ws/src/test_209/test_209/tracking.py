@@ -14,10 +14,9 @@ class Tracking(Node):
     def __init__(self):
         super().__init__('minimal_subscriber')
         self.yolo_sub = self.create_subscription(String,'captured_object',self.listener_callback, 10)
-        self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
+        self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 1)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
-        self.timer = self.create_timer(0.1, self.timer_callback)
-        self.cmd_pub = self.create_publisher(Twist, 'cmd_vel', 10)
+        self.timer = self.create_timer(0.2, self.timer_callback)
         self.tracking_pub = self.create_publisher(Int32, 'tracking_err', 10)
         self.request_pub = self.create_publisher(String, 'request', 10)
 
@@ -58,6 +57,9 @@ class Tracking(Node):
         data = json.loads(msg.data)
 
         if 'dog_list' in data:
+            if not data['dog_list']:
+                self.is_dog = False
+            
             for dog in data['dog_list']:
                 
                 self.is_dog = True
@@ -77,8 +79,8 @@ class Tracking(Node):
                 self.turtlebot_to_dog_theta = np.arctan2(self.dog_x_in_camera * 3, self.dog_y_in_camera * 4)
                 self.turtlebot_to_dog_distance = self.dog_distance_in_camera / (self.dog_height * np.cos(self.turtlebot_to_dog_theta))  
 
-                self.goal_x = self.robot_pose_x + (self.turtlebot_to_dog_distance - 1.2) * np.cos(self.robot_yaw + self.turtlebot_to_dog_theta)
-                self.goal_y = self.robot_pose_y + (self.turtlebot_to_dog_distance -1.2) * np.sin(self.robot_yaw + self.turtlebot_to_dog_theta)
+                self.goal_x = self.robot_pose_x + (self.turtlebot_to_dog_distance - 2.0) * np.cos(self.robot_yaw + self.turtlebot_to_dog_theta)
+                self.goal_y = self.robot_pose_y + (self.turtlebot_to_dog_distance -2.0) * np.sin(self.robot_yaw + self.turtlebot_to_dog_theta)
                 self.goal_yaw = self.turtlebot_to_dog_theta + self.robot_yaw
 
          
@@ -96,23 +98,26 @@ class Tracking(Node):
 
         current_time = time.time()
 
-        if self.is_dog and (current_time - self.last_dog_seen_time) > self.dog_seen_timeout:
+        if self.is_dog == False:
+            if (current_time - self.last_dog_seen_time) > self.dog_seen_timeout:
+                self.ros_log_pub.publish_log('DEBUG', 'Subscription tracking: Cannot find Dog for 5 seconds')
+                self.request_msg.data = "lost"
+                self.request_pub.publish(self.request_msg)
+                return
+            else:
+                if self.dog_x_in_camera > 0:
+                    self.tracking_err_msg.data = 5
+                else:
+                    self.tracking_err_msg.data = 6
+                self.tracking_pub.publish(self.tracking_err_msg)
 
-            self.is_dog = False 
-            self.ros_log_pub.publish_log('DEBUG', 'Subscription tracking: Cannot find Dog for 5 seconds')
-
-        if not self.is_dog:
-            # print("강아지가 감지되지 않았습니다.")
-            self.request_msg.data = "lost"
-            self.reqeust_pub.publish(self.request_msg)
-            return  
         else:
             self.tracking_dog()
 
 
     def tracking_dog(self):
 
-        if self.turtlebot_to_dog_distance < 1.2 or self.dog_height > 120:
+        if self.turtlebot_to_dog_distance < 2.0 or self.dog_height > 72: # 1.2 / 120
 
             if self.turtlebot_to_dog_distance < 0.7 or self.dog_height > 150:
 
@@ -120,19 +125,18 @@ class Tracking(Node):
                 self.tracking_pub.publish(self.tracking_err_msg)
                 
             else:
-                if -100 < self.dog_x_in_camera < 100:
+                if -20 < self.dog_x_in_camera < 20:
 
                     self.tracking_err_msg.data = 1
                     self.tracking_pub.publish(self.tracking_err_msg)
-                    return
                     
-                elif -160 < self.dog_x_in_camera <= -100:
+                elif -160 < self.dog_x_in_camera <= -20:
 
                     self.tracking_err_msg.data = 2
                     self.tracking_pub.publish(self.tracking_err_msg)
                     
 
-                elif 100 <= self.dog_x_in_camera < 160:
+                elif 20 <= self.dog_x_in_camera < 160:
 
                     self.tracking_err_msg.data = 3
                     self.tracking_pub.publish(self.tracking_err_msg)
@@ -150,11 +154,6 @@ class Tracking(Node):
 
             self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
             self.goal_pub.publish(self.goal_msg)
-
-            self.tracking_err_msg.data = 5
-            self.tracking_pub.publish(self.tracking_err_msg)
-
-        return
 
 
 

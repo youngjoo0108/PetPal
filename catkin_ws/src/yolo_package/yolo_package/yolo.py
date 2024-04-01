@@ -199,8 +199,8 @@ class IMGParser(Node):
             
         # 로직 5. 이미지 출력 (cv2.imshow)       
         
-        re_img = cv2.resize(img_bgr, (0, 0), fx=2, fy=2, interpolation=cv2.INTER_NEAREST)
-        cv2.imshow("re_img", re_img)      
+        # re_img = cv2.resize(img_bgr, (0, 0), fx=2, fy=2, interpolation=cv2.INTER_NEAREST)
+        # cv2.imshow("re_img", re_img)      
         
         cv2.waitKey(1)
 
