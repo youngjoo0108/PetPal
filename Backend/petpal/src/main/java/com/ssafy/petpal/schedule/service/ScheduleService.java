@@ -34,7 +34,6 @@ public class ScheduleService {
                 .appliance(appliance)
                 .scheduleDay(scheduleDto.getDay())
                 .scheduleTime(scheduleDto.getTime())
-                .scheduleRepeat(scheduleDto.isRepeat())
                 .taskType(scheduleDto.getTaskType())
                 .isActive(scheduleDto.isActive())
                 .build();
@@ -62,7 +61,6 @@ public class ScheduleService {
                 schedule.getScheduleDay(),
                 schedule.getScheduleTime(),
                 schedule.getTaskType(),
-                schedule.isScheduleRepeat(),
                 schedule.isActive()
         );
     }

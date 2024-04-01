@@ -29,6 +29,9 @@ public class Target extends BaseEntity {
     @JoinColumn(name = "home_id")
     private Home home;
 
+    @Column(name = "object_type")
+    private String objectType;
+
     @OneToOne
     @JoinColumn(name = "image_id")
     private Image image;
@@ -40,8 +43,9 @@ public class Target extends BaseEntity {
 
 
     @Builder
-    public Target(Home home, Image image, Point coordinate){
+    public Target(Home home,String objectType, Image image, Point coordinate){
         this.home = home;
+        this.objectType = objectType;
         this.image = image;
         this.coordinate = coordinate;
     }

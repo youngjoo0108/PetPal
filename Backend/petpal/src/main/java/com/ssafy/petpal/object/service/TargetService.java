@@ -26,6 +26,7 @@ public class TargetService {
         Home home = homeRepository.findById(objectRegisterDto.getHomeId())
                 .orElseThrow(IllegalArgumentException::new);
         Target target = Target.builder()
+                .objectType(objectRegisterDto.getObjectType())
                 .image(image)
                 .coordinate(TargetRegisterDto.locationToPoint(objectRegisterDto.getCoordinate()))
                 .home(home)
@@ -35,6 +36,12 @@ public class TargetService {
 
         // 알림 서비스 호출
 
+    }
+
+    public String fetchFilenameByTargetId(Long targetId){
+        Target target = targetRepository.findById(targetId)
+                .orElseThrow(IllegalArgumentException::new);
+        return target.getImage().getFilename();
     }
 
 }

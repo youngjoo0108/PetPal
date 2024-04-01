@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import org.locationtech.jts.geom.Point;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Data
@@ -21,10 +22,9 @@ public class ScheduleActualResponseDto {
 
     private String roomName;
 
-    private String day;
+    private LocalDate day;
     private LocalTime time;
     private String taskType;
 
-    private boolean isRepeat;
     private boolean isActive; // 스케줄 자체의 상태
 }

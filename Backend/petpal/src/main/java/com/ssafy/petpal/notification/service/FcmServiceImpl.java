@@ -13,6 +13,7 @@ import com.ssafy.petpal.notification.service.FcmService;
 import com.ssafy.petpal.user.dto.UserDto;
 import com.ssafy.petpal.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -32,8 +33,6 @@ public class FcmServiceImpl implements FcmService {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private ImageService imageService;
 
     @Override
     public int sendMessageTo(NotificationRequestDto notificationRequestDto) throws IOException {
@@ -70,14 +69,14 @@ public class FcmServiceImpl implements FcmService {
                 .message(FcmMessageDto.Message.builder()
                         .token(token)
                         .notification(FcmMessageDto.Notification.builder()
-                                .title("띵동")
-                                .body("ROS에서 보낸 메시지가 있습니다. " + notificationRequestDto.getContent())
+                                .title("PetPal 알림 도착")
+                                .body(notificationRequestDto.getContent())
                                 .build())
                         .data(Map.of( // 사용자 정의 데이터
-                                "category", notificationRequestDto.getCategory(),
-                                "content", notificationRequestDto.getContent(),
-                                "time", notificationRequestDto.getTime(),
-                                "image", notificationRequestDto.getImage()
+                                "category", notificationRequestDto.getCategory(), // 어떤 동작을 했냐
+                                "content", notificationRequestDto.getContent(), // 동작에 대한 설명
+                                "time", notificationRequestDto.getTime(), // 로컬 타임
+                                "image", notificationRequestDto.getImage() // s3 presigned download url
                         ))
                         .build())
                 .build();

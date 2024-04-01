@@ -2,6 +2,7 @@ package com.ssafy.petpal.schedule.dto;
 
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Getter
@@ -15,10 +16,9 @@ public class ScheduleDto {
     private Long homeId;
     private Long applianceId;
 
-    private String day;
-    private LocalTime time;
-    private String taskType;
+    private LocalDate day;  // YYYY-MM-DD 형식 String
+    private LocalTime time; // HH-MM 형식 String
+    private String taskType; //  "ON" | "OFF" String
 
-    private boolean isRepeat;
-    private boolean isActive; // 스케줄 자체의 상태
+    private boolean isActive;// boolean(일단 무조건 true로 보냄)
 }

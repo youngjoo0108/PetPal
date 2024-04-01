@@ -1,16 +1,19 @@
 package com.ssafy.petpal.control.controller;
 
+import com.amazonaws.HttpMethod;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssafy.petpal.control.dto.ApplianceContainer;
 import com.ssafy.petpal.control.dto.ControlDto;
+import com.ssafy.petpal.control.dto.MessageContainer;
 import com.ssafy.petpal.home.service.HomeService;
+import com.ssafy.petpal.image.service.ImageService;
 import com.ssafy.petpal.map.dto.MapDto;
 import com.ssafy.petpal.map.service.MapService;
 import com.ssafy.petpal.notification.dto.NotificationRequestDto;
 import com.ssafy.petpal.notification.service.FcmService;
 import com.ssafy.petpal.notification.service.NotificationService;
 import com.ssafy.petpal.object.service.ApplianceService;
+import com.ssafy.petpal.object.service.TargetService;
 import com.ssafy.petpal.route.dto.RouteDto;
 import com.ssafy.petpal.route.service.RouteService;
 import com.ssafy.petpal.user.service.UserService;
@@ -47,7 +50,8 @@ public class ControlController {
     private final HomeService homeService;
 //    private final UserService userService;
     private final NotificationService notificationService;
-
+    private final ImageService imageService;
+    private final TargetService targetService;
     private static final String CONTROL_QUEUE_NAME = "control.queue";
     private static final String CONTROL_EXCHANGE_NAME = "control.exchange";
 
@@ -60,12 +64,12 @@ public class ControlController {
         String type = controlDto.getType();
         switch (type){
             //COMPLETE한게 가전 On/Off를 완료한 것인지 위험물 처리 프로세스를 완료한 것인지 구분을 할 필요가 있음.
-            case "COMPLETE":
+            case "A_COMPLETE":
                 // ROS에서 입증한 실제 가전상태 데이터를 redis에 올린다.
 //                controlDto.getMessage() //parsing
-                ApplianceContainer.Complete complete = objectMapper.readValue(controlDto.getMessage(),ApplianceContainer.Complete.class);
-                if(complete.getIsSuccess()){
-                    applianceService.updateApplianceStatus(homeId,complete.getApplianceId(),complete.getCurrentStatus());
+                MessageContainer.A_Complete aComplete = objectMapper.readValue(controlDto.getMessage(),MessageContainer.A_Complete.class);
+                if(aComplete.getIsSuccess()){
+                    applianceService.updateApplianceStatus(homeId,aComplete.getApplianceId(),aComplete.getCurrentStatus());
                 }else{
                     // 다시 발행
                 }
@@ -76,15 +80,30 @@ public class ControlController {
 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
                 String formattedTime = nowInKorea.format(formatter);
-                NotificationRequestDto notificationRequestDto
-                        = new NotificationRequestDto(targetUserId, type, "선택하신 가전의 상태를 변경하였습니다.",
+
+                NotificationRequestDto notificationRequestDto1
+                        = new NotificationRequestDto(targetUserId, type, aComplete.getApplianceName()+"의 상태를 변경하였습니다.",
                         formattedTime,"");
-                fcmService.sendMessageTo(notificationRequestDto);
-                notificationService.saveNotification(notificationRequestDto); // DB에 저장
+                fcmService.sendMessageTo(notificationRequestDto1);
+                notificationService.saveNotification(notificationRequestDto1); // DB에 저장
                 break;
             case "ON":
             case "OFF":
                 rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
+                break;
+            case "O_COMPLETE":
+                MessageContainer.O_Complete oComplete =  objectMapper.readValue(controlDto.getMessage(), MessageContainer.O_Complete.class);
+                String filename = targetService.fetchFilenameByTargetId(oComplete.getObjectId());
+                String downloadURL = imageService.generateURL(filename, HttpMethod.GET);
+
+                Long targetUserId2 = homeService.findKakaoIdByHomeId(homeId);
+                LocalDateTime nowInKorea2 = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
+                DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                String formattedTime2 = nowInKorea2.format(formatter2);
+                NotificationRequestDto notificationRequestDto2
+                        = new NotificationRequestDto(targetUserId2, type, oComplete.getObjectType()+"를 처리하였습니다.",
+                        formattedTime2,downloadURL);
                 break;
             default:
                 break;
@@ -132,4 +151,6 @@ public class ControlController {
     public void receive(ControlDto controlDto) {
 //        logger.info(" log : " + controlDto);
     }
+
+
 }
