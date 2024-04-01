@@ -50,7 +50,8 @@ public class ApplianceService {
                 .home(home)
                 .room(room)
                 .build();
-        applianceRepository.save(appliance);
+        Appliance appliance1  =applianceRepository.save(appliance);
+        redisTemplate.opsForValue().set("home:" + applianceRegisterDTO.getHomeId() + ":appliance:" + appliance1.getId(), "OFF");
     }
 
     public ApplianceResponseDto fetchApplianceByUUID(String uuid){
