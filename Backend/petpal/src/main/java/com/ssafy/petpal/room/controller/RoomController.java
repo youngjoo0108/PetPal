@@ -17,15 +17,35 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/rooms")
 public class RoomController {
-    static String[] STR_ARR = {"거실","주방","침실1","침실2","침실3","화장실"};
+    static String[] STR_ARR = {"거실","주방","침실","화장실"};
     private final RoomService roomService;
 
     @PostMapping
     public ResponseEntity<Void> postRoom(@RequestBody RoomRegisterDTO roomRegisterDTO){
         try{
-            roomService.createRoom(roomRegisterDTO);
-            return ResponseEntity.ok(null);
-        }catch (Exception e) {
+            String newRoomName = roomRegisterDTO.getRoomName();
+            List<RoomResponseDTO> list = roomService.fetchAllRoomById(roomRegisterDTO.getHomeId());
+            boolean isDuplicate = false;
+            for(RoomResponseDTO dto : list){
+                if(dto.getRoomName().equals(newRoomName)){
+                    isDuplicate = true;
+                    break;
+                }
+            }
+            if(isDuplicate){
+                // 중복이 발생했을 경우의 로직
+                throw new IllegalArgumentException("중복된 방 이름입니다.");
+            } else {
+                // 중복이 없을 경우의 로직, 예를 들어 새로운 방을 추가하는 로직 등
+                roomService.createRoom(roomRegisterDTO);
+                return ResponseEntity.ok(null);
+            }
+
+
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -38,7 +58,9 @@ public class RoomController {
     @GetMapping("/{homeId}")
     public ResponseEntity<List<RoomResponseDTO>> getRooms(@PathVariable Long homeId){
         try{
+
             List<RoomResponseDTO> list = roomService.fetchAllRoomById(homeId);
+            System.out.println(list.get(0).getRoomName());
             return ResponseEntity.ok(list);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
