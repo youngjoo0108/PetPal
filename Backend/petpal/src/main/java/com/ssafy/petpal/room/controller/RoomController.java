@@ -17,7 +17,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/rooms")
 public class RoomController {
-    static String[] STR_ARR = {"거실","주방","침실","화장실"};
+    static String[] STR_ARR = {"거실","주방","침실1","침실2","침실3","화장실"};
     private final RoomService roomService;
 
     @PostMapping
