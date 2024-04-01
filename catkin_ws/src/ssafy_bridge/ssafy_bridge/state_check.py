@@ -12,6 +12,9 @@ state_launch_file_map = {
     'stay': 'stay.py',
     'scan': 'scan.py',
     'tracking': 'tracking.py',
+    'search': 'search.py',
+    'iot': 'iot.py',
+    'obstacle': 'obstacle.py',
 }
 
 FSM = {

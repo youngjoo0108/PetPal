@@ -35,6 +35,7 @@ class patrolRoute(Node):
         self.is_goal = True
         self.is_param = False
         self.is_map = False
+        self.is_grid_update = False
 
         self.idx = 0
         self.route = []
@@ -48,10 +49,7 @@ class patrolRoute(Node):
             
     
     def patrol_callback(self, msg):
-        if msg.data == 0:
-            self.is_goal = False
-
-        elif msg.data == 1:
+        if msg.data == 1:
             if self.is_goal == False:
                 self.idx += 1
                 if self.idx >= len(self.route):
@@ -71,9 +69,11 @@ class patrolRoute(Node):
     def map_callback(self,msg):
         self.is_map = True
         self.map_msg = msg
+        if not self.is_grid_update:
+            self.grid_update()
+            self.is_grid_update = True
 
     def grid_update(self):
-        self.is_grid_update=True
         self.map_to_grid = np.array(self.map_msg.data).reshape((self.map_size_x, self.map_size_y)).transpose()
 
         for i in range(self.map_size_x):
@@ -94,7 +94,13 @@ class patrolRoute(Node):
     def timer_callback(self):
         if self.is_param and self.is_map and self.is_odom:
             if self.is_goal:
-                self.is_goal = False
+
+                x=self.odom_msg.pose.pose.position.x
+                y=self.odom_msg.pose.pose.position.y
+                now_grid_cell=self.pose_to_grid_cell(x,y)
+
+                #if 100 <= self.map_to_grid[now_grid_cell[0], now_grid_cell[1]]:
+                     
                 now_goal = self.route[self.idx]
                 #print(self.idx, 'th = ', now_goal)
                 goal_x, goal_y = self.grid_cell_to_pose(now_goal)
@@ -109,6 +115,7 @@ class patrolRoute(Node):
 
                 self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
                 self.goal_pub.publish(self.goal_msg)
+                self.is_goal = False
 
     def pose_to_grid_cell(self,x,y):
         map_point_x = int((x - self.map_offset_x) / self.map_resolution)

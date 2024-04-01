@@ -148,8 +148,6 @@ class PurePursuit(Node):
                 if lookahead_point is not None:
                     if self.fsm_msg.data == "patrol":
                         self.is_goal = False
-                        self.patrol_msg.data = 0
-                        self.patrol_pub.publish(self.patrol_msg)
                     robot_orientation_q = self.odom_msg.pose.pose.orientation
                     robot_orientation_euler = Quaternion(robot_orientation_q.w, robot_orientation_q.x, robot_orientation_q.y, robot_orientation_q.z).to_euler()
                     robot_yaw = robot_orientation_euler[2]
@@ -169,7 +167,7 @@ class PurePursuit(Node):
                         start_time = time.time()  # 현재 시간 기록
                         while True:
                             if time.time() - start_time < 1:  # 1초 동안 실행
-                                self.cmd_msg.linear.x = -0.3
+                                self.cmd_msg.linear.x = -0.2
                                 # print('후진중!!')
                             else:
                                 self.cmd_msg.linear.x = 0.0
