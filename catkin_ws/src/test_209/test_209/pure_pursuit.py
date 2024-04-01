@@ -15,10 +15,10 @@ class PurePursuit(Node):
         self.fsm_sub = self.create_subscription(String, '/fsm', self.fsm_callback, 10)
         self.cmd_pub = self.create_publisher(Twist, 'cmd_vel', 10)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
-        self.path_sub = self.create_subscription(Path, '/local_path', self.path_callback, 10)
+        self.path_sub = self.create_subscription(Path, '/local_path', self.path_callback, 1)
         self.lidar_sub = self.create_subscription(LaserScan, '/scan', self.lidar_callback, 10)
-        self.tracking_sub = self.create_subscription(Int32, 'tracking_err', self.tracking_err_callback, 10)
-        self.scan_sub = self.create_subscription(Int32, '/err', self.scan_err_callback, 10)
+        self.tracking_sub = self.create_subscription(Int32, 'tracking_err', self.tracking_err_callback, 1)
+        self.scan_sub = self.create_subscription(Int32, '/err', self.scan_err_callback, 1)
         self.patrol_pub = self.create_publisher(Int32, 'patrol', 1)
         self.timer = self.create_timer(0.05, self.timer_callback)
 
@@ -36,6 +36,7 @@ class PurePursuit(Node):
         self.tracking_err_msg = Int32()
         self.scan_err_msg = Int32()
         self.cmd_msg = Twist()
+        self.patrol_msg = Int32()
 
         self.lookahead_distance = 0.5
 
@@ -62,7 +63,7 @@ class PurePursuit(Node):
 
     def check_collision(self, msg):
         for angle,r in enumerate(msg.ranges):
-            if angle < 20 or angle > 340:
+            if angle < 25 or angle > 335:
                 if 0.0 < r < 0.2:
                     self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit : collsion occur')
                     return True
@@ -145,36 +146,41 @@ class PurePursuit(Node):
                 lookahead_point = self.find_lookahead_point(path_points, robot_pose_x, robot_pose_y)
             
                 if lookahead_point is not None:
+                    if self.fsm_msg.data == "patrol":
+                        self.is_goal = False
+                        self.patrol_msg.data = 0
+                        self.patrol_pub.publish(self.patrol_msg)
                     robot_orientation_q = self.odom_msg.pose.pose.orientation
                     robot_orientation_euler = Quaternion(robot_orientation_q.w, robot_orientation_q.x, robot_orientation_q.y, robot_orientation_q.z).to_euler()
                     robot_yaw = robot_orientation_euler[2]
 
                     angle_to_target = atan2(lookahead_point.y - robot_pose_y, lookahead_point.x - robot_pose_x)
                     theta = self.normalize_angle(angle_to_target - robot_yaw) * -1
-                    
-                    # if self.fsm_msg.data == "tracking" and self.collision:
-                    #     start_time = time.time()  # 현재 시간 기록
-                    #     while True:
-                    #         if time.time() - start_time < 1:  # 1초 동안 실행
-                    #             self.cmd_msg.linear.x = -0.3
-                    #             # print('후진중!!')
-                    #         else:
-                    #             self.cmd_msg.linear.x = 0.0
-                    #             self.cmd_pub.publish(self.cmd_msg)
 
-                    #             break
-                    #         self.cmd_pub.publish(self.cmd_msg)
-
-                    #     self.cmd_msg.linear.x = 0.0
-                    #     self.cmd_pub.publish(self.cmd_msg)
-                    
-                    if self.collision:
+                    if self.fsm_msg.data == "scan" and self.collision:
                         if theta < 0:
                             self.cmd_msg.linear.x = 0.0
                             self.cmd_msg.angular.z = -0.2
                         else:
                             self.cmd_msg.linear.x = 0.0
                             self.cmd_msg.angular.z = 0.2
+
+                    elif self.collision:
+                        start_time = time.time()  # 현재 시간 기록
+                        while True:
+                            if time.time() - start_time < 1:  # 1초 동안 실행
+                                self.cmd_msg.linear.x = -0.3
+                                # print('후진중!!')
+                            else:
+                                self.cmd_msg.linear.x = 0.0
+                                self.cmd_pub.publish(self.cmd_msg)
+
+                                break
+                            self.cmd_pub.publish(self.cmd_msg)
+
+                        self.cmd_msg.linear.x = 0.0
+                        self.cmd_pub.publish(self.cmd_msg)
+                        return
 
                     else:
                         if theta > 1.5 or theta < -1.5:
@@ -201,10 +207,10 @@ class PurePursuit(Node):
                 else:
                     self.cmd_msg.linear.x = 0.0
                     self.cmd_msg.angular.z = 0.0
-                    if self.fsm_msg.data == "patrol":
-                        patrol_msg = Int32()
-                        patrol_msg.data = 1
-                        self.patrol_pub.publish(patrol_msg)
+                    if self.fsm_msg.data == "patrol" and self.is_goal == False:
+                        self.patrol_msg.data = 1
+                        self.is_goal = True
+                        self.patrol_pub.publish(self.patrol_msg)
 
         self.cmd_pub.publish(self.cmd_msg)
 

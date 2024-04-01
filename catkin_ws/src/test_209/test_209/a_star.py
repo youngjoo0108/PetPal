@@ -44,11 +44,11 @@ class A_star(Node):
         self.dCost = [1,1,1,1,1.414,1.414,1.414,1.414]
        
        # logging
-        self.ros_log_pub = None
-        try:
-            self.ros_log_pub = RosLogPublisher(self)
-        except Exception as e:
-            self.get_logger().error('Subscription initialization error: {}'.format(e))
+        # self.ros_log_pub = None
+        # try:
+        #     self.ros_log_pub = RosLogPublisher(self)
+        # except Exception as e:
+        #     self.get_logger().error('Subscription initialization error: {}'.format(e))
 
 
     def grid_update(self):
@@ -148,9 +148,9 @@ class A_star(Node):
                 if len(self.final_path)!=0 :
                     self.a_star_pub.publish(self.global_path_msg)
 
-                end_time = time.time()  
-                elapsed_time = end_time - start_time
-                self.ros_log_pub.publish_log('astar', f'Subscription astar success time: {elapsed_time}')
+                #end_time = time.time()  
+                #elapsed_time = end_time - start_time
+                #self.ros_log_pub.publish_log('astar', f'Subscription astar success time: {elapsed_time}')
 
                     
     def heuristic(self, node, goal):
@@ -167,7 +167,10 @@ class A_star(Node):
         self.cost[start[0]][start[1]] = 0
         found = False
         
+        start_time = time.time()
         while Q:
+            if time.time() - start_time >= 3:
+                break
             current, _ = Q.popleft()
             
             if current == self.goal:
@@ -177,7 +180,7 @@ class A_star(Node):
             for i in range(8):
                 next = (current[0] + self.dx[i], current[1] + self.dy[i])
                 if 0 <= next[0] < self.GRIDSIZE and 0 <= next[1] < self.GRIDSIZE:
-                    if self.map_to_grid[next[0]][next[1]] < 50: 
+                    if self.map_to_grid[next[0]][next[1]] < 50:
                         new_cost = self.cost[current[0]][current[1]] + self.dCost[i]
                         if self.cost[next[0]][next[1]] > new_cost:
                             heuristic_cost = new_cost + self.heuristic(next, self.goal)
@@ -191,8 +194,8 @@ class A_star(Node):
             while node != start:
                 self.final_path.append(node)
                 node = self.path[node[0]][node[1]]
-        else:
-            self.ros_log_pub.publish_log('DEBUG', 'Subscription initialization error: astar goal not found')
+        #else:
+            #self.ros_log_pub.publish_log('DEBUG', 'Subscription initialization error: astar goal not found')
 
                 
 def main(args=None):
