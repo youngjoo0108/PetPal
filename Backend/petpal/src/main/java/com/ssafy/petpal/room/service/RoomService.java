@@ -2,6 +2,7 @@ package com.ssafy.petpal.room.service;
 
 import com.ssafy.petpal.home.entity.Home;
 import com.ssafy.petpal.home.repository.HomeRepository;
+import com.ssafy.petpal.object.entity.Appliance;
 import com.ssafy.petpal.room.dto.RoomRegisterDTO;
 import com.ssafy.petpal.room.dto.RoomResponseDTO;
 import com.ssafy.petpal.room.entity.Room;
@@ -34,5 +35,11 @@ public class RoomService {
         List<RoomResponseDTO> allByHomeId = roomRepository.findAllByHomeId(homeId);
         log.info("35");
         return allByHomeId;
+    }
+
+    public void deleteRoom(Long roomId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(IllegalArgumentException::new);
+        roomRepository.delete(room);
     }
 }

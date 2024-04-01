@@ -104,4 +104,11 @@ public class ApplianceService {
             return "NULL"; // Redis에서 조회된 값이 null인 경우
         }
     }
+
+    public void deleteAppliance(Long applianceId) {
+        Appliance appliance = applianceRepository.findById(applianceId)
+                .orElseThrow(IllegalArgumentException::new);
+        applianceRepository.delete(appliance);
+    }
+
 }
