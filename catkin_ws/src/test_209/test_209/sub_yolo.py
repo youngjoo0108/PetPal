@@ -52,7 +52,6 @@ class YoloSub(Node):
 
 
             elif data['obstacle_list']:
-                # obstacle 4종류 분류해야함!!
 
                 for obstacle in data['obstacle_list']:
                     self.obstacle_msg.data = obstacle
