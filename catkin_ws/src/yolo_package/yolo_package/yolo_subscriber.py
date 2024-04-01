@@ -17,11 +17,20 @@ class YoloSubscriber(Node):
         self.subscription  # prevent unused variable+warning
 
     def listener_callback(self, msg):
+        # print(msg.data, '\n---------')
+        
         data = json.loads(msg.data)
-        for dog in data['list']:
-            #print(dog)
-            self.get_logger().info('Yolo Subscriber heards: "%s"' % dog)
-            
+        for i in data['obstacle_list']:
+            print('Obstacle :', i)
+        for i in data['furniture_list']:
+            print('Furniture :', i)
+        for i in data['dog_list']:
+            print('Dog :', i)
+        for i in data['human_list']:
+            print('Human :', i)
+        for i in data['iot_list']:
+            print('Iot :', i)
+        print()
 
 
 def main(args=None):

@@ -15,7 +15,7 @@ class A_star(Node):
 
     def __init__(self):
         super().__init__('a_Star')
-
+        # 로직 1. publisher, subscriber 만들기
         self.map_sub = self.create_subscription(OccupancyGrid,'map',self.map_callback,1)
         self.odom_sub = self.create_subscription(Odometry,'odom',self.odom_callback,1)
         self.goal_sub = self.create_subscription(PoseStamped,'goal_pose',self.goal_callback,1)
@@ -27,14 +27,15 @@ class A_star(Node):
         self.is_odom=False
         self.is_found_path=False
         self.is_grid_update=False
-        self.is_start_grid_changed = False
 
         self.is_param = False
-
+        # 로직 2. 파라미터 설정
         self.goal = (0,0)
         self.map_size_x=700
         self.map_size_y=700
         self.map_resolution=0.05
+        # self.map_offset_x=-8-8.75
+        # self.map_offset_y=-4-8.75
     
         self.GRIDSIZE=700
  
@@ -58,12 +59,17 @@ class A_star(Node):
 
         for i in range(self.map_size_x):
             for j in range(self.map_size_y):
+                # 값이 100인 원소 찾기
                 if self.map_to_grid[i, j] == 100:
-                    for dx in range(-5, 6):  
-                        for dy in range(-5, 6): 
+                    # 주변 원소 탐색
+                    for dx in range(-5, 6):  # x 좌표 차이가 -2부터 2까지
+                        for dy in range(-5, 6):  # y 좌표 차이가 -2부터 2까지
+                            # 새로운 위치 계산
                             new_i = i + dx
                             new_j = j + dy
+                            # 새로운 위치가 배열 범위 내에 있는지 확인
                             if 0 <= new_i < self.map_size_x and 0 <= new_j < self.map_size_y and self.map_to_grid[new_i, new_j] == 0:
+                                # 조건에 맞는 주변 원소의 값을 100으로 설정
                                 self.map_to_grid[new_i, new_j] = 101
 
 
@@ -123,38 +129,14 @@ class A_star(Node):
 
                 
 
-                if self.map_to_grid[start_grid_cell[0]][start_grid_cell[1]] >= 50:
-                    self.is_start_grid_changed = True
-                    visited = set()  
-                    self.save_path = [start_grid_cell]
-                    queue = deque([(start_grid_cell, self.save_path)]) 
-
-                    while queue:
-                        current_cell, current_saved_path = queue.popleft()
-                        
-                        if self.map_to_grid[current_cell[0]][current_cell[1]] == 0:
-                            start_grid_cell = current_cell 
-                            break
-
-                        for i in range(8):
-                            next_cell = (current_cell[0] + self.dx[i], current_cell[1] + self.dy[i])
-                            if 0 <= next_cell[0] < self.GRIDSIZE and 0 <= next_cell[1] < self.GRIDSIZE and next_cell not in visited:
-                                next_saved_path = current_saved_path + [next_cell]
-                                queue.append((next_cell, next_saved_path))
-                                visited.add(next_cell)
-
-                # else:
-                #     self.is_start_grid_changed = False
-
-                self.a_star(start_grid_cell)
-
+                if start_grid_cell != self.goal :
+                    self.a_star(start_grid_cell)
+                else:
+                    pass
 
                 self.global_path_msg=Path()
                 self.global_path_msg.header.frame_id='map'
                 
-                if self.is_start_grid_changed:
-                    self.final_path = self.final_path + self.save_path[:-1]
-
                 for grid_cell in reversed(self.final_path):
                     tmp_pose=PoseStamped()
                     waypoint_x,waypoint_y=self.grid_cell_to_pose(grid_cell)

@@ -30,7 +30,6 @@ class ObstacleControl(Node):
 
         self.goal_msg.header.frame_id = 'map'
 
-        self.yolo_sub
         self.is_turtlebot_status = False
         self.is_obstacle = False
         self.is_odom = False
@@ -72,7 +71,7 @@ class ObstacleControl(Node):
         if 'knife_list' in data and not self.turtlebot_status_msg.can_use_hand:
             for obstacle in data['knife_list']:
                 self.is_obstacle = True
-                print(obstacle)
+                #print(obstacle)
                 left_top = obstacle.split('/')[-2]
                 right_bottom = obstacle.split('/')[-1]
                 left_top_x, left_top_y = map(float, left_top.split('-'))

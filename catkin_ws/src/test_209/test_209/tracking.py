@@ -19,7 +19,9 @@ class Tracking(Node):
         self.cmd_pub = self.create_publisher(Twist, 'cmd_vel', 10)
         self.tracking_pub = self.create_publisher(Int32, 'tracking_err', 10)
         self.dog_sub = self.create_subscription(String, 'dog_position', self.dog_callback, 10)
+        self.request_pub = self.create_publisher(String, 'request', 10)
 
+        self.request_msg = String()
         self.goal_msg = PoseStamped()
         self.goal_msg.header.frame_id = 'map'
         self.is_odom = False
@@ -98,10 +100,11 @@ class Tracking(Node):
 
             self.is_dog = False 
             self.ros_log_pub.publish_log('DEBUG', 'Subscription tracking: Cannot find Dog for 5 seconds')
-            return
 
         if not self.is_dog:
             # print("강아지가 감지되지 않았습니다.")
+            self.request_msg.data = "lost"
+            self.reqeust_pub.publish(self.request_msg)
             return  
         else:
             self.tracking_dog()

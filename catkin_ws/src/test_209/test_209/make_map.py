@@ -4,13 +4,14 @@ import ros2pkg
 from geometry_msgs.msg import Twist,PoseStamped,Pose,TransformStamped
 from ssafy_msgs.msg import TurtlebotStatus
 from sensor_msgs.msg import Imu,LaserScan
-from std_msgs.msg import Float32, Int32
+from std_msgs.msg import Float32, Int32, String
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,Path,OccupancyGrid,MapMetaData
 from math import pi,cos,sin,sqrt
 import tf2_ros
 import os
 import test_209.utils as utils
+from test_209.make_route import makeRoute
 import numpy as np
 import cv2
 import time
@@ -140,29 +141,35 @@ class Mapping:
         # cv2.imshow('Sample Map', map_bgr)
         # cv2.waitKey(1)
 
-
-
         
 class Mapper(Node):
 
     def __init__(self):
         super().__init__('Mapper')
         
-        # 로직 1 : publisher, subscriber, msg 생성
         self.subscription = self.create_subscription(LaserScan,
         '/scan',self.scan_callback,10)
         self.map_pub = self.create_publisher(OccupancyGrid, '/map', 1)
         self.status_sub = self.create_subscription(TurtlebotStatus, '/turtlebot_status', self.status_callback, 10)
         self.end_sub = self.create_subscription(Int32, '/err', self.end_callback, 1)
+        self.request_pub = self.create_publisher(String, 'request', 10)
 
         self.is_status = False
+        self.is_end = False
         
         self.map_msg=OccupancyGrid()
         self.map_msg.header.frame_id="map"
     
     def end_callback(self, msg):
         if msg.data == 100:
-            pass # 순찰 루트 계산 후 중앙 노드로 scan_off 요청 보내기
+            # 순찰 루트 계산 후 중앙 노드로 scan_off 요청 보내기
+            self.is_end = True
+            self.save_map()
+            self.save_path()
+
+            request_msg = String()
+            request_msg.data = "scan_off"
+            self.request_pub.publish(request_msg)
 
     def status_callback(self, msg):
         if self.is_status == False:
@@ -186,24 +193,20 @@ class Mapper(Node):
 
             self.map_msg.info=self.map_meta_data
 
-            # 로직 2 : mapping 클래스 생성
             self.mapping = Mapping(params_map)
 
 
     def scan_callback(self,msg):
-        if self.is_status:
-            # 로직 4 : laser scan 메시지 안의 ground truth pose 받기?
+        if self.is_status and not self.is_end:
             pose_x = msg.range_min
             pose_y = msg.scan_time
             heading = msg.time_increment
 
-            # 로직 5 : lidar scan 결과 수신
             Distance = np.array(msg.ranges)
             x = Distance * np.cos(np.linspace(0, 2 * np.pi, 360))
             y = Distance * np.sin(np.linspace(0, 2 * np.pi, 360))
             laser = np.vstack((x.reshape((1, -1)), y.reshape((1, -1))))
 
-            # 로직 6 : map 업데이트 실행(4,5번이 완성되면 바로 주석처리된 것을 해제하고 쓰시면 됩니다.)
             pose = np.array([[pose_x],[pose_y],[heading]])
             self.mapping.update(pose, laser)
 
@@ -218,38 +221,47 @@ class Mapper(Node):
                 if list_map_data[0][i] <0 :
                     list_map_data[0][i]=0
 
-            # 로직 11 : 업데이트 중인 map publish(#으로 주석처리된 것을 해제하고 쓰시고, 나머지 부분은 직접 완성시켜 실행하십시오)
-
             self.map_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
             self.map_msg.data = list_map_data[0]
             self.map_pub.publish(self.map_msg)
 
 
-def save_map(node,file_path): # 서버 저장으로 추후에 변경
+    def save_map(self): # 서버 저장으로 추후에 변경
 
-    full_path = 'C:\\Users\\SSAFY\\Desktop\\\S10P22A209\\catkin_ws\\src\\test_209\\map\\map.txt'
-    f=open(full_path,'w')
-    data=''
+        full_path = 'C:\\Users\\SSAFY\\Desktop\\\S10P22A209\\catkin_ws\\src\\test_209\\map\\map.txt'
+        f=open(full_path,'w')
+        data=''
 
-    for pixel in node.map_msg.data :
-        data+='{0} '.format(pixel)
-    
-    data += '\n{0} {1}'.format(node.map_msg.info.origin.position.x, node.map_msg.info.origin.position.y)
-    f.write(data) 
-    f.close()
-    
+        for pixel in self.map_msg.data :
+            data+='{0} '.format(pixel)
+        
+        data += '\n{0} {1}'.format(self.map_msg.info.origin.position.x, self.map_msg.info.origin.position.y)
+        f.write(data) 
+        f.close()
+
+    def save_path(self):
+        self.path_maker = makeRoute(self.map_msg.data)
+        patrol_path = self.path_maker.answer
+        full_path = 'C:\\Users\\SSAFY\\Desktop\\pppp.txt'
+        f=open(full_path,'w')
+        data=''
+
+        for pixel in patrol_path :
+            data+='{0} {1}\n'.format(pixel[0],pixel[1])
+        f.write(data) 
+        f.close()
+
         
 def main(args=None):    
     rclpy.init(args=args)
-    
-    try :    
-        run_mapping = Mapper()
-        rclpy.spin(run_mapping)
-        run_mapping.destroy_node()
-        rclpy.shutdown()
+   
+    run_mapping = Mapper()
+    rclpy.spin(run_mapping)
+    run_mapping.destroy_node()
+    rclpy.shutdown()
 
-    except :
-        save_map(run_mapping,'map.txt')
+    # except :
+    #     save_map(run_mapping)
 
 
 if __name__ == '__main__':
