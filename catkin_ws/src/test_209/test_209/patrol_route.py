@@ -57,18 +57,6 @@ class patrolRoute(Node):
         self.count = 0
         self.new_grid = np.zeros((70,70))
 
-    
-    def yolo_callback(self, msg):
-
-        data = json.loads(msg.data)
-        if data:
-            if 'dog_list' in data:
-                pass
-            elif 'knife_list' in data:
-                self.request_msg.data = 'interrupt_on'
-                self.reqeust_pub.publish(self.goal_msg)
-
-
 
     def patrol_callback(self, msg):
         if msg.data == 0:

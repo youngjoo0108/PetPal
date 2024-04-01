@@ -54,6 +54,7 @@ setup(
             # dog tracking
             'tracking=test_209.tracking:main',
             'tracking_test=test_209.tracking_test:main',
+            'search=test_209.search:main',
             
             # etc(for test)
             'make=test_209.make_path:main',

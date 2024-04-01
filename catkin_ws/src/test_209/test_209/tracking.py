@@ -14,10 +14,11 @@ class Tracking(Node):
     def __init__(self):
         super().__init__('minimal_subscriber')
         self.yolo_sub = self.create_subscription(String,'captured_object',self.listener_callback, 10)
-        self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 1)
+        self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
         self.timer = self.create_timer(0.2, self.timer_callback)
         self.tracking_pub = self.create_publisher(Int32, 'tracking_err', 10)
+        self.dog_sub = self.create_subscription(String, 'dog_position', self.dog_callback, 10)
         self.request_pub = self.create_publisher(String, 'request', 10)
 
         self.request_msg = String()
@@ -52,7 +53,7 @@ class Tracking(Node):
             self.get_logger().error('Subscription initialization error: {}'.format(e))
     
 
-    def listener_callback(self, msg):
+    def dog_callback(self, msg):
 
         data = json.loads(msg.data)
 
@@ -159,11 +160,7 @@ class Tracking(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    
-    print('yolo sub start')
     yolo_subscriber = Tracking()
-
-    print('yolo sub run!')
     rclpy.spin(yolo_subscriber)
 
     yolo_subscriber.destroy_node()
