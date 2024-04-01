@@ -15,7 +15,7 @@ class mapSetting(Node):
         super().__init__('mapSetting')
         self.map_sub = self.create_subscription(OccupancyGrid,'/map',self.map_callback,10)
         self.odom_sub = self.create_subscription(Odometry,'/odom',self.odom_callback, 10)
-        self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
+        self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 1)
         self.timer = self.create_timer(0.5, self.timer_callback)
 
         # test
@@ -87,11 +87,11 @@ class mapSetting(Node):
                 if self.count2 >= 10:
                     self.count2 = 0
                     self.error_msg.data = 4
-                    print('error4')
+                    #print('error4')
                 else:
                     self.count2 += 1
                     self.error_msg.data = 2
-                    print('error2')
+                    #print('error2')
                 
                 self.error_pub.publish(self.error_msg)
                 return
@@ -99,7 +99,7 @@ class mapSetting(Node):
                 self.count2 = 0
 
             self.goal = self.select_goal(now_grid_cell)
-            print(self.goal)
+            #print(self.goal)
             dis = (now_grid_cell[0] - self.goal[0], now_grid_cell[1] - self.goal[1])
             if self.goal == [-1, -1] or (dis[0]*dis[0]+dis[1]*dis[1]) <= 25:
                 if self.count1[1] >= 10 and self.count1[0] < 2:
@@ -112,7 +112,7 @@ class mapSetting(Node):
                     self.error_msg.data = 100
                     self.error_pub.publish(self.error_msg)
                     self.is_goal = True
-                    print('End')
+                    #print('End')
                 else:
                     self.count1[1] += 1
                     self.error_msg.data = 1
@@ -125,7 +125,7 @@ class mapSetting(Node):
                 self.error_msg.data = 100
                 self.error_pub.publish(self.error_msg)
                 self.is_goal = True
-                print('End')
+                #print('End')
 
             else:
                 self.count1 = [0, 0]

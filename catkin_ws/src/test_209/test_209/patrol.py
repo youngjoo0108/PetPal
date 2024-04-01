@@ -1,175 +1,142 @@
 import rclpy
-from rclpy.node import Node
-from std_msgs.msg import Int32
-from geometry_msgs.msg import Twist, Point, Point32
-from sensor_msgs.msg import LaserScan,PointCloud
-from ssafy_msgs.msg import TurtlebotStatus
-from squaternion import Quaternion
-from nav_msgs.msg import Odometry, Path
-from math import pi, cos, sin, sqrt, atan2
 import numpy as np
+from rclpy.node import Node
+import os
+from geometry_msgs.msg import Pose,PoseStamped
+from squaternion import Quaternion
+from nav_msgs.msg import Odometry,OccupancyGrid,MapMetaData,Path
+from std_msgs.msg import Int32
+from math import pi,cos,sin, sqrt
+from collections import deque
+from queue import PriorityQueue
 
-class followTheCarrot(Node):
+class patrolRoute(Node):
 
     def __init__(self):
-        super().__init__('path_tracking')
-        self.cmd_pub = self.create_publisher(Twist, 'cmd_vel', 10)
-        self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
-        self.status_sub = self.create_subscription(TurtlebotStatus, 'turtlebot_status', self.status_callback, 10)
-        self.path_sub = self.create_subscription(Path, '/local_path', self.path_callback, 10)
-        self.lidar_sub = self.create_subscription(LaserScan, '/scan', self.lidar_callback, 10)
-        self.patrol_pub = self.create_publisher(Int32, 'patrol', 1)
+        super().__init__('patrolRoute')
+        self.odom_sub = self.create_subscription(Odometry,'/odom',self.odom_callback, 10)
+        self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
+        self.patrol_sub = self.create_subscription(Int32, '/patrol', self.patrol_callback, 10)
+        self.map_sub = self.create_subscription(OccupancyGrid,'/map',self.map_callback,10)
+        self.timer = self.create_timer(0.5, self.timer_callback)
 
-        time_period = 0.05
-        self.timer = self.create_timer(time_period, self.timer_callback)
+        self.error_msg = Int32()
+        self.is_route = False
 
-        self.is_odom = False
-        self.is_path = False
-        self.is_status = False
-        self.is_lidar = False
-        self.collision = False
-
+        self.goal_msg = PoseStamped()
+        self.goal_msg.header.frame_id = 'map'
         self.odom_msg = Odometry()
-        self.patrol_msg = Int32()
 
-        self.path_msg = Path()
-        self.cmd_msg = Twist()
-        self.lidar_msg = LaserScan()
-        self.robot_yaw = 0.0
+        self.map_size_x=700
+        self.map_size_y=700
+        self.map_resolution=0.05
 
-        self.lfd = 0.1
-        self.min_lfd = 0.1
-        self.max_lfd = 2.0
+        self.is_odom=False
+        self.is_goal = True
+        self.is_param = False
+        self.is_map = False
+        self.is_grid_update = False
 
-    def lidar_check_move(self):
-        if self.lidar_msg.ranges[0] + self.lidar_msg.ranges[180] < 2.0:
-            self.cmd_msg.linear.x = 0.0
-            self.cmd_msg.angular.z = 0.2
+        self.idx = 0
+        self.route = []
 
-        else:
-            if self.lidar_msg.ranges[0] < self.lidar_msg.ranges[180]:
-                self.cmd_msg.linear.x = -0.2
-                self.cmd_msg.angular.z = 0.0
-            else:
-                self.cmd_msg.linear.x = 0.2
-                self.cmd_msg.angular.z = 0.0
+        full_path = 'C:\\Users\\SSAFY\\Desktop\\pppp.txt'
+        f=open(full_path,'r')
+        lines = f.readlines()
+        for line in lines:
+            data = line.split()
+            self.route.append((int(data[0]), int(data[1])))
+            
+    
+    def patrol_callback(self, msg):
+        if msg.data == 1:
+            if self.is_goal == False:
+                self.idx += 1
+                if self.idx >= len(self.route):
+                    self.idx = 0
+                self.is_goal = True
 
-    def timer_callback(self):
-        if self.is_status and self.is_odom == True and self.is_path == True and self.is_lidar == True:
-            if len(self.path_msg.poses) > 2:
-                self.is_look_forward_point = False
-                self.patrol_msg.data = 0
-                self.patrol_pub.publish(self.patrol_msg)
-
-                robot_pose_x = self.odom_msg.pose.pose.position.x
-                robot_pose_y = self.odom_msg.pose.pose.position.y
-                lateral_error = sqrt(pow(self.path_msg.poses[0].pose.position.x - robot_pose_x,2)+pow(self.path_msg.poses[0].pose.position.y - robot_pose_y,2))
-
-                self.lfd = (self.status_msg.twist.linear.x + lateral_error)*0.5
-
-                if self.lfd < self.min_lfd:
-                    self.lfd = self.min_lfd
-                if self.lfd > self.max_lfd:
-                    self.lfd = self.max_lfd
-
-                min_dis = float('inf')
-
-                for num, waypoint in enumerate(self.path_msg.poses):
-                    self.current_point = waypoint.pose.position
-
-                    dis = sqrt(pow(self.path_msg.poses[0].pose.position.x - self.current_point.x, 2) + pow(self.path_msg.poses[0].pose.position.y - self.current_point.y, 2))
-                    if abs(dis-self.lfd) < min_dis:
-                        min_dis = abs(dis-self.lfd)
-                        self.forward_point = self.current_point
-                        self.is_look_forward_point = True
-
-                if self.is_look_forward_point:
-                    global_forward_point = [self.forward_point.x, self.forward_point.y, 1]
-
-                trans_matrix = np.array([
-                    [cos(self.robot_yaw), -sin(self.robot_yaw), robot_pose_x],
-                    [sin(self.robot_yaw), cos(self.robot_yaw), robot_pose_y],
-                    [0,0,1]
-                ])
-
-                det_trans_matrix = np.linalg.inv(trans_matrix)
-                local_forward_point = det_trans_matrix.dot(global_forward_point)
-                theta = -atan2(local_forward_point[1], local_forward_point[0])
-
-                if self.collision:
-                    if theta < 0:
-                        self.cmd_msg.linear.x = 0.0
-                        self.cmd_msg.angular.z = -0.2
-                    else:
-                        self.cmd_msg.linear.x = 0.0
-                        self.cmd_msg.angular.z = 0.2
-                
-                else:
-                    if theta > 1.5 or theta < -1.5:
-                        self.cmd_msg.linear.x = 0.0
-                        self.cmd_msg.angular.z = theta/2
-
-                    elif 0.7 < theta < 1.5 or -1.5 < theta < -0.7:
-                        self.cmd_msg.linear.x = 0.2
-                        self.cmd_msg.angular.z = theta/3
-                    
-                    elif 0.2 < theta <= 0.7 or -0.7 <= theta < -0.2:
-                        self.cmd_msg.linear.x = 0.5
-                        self.cmd_msg.angular.z = theta/4
-
-                    else:
-                        if 0.2 < self.lidar_msg.ranges[0]/5 < 1.0:
-                            self.cmd_msg.linear.x = self.lidar_msg.ranges[0]/5
-                        elif self.lidar_msg.ranges[0]/5 > 1.0:
-                            self.cmd_msg.linear.x = 1.0
-                        else:
-                            self.cmd_msg.linear.x = 0.2
-                        #self.cmd_msg.linear.x = min(1.0, self.lidar_msg.ranges[0]/5)
-                        self.cmd_msg.angular.z = theta/5
-
-            else:
-                self.cmd_msg.linear.x = 0.0
-                self.cmd_msg.angular.z = 0.0
-                self.patrol_msg.data = 1
-                self.patrol_pub.publish(self.patrol_msg)
-        
-        self.cmd_pub.publish(self.cmd_msg)
-  
-    def check_collision(self, msg):
-        for angle,r in enumerate(msg.ranges):
-            if angle < 20 or angle > 340:
-                if 0.0 < r < 0.3:
-                    return True
-        return False
-  
-    def lidar_callback(self, msg):
-        self.lidar_msg = msg
-
-        if self.is_path == True and self.is_odom == True:
-            self.collision = self.check_collision(msg)
-            self.is_lidar = True
-  
     def odom_callback(self, msg):
+        if self.is_param == False and self.is_map == True:
+            self.is_param = True
+
+            self.map_offset_x = self.map_msg.info.origin.position.x
+            self.map_offset_y = self.map_msg.info.origin.position.y
+
         self.is_odom = True
         self.odom_msg = msg
-        q = Quaternion(msg.pose.pose.orientation.w , msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z)
-        _,_,self.robot_yaw = q.to_euler()
+    
+    def map_callback(self,msg):
+        self.is_map = True
+        self.map_msg = msg
+        if not self.is_grid_update:
+            self.grid_update()
+            self.is_grid_update = True
 
-    def path_callback(self, msg):
-        self.is_path = True
-        self.path_msg = msg
+    def grid_update(self):
+        self.map_to_grid = np.array(self.map_msg.data).reshape((self.map_size_x, self.map_size_y)).transpose()
 
-    def status_callback(self, msg):
-        self.is_status = True
-        self.status_msg = msg
+        for i in range(self.map_size_x):
+            for j in range(self.map_size_y):
+                # 값이 100인 원소 찾기
+                if self.map_to_grid[i, j] == 100:
+                    # 주변 원소 탐색
+                    for dx in range(-5, 6):  # x 좌표 차이가 -2부터 2까지
+                        for dy in range(-5, 6):  # y 좌표 차이가 -2부터 2까지
+                            # 새로운 위치 계산
+                            new_i = i + dx
+                            new_j = j + dy
+                            # 새로운 위치가 배열 범위 내에 있는지 확인
+                            if 0 <= new_i < self.map_size_x and 0 <= new_j < self.map_size_y and self.map_to_grid[new_i, new_j] == 0:
+                                # 조건에 맞는 주변 원소의 값을 100으로 설정
+                                self.map_to_grid[new_i, new_j] = 101
+
+    def timer_callback(self):
+        if self.is_param and self.is_map and self.is_odom:
+            if self.is_goal:
+
+                x=self.odom_msg.pose.pose.position.x
+                y=self.odom_msg.pose.pose.position.y
+                now_grid_cell=self.pose_to_grid_cell(x,y)
+
+                #if 100 <= self.map_to_grid[now_grid_cell[0], now_grid_cell[1]]:
+                     
+                now_goal = self.route[self.idx]
+                #print(self.idx, 'th = ', now_goal)
+                goal_x, goal_y = self.grid_cell_to_pose(now_goal)
+                self.goal_msg.pose.position.x = goal_x
+                self.goal_msg.pose.position.y = goal_y
+
+                q = Quaternion.from_euler(0, 0, 0)
+                self.goal_msg.pose.orientation.x = q.x
+                self.goal_msg.pose.orientation.y = q.y
+                self.goal_msg.pose.orientation.z = q.z
+                self.goal_msg.pose.orientation.w = q.w
+
+                self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
+                self.goal_pub.publish(self.goal_msg)
+                self.is_goal = False
+
+    def pose_to_grid_cell(self,x,y):
+        map_point_x = int((x - self.map_offset_x) / self.map_resolution)
+        map_point_y = int((y - self.map_offset_y) / self.map_resolution)
+        
+        return map_point_x,map_point_y
+
+    def grid_cell_to_pose(self,grid_cell):
+        x = grid_cell[0] * self.map_resolution + self.map_offset_x
+        y = grid_cell[1] * self.map_resolution + self.map_offset_y
+
+        return [x,y]
 
 
-def main(args = None):
+def main(args=None):
     rclpy.init(args=args)
-    follow_the_carrot = followTheCarrot()
-    rclpy.spin(follow_the_carrot)
-    follow_the_carrot.destroy_node()
+    patrol = patrolRoute()
+    rclpy.spin(patrol)
+    patrol.destroy_node()
     rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()

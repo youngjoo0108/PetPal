@@ -27,7 +27,6 @@ setup(
             # follow
             'follow=test_209.path_tracking:main',
             'purefollow=test_209.pure_pursuit:main',
-            'patrol=test_209.patrol:main',
             'stop=test_209.stop:main',
 
             # mapping
@@ -48,11 +47,13 @@ setup(
             'iot_test=test_209.iot_test:main',
             'iot_room1=test_209.iot_room1:main',
             'obscontrol=test_209.obstacle_control:main',
+
+            # patrol
+            'patrol=test_209.patrol:main',
             
             # dog tracking
             'tracking=test_209.tracking:main',
             'tracking_test=test_209.tracking_test:main',
-            
             
             # etc(for test)
             'make=test_209.make_path:main',
