@@ -23,7 +23,7 @@ public class ApplianceController {
     public ResponseEntity<Void> postAppliance(@RequestBody ApplianceRegisterDTO applianceRegisterDTO){
         try{
             String newApplianceName = applianceRegisterDTO.getApplianceType();
-            List<ApplianceResponseDto> list = applianceService.fetchAllApplianceByHomeId(applianceRegisterDTO.getHomeId());
+            List<ApplianceResponseDto> list = applianceService.fetchAllApplianceByRoomId(applianceRegisterDTO.getRoomId());
             boolean isDuplicate = false;
             for(ApplianceResponseDto dto : list){
                 if(dto.getApplianceType().equals(newApplianceName)){
@@ -33,7 +33,7 @@ public class ApplianceController {
             }
             if(isDuplicate){
                 // 중복이 발생했을 경우의 로직
-                throw new IllegalArgumentException("중복된 가전 이름입니다.");
+                throw new IllegalArgumentException("해당 방에 중복된 가전 이름이 있습니다.");
             } else {
                 // 중복이 없을 경우의 로직, 예를 들어 새로운 방을 추가하는 로직 등
                 applianceService.createAppliance(applianceRegisterDTO);
