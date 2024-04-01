@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class NotificationRequestDto {
     private Long targetUserId;
-    private String category;
-    private String content;
-    private String time;
-    private String image;
+    private String category; //ㅇㅇㅇ... 분류 치우기, 가전제어
+    private String content; // 콘텐츠는 동작에 대한 설명
+    private String time; // 로컬 타임
+    private String image; // S3 다운로드 Url
 
     @Builder
     public NotificationRequestDto(Long targetUserId, String category, String content, String time, String image){

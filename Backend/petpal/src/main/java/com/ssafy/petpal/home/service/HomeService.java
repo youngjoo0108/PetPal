@@ -85,4 +85,10 @@ public class HomeService {
     public void updateTurtleCoordinate(Long homeId, Location coordinate) {
         redisTemplate.opsForValue().set("home:" + homeId+":turtle", coordinate);
     }
+
+    public Long findKakaoIdByHomeId(Long homeId) {
+        return homeRepository.findById(homeId)
+                .map(Home::getKakaoId) // Home 엔티티에서 kakaoId 추출
+                .orElseThrow(() -> new RuntimeException("Home not found with id: " + homeId));
+    }
 }

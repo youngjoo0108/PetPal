@@ -66,7 +66,7 @@ public class FcmServiceImpl implements FcmService {
                         .token(token)
                         .notification(FcmMessageDto.Notification.builder()
                                 .title("띵동")
-                                .body("ROS에서 보낸 메시지가 있습니다.")
+                                .body("ROS에서 보낸 메시지가 있습니다. " + notificationRequestDto.getContent())
                                 .build())
                         .data(Map.of( // 사용자 정의 데이터
                                 "category", notificationRequestDto.getCategory(),
