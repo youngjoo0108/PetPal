@@ -1,71 +1,52 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/component/reserve/create_reserve_screen.dart';
+import 'package:frontend/component/reserve/create_schedule_screen.dart';
 import 'package:frontend/const/colors.dart';
 import 'package:frontend/const/time_creator.dart';
-import 'package:frontend/model/appliance.dart';
-import 'package:frontend/model/reservation.dart';
+import 'package:frontend/model/schedule.dart';
 import 'package:frontend/model/room.dart';
+import 'package:frontend/service/schedule_service.dart';
+import 'package:logger/logger.dart';
 
-class ReserveScreen extends StatefulWidget {
-  const ReserveScreen({super.key});
+final Logger logger = Logger();
+
+class ScheduleScreen extends StatefulWidget {
+  const ScheduleScreen({super.key});
 
   @override
-  State<ReserveScreen> createState() => _ReserveScreenState();
+  State<ScheduleScreen> createState() => _ScheduleScreenState();
 }
 
-class _ReserveScreenState extends State<ReserveScreen> {
-  // 예약 목록을 저장할 리스트
-  List<Reservation> reservations = [];
+class _ScheduleScreenState extends State<ScheduleScreen> {
+  List<Schedule> schedules = [];
   @override
   void initState() {
-    /*
-    --------------DB에서 예약 가져오는 로직 추가
-     */
+    fetchSchedules();
     super.initState();
   }
 
+  void fetchSchedules() async {
+    try {
+      schedules = await ScheduleService().fetchSchedules();
+      setState(() {});
+    } catch (e) {
+      // 오류 처리
+      logger.e(e);
+    }
+  }
+
   // 방과 가전의 예시 데이터
-  final List<Room> rooms = [
-    // Room(
-    //   name: '거실',
-    //   appliances: [
-    //     Appliance(name: '전등', imagePath: 'asset/img/light.png'),
-    //     Appliance(name: '커튼', imagePath: 'asset/img/curtains.png'),
-    //     Appliance(name: 'TV', imagePath: 'asset/img/tv.png'),
-    //     Appliance(name: '에어컨', imagePath: 'asset/img/airConditioner.png'),
-    //     Appliance(name: '공기청정기', imagePath: 'asset/img/purifier.png'),
-    //   ],
-    // ),
-    // Room(
-    //   name: '주방',
-    //   appliances: [
-    //     Appliance(name: '전등', imagePath: 'asset/img/light.png'),
-    //     Appliance(name: '커튼', imagePath: 'asset/img/curtains.png'),
-    //     Appliance(name: '세탁기', imagePath: 'asset/img/washingMachine.png'),
-    //   ],
-    // ),
-    // Room(
-    //   name: '침실',
-    //   appliances: [
-    //     Appliance(name: '전등', imagePath: 'asset/img/light.png'),
-    //     Appliance(name: '커튼', imagePath: 'asset/img/curtains.png'),
-    //     Appliance(name: 'TV', imagePath: 'asset/img/tv.png'),
-    //     Appliance(name: '에어컨', imagePath: 'asset/img/airConditioner.png'),
-    //     Appliance(name: '공기청정기', imagePath: 'asset/img/purifier.png'),
-    //   ],
-    // ),
-  ];
+  final List<Room> rooms = [];
 
   @override
   Widget build(BuildContext context) {
     // isActive가 true인 예약 중 첫 번째 예약 찾기
-    Reservation? activeReservation = reservations.firstWhereOrNull(
+    Schedule? activeReservation = schedules.firstWhereOrNull(
       (reservation) => reservation.isActive,
     );
 
     // 예약이 있고, isActive가 true인 경우에 대한 문구 생성
-    String message = reservations.isEmpty
+    String message = schedules.isEmpty
         ? '설정된 예약이\n 없습니다.'
         : activeReservation != null
             ? getTimeDifferenceMessage(activeReservation)
@@ -105,20 +86,59 @@ class _ReserveScreenState extends State<ReserveScreen> {
                 fit: FlexFit.loose,
                 child: ListView.builder(
                   padding: const EdgeInsets.only(top: 10),
-                  itemCount: reservations.length,
+                  itemCount: schedules.length,
                   itemBuilder: (context, index) {
-                    final reservation = reservations[index];
+                    final schedule = schedules[index];
                     return Dismissible(
-                      key: Key(
-                          reservation.hashCode.toString()), // 고유한 키로 각 항목을 식별
-                      onDismissed: (direction) {
-                        // 항목 삭제
+                      key: Key(schedule.hashCode.toString()), // 고유한 키로 각 항목을 식별
+                      onDismissed: (direction) async {
+                        final scheduleId = schedules[index].scheduleId;
+                        final removedSchedule = schedules[index];
+                        // 우선 스케줄을 목록에서 제거
                         setState(() {
-                          /*
-                          ---------------------- 서버와 통신하는 로직 추가
-                           */
-                          reservations.removeAt(index);
+                          schedules.removeAt(index);
                         });
+                        // 서버에서 스케줄 삭제 시도
+                        bool success =
+                            await ScheduleService().deleteSchedule(scheduleId);
+                        if (!success) {
+                          // 삭제 실패 시 스케줄을 목록에 다시 추가
+                          setState(() {
+                            schedules.insert(index, removedSchedule);
+                          });
+                          // 실패 메시지와 함께 재시도 옵션 제공
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text(
+                                  "Failed to delete the schedule. Try again."),
+                              action: SnackBarAction(
+                                label: "RETRY",
+                                onPressed: () async {
+                                  // 재시도 로직: 사용자가 스낵바의 재시도를 탭했을 때 다시 시도
+                                  bool retrySuccess = await ScheduleService()
+                                      .deleteSchedule(scheduleId);
+                                  if (retrySuccess) {
+                                    setState(() {
+                                      schedules.removeWhere((schedule) =>
+                                          schedule.scheduleId == scheduleId);
+                                    });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              "Schedule deleted successfully")),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              "Retry failed. Check your connection.")),
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
+                          );
+                        }
                       },
                       background: Container(
                         alignment: Alignment.centerRight,
@@ -129,7 +149,7 @@ class _ReserveScreenState extends State<ReserveScreen> {
                         margin: const EdgeInsets.all(12.0),
                         padding: const EdgeInsets.all(16.0),
                         decoration: BoxDecoration(
-                          color: reservation.isActive
+                          color: schedule.isActive
                               ? lightYellow
                               : Colors.grey[100],
                           borderRadius: BorderRadius.circular(10.0),
@@ -138,15 +158,15 @@ class _ReserveScreenState extends State<ReserveScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              reservation.time.format(context),
+                              schedule.time.format(context),
                               style: const TextStyle(fontSize: 16.0),
                             ),
                             Text(
-                              reservation.room.name,
+                              schedule.appliance.roomName,
                               style: const TextStyle(fontSize: 16.0),
                             ),
                             Text(
-                              reservation.appliance.name,
+                              schedule.appliance.applianceType,
                               style: const TextStyle(fontSize: 16.0),
                             ),
                             SizedBox(
@@ -159,7 +179,7 @@ class _ReserveScreenState extends State<ReserveScreen> {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    reservation.action.toUpperCase(),
+                                    schedule.action.toUpperCase(),
                                     style: const TextStyle(
                                       color: black,
                                       fontWeight: FontWeight.bold,
@@ -169,10 +189,10 @@ class _ReserveScreenState extends State<ReserveScreen> {
                               ),
                             ),
                             Switch(
-                              value: reservation.isActive,
+                              value: schedule.isActive,
                               onChanged: (bool value) {
                                 setState(() {
-                                  reservation.isActive = value;
+                                  schedule.isActive = value;
                                 });
                               },
                             ),
@@ -188,17 +208,16 @@ class _ReserveScreenState extends State<ReserveScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.push(
+        onPressed: () {
+          // CreateScheduleScreen으로 이동하고, 복귀했을 때 서버로부터 스케줄 리스트를 다시 불러옵니다.
+          Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => CreateReservationScreen(rooms: rooms)),
-          );
-          if (result is Reservation) {
-            setState(() {
-              reservations.add(result);
-            });
-          }
+                builder: (context) => const CreateScheduleScreen()),
+          ).then((_) {
+            fetchSchedules();
+            // 복귀 시 서버로부터 스케줄 리스트를 새로고침
+          });
         },
         backgroundColor: lightYellow,
         child: const Icon(Icons.add, color: black), // '+' 아이콘만 표시
@@ -207,7 +226,7 @@ class _ReserveScreenState extends State<ReserveScreen> {
     );
   }
 
-  String getTimeDifferenceMessage(Reservation reservation) {
+  String getTimeDifferenceMessage(Schedule reservation) {
     DateTime now = TimeCreator.nowInKorea();
     DateTime reservationDateTime = DateTime(
       reservation.date.year,
@@ -236,7 +255,7 @@ class _ReserveScreenState extends State<ReserveScreen> {
     }
 
     message +=
-        '후에\n${reservation.room.name}-${reservation.appliance.name} 을(를) 동작시킵니다.';
+        '후에\n${reservation.appliance.roomName}-${reservation.appliance.applianceType} 을(를) 동작시킵니다.';
     return message;
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/component/menu/appliance_management.dart';
 import 'package:frontend/component/menu/room_management.dart';
 import 'package:frontend/controller/menu_tab_controller.dart';
 import 'package:frontend/const/colors.dart';
@@ -19,9 +20,14 @@ class _MenuScreenState extends State<MenuScreen> {
     super.initState();
     // 콜백 함수를 포함하여 MenuTabController 초기화
     menuTabController = MenuTabController(
-      onAddRoom: () {
+      onManageRoom: () {
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const RoomManagement(), // '방 추가' 화면으로 전환
+          builder: (context) => const RoomManagement(), // '방 관리' 페이지로 이동
+        ));
+      },
+      onManageAppliance: () {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const ApplianceManagement(), // '가전 관리' 페이지로 이동
         ));
       },
       onLogout: () {

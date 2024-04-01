@@ -1,3 +1,4 @@
+// import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
@@ -28,6 +29,7 @@ class UserService {
       // 로그인 성공 후, 토큰을 안전하게 저장하고 서버에 전송
       await secureStorage.write(key: "isLoggedIn", value: "true");
       await sendTokenToServer(token.accessToken); // 서버에 토큰 전송 로직 추가
+      await saveUserInfo(token.accessToken);
 
       return true; // 로그인 성공 반환
     } catch (error) {
@@ -62,7 +64,8 @@ class UserService {
       await secureStorage.write(
           key: "profileUrl",
           value: userInfo['properties'][
-              'thumbnail_image_url']); // profile_image는 640x640, thumbnail_image는 110x110
+              'profile_image']); // profile_image는 640x640, thumbnail_image는 110x110
+      logger.e(userInfo['properties']['profile_image']);
       logger.d(
           '*********************************Succeeded in fetching userInfo: ${json.decode(response.body)}');
     } else {
@@ -117,11 +120,14 @@ class UserService {
             responseData.containsKey('refreshToken')) {
           final String serverAccessToken = responseData['accessToken'];
           final String serverRefreshToken = responseData['refreshToken'];
+          final int homeId = responseData['homeId'];
           // Token들을 FlutterSecureStorage에 저장
           await secureStorage.write(
               key: "accessToken", value: serverAccessToken);
           await secureStorage.write(
               key: "refreshToken", value: serverRefreshToken);
+          await secureStorage.write(key: "homeId", value: homeId.toString());
+          logger.e(homeId);
           logger.d('New Tokens from server stored successfully');
         } else {
           logger.w(

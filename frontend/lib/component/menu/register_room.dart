@@ -10,6 +10,7 @@ class RegisterRoom extends StatefulWidget {
 }
 
 class _RegisterRoomScreenState extends State<RegisterRoom> {
+  RoomService roomService = RoomService();
   List<Room> availableRooms = [];
 
   @override
@@ -20,7 +21,7 @@ class _RegisterRoomScreenState extends State<RegisterRoom> {
 
   void _loadAvailableRooms() async {
     // RoomService를 통해 서버로부터 등록 가능한 방 목록을 불러오는 로직
-    List<Room> fetchedRooms = await RoomService.getAvailableRooms();
+    List<Room> fetchedRooms = await roomService.getAvailableRooms();
     setState(() {
       availableRooms = fetchedRooms;
     });
@@ -35,7 +36,7 @@ class _RegisterRoomScreenState extends State<RegisterRoom> {
         itemBuilder: (context, index) {
           Room room = availableRooms[index];
           return ListTile(
-            title: Text(room.name),
+            title: Text(room.roomName),
             onTap: () {
               // 여기에서 방을 등록하는 로직을 추가하고, 성공적으로 등록되면 이전 화면으로 방 객체를 반환합니다.
               Navigator.pop(context, room);

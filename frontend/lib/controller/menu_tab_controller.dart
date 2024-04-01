@@ -4,9 +4,14 @@ import 'package:frontend/service/user_service.dart';
 
 class MenuTabController {
   final Function? onLogout;
-  final Function? onAddRoom; // '방 추가'에 대한 콜백 함수
+  final Function? onManageRoom; // '방 관리'에 대한 콜백 함수
+  final Function? onManageAppliance; // '가전 관리'에 대한 콜백 함수
 
-  MenuTabController({this.onLogout, this.onAddRoom});
+  MenuTabController({
+    this.onLogout,
+    this.onManageRoom,
+    this.onManageAppliance,
+  });
 
   UserService userService = UserService();
 
@@ -16,10 +21,11 @@ class MenuTabController {
         break;
       case "홈 스캔":
         break;
-      case "방 추가":
-        onAddRoom?.call(); // '방 추가' 콜백 함수 호출
+      case "방 관리":
+        onManageRoom?.call(); // '방 관리' 콜백 함수 호출
         break;
-      case "가전 추가":
+      case "가전 관리":
+        onManageAppliance?.call(); // '가전 관리' 콜백 함수 호출
         break;
       case "사물 등록":
         break;

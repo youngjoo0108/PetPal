@@ -3,24 +3,36 @@ import 'package:frontend/const/colors.dart';
 import 'package:frontend/const/time_creator.dart';
 import 'package:frontend/model/appliance.dart';
 import 'package:frontend/model/room.dart';
-import 'package:frontend/model/reservation.dart'; // 'Reservation' 클래스 경로
+import 'package:frontend/service/appliance_service.dart';
+import 'package:frontend/service/room_service.dart';
+import 'package:frontend/service/schedule_service.dart'; // 'Reservation' 클래스 경로
 
-class CreateReservationScreen extends StatefulWidget {
-  final List<Room> rooms;
-
-  const CreateReservationScreen({super.key, required this.rooms});
-
+class CreateScheduleScreen extends StatefulWidget {
+  const CreateScheduleScreen({super.key});
   @override
-  State<CreateReservationScreen> createState() =>
-      _CreateReservationScreenState();
+  State<CreateScheduleScreen> createState() => _CreateReservationScreenState();
 }
 
-class _CreateReservationScreenState extends State<CreateReservationScreen> {
+class _CreateReservationScreenState extends State<CreateScheduleScreen> {
   DateTime selectedDate = TimeCreator.nowInKorea();
   TimeOfDay selectedTime = TimeCreator.timeOfDayInKorea();
   Room? selectedRoom;
   Appliance? selectedAppliance;
   String? selectedAction;
+  List<Room> rooms = [];
+  List<Appliance> appliances = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadInitialData();
+  }
+
+  void loadInitialData() async {
+    rooms = await RoomService().getRooms();
+    appliances = await ApplianceService().fetchAppliances();
+    setState(() {});
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -51,6 +63,12 @@ class _CreateReservationScreenState extends State<CreateReservationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<Appliance> filteredAppliances = selectedRoom != null
+        ? appliances
+            .where((appliance) => appliance.roomId == selectedRoom!.roomId)
+            .toList()
+        : [];
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('예약 생성'),
@@ -62,18 +80,17 @@ class _CreateReservationScreenState extends State<CreateReservationScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 방 선택
             buildDropdownButtonFormField<Room>(
               '방 선택',
               selectedRoom,
-              widget.rooms,
+              rooms,
               (Room? value) {
                 setState(() {
                   selectedRoom = value;
-                  selectedAppliance = null;
+                  selectedAppliance = null; // 방을 변경하면 가전 선택을 초기화
                 });
               },
-              (Room room) => room.name, // Room 객체의 name 속성을 문자열로 사용
+              (Room room) => room.roomName,
             ),
             const SizedBox(height: 20), // 요소 사이의 간격
             // 가전 선택
@@ -81,14 +98,13 @@ class _CreateReservationScreenState extends State<CreateReservationScreen> {
               buildDropdownButtonFormField<Appliance>(
                 '가전 선택',
                 selectedAppliance,
-                selectedRoom!.appliances,
+                filteredAppliances,
                 (Appliance? value) {
                   setState(() {
                     selectedAppliance = value;
                   });
                 },
-                (Appliance appliance) =>
-                    appliance.name, // Appliance 객체의 name 속성을 문자열로 사용
+                (Appliance appliance) => appliance.applianceType,
               ),
             const SizedBox(height: 20), // 요소 사이의 간격
             if (selectedRoom != null && selectedAppliance != null)
@@ -167,33 +183,51 @@ class _CreateReservationScreenState extends State<CreateReservationScreen> {
     );
   }
 
-  void createReservation() {
-    if (selectedRoom != null &&
-        selectedAppliance != null &&
-        selectedAction != null) {
-      final Reservation newReservation = Reservation(
-        room: selectedRoom!,
+  void createReservation() async {
+    if (selectedAppliance != null && selectedAction != null) {
+      // 서버로 예약 데이터 전송
+      bool success = await ScheduleService().addSchedule(
         appliance: selectedAppliance!,
         date: selectedDate,
         time: selectedTime,
         action: selectedAction!,
         isActive: true,
       );
-      /*
-        ---------------------서버에 전달하는 로직 추가---------------------
-       */
-      Navigator.pop(context, newReservation); // 이전 화면으로 예약 정보 반환
+
+      if (success) {
+        // 성공적으로 데이터를 전송했을 경우, 이전 화면으로 돌아감
+        Navigator.pop(context);
+      } else {
+        // 서버로부터 실패 응답을 받았을 경우, 사용자에게 알림
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: const Text('Failed to create reservation.'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
     } else {
-      // 방이나 가전이 선택되지 않았을 경우 사용자에게 알림
+      // 필요한 모든 데이터가 선택되지 않았을 경우
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('돌아가'),
-            content: const Text('방과 가전, 동작을 모두 선택해주세요.'),
+            title: const Text('Missing Information'),
+            content: const Text('Please select an appliance and an action.'),
             actions: <Widget>[
               TextButton(
-                child: const Text('확인'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },

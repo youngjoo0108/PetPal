@@ -11,6 +11,7 @@ class RoomManagement extends StatefulWidget {
 }
 
 class _RoomManagementScreenState extends State<RoomManagement> {
+  RoomService roomService = RoomService();
   List<Room> rooms = [];
 
   @override
@@ -21,7 +22,7 @@ class _RoomManagementScreenState extends State<RoomManagement> {
 
   void _loadRooms() async {
     // RoomService를 통해 서버로부터 방 정보를 불러오는 로직
-    List<Room> fetchedRooms = await RoomService.getRooms();
+    List<Room> fetchedRooms = await roomService.getRooms();
     setState(() {
       rooms = fetchedRooms;
     });
@@ -36,7 +37,7 @@ class _RoomManagementScreenState extends State<RoomManagement> {
         itemBuilder: (context, index) {
           Room room = rooms[index];
           return ListTile(
-            title: Text(room.name),
+            title: Text(room.roomName),
             // 여기에 각 방에 대한 추가적인 정보를 표시할 수 있습니다.
           );
         },
