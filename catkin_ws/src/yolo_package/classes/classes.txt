@@ -1,0 +1,12 @@
+Dog
+Person
+Plant
+Chair
+BrownTable
+WhiteTable
+SquareTable
+BackPack
+Wallet
+CarKey
+RemoteController
+Bed
