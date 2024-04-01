@@ -19,7 +19,7 @@ public class TargetService {
     private final ApplianceRepository applianceRepository;
     private final HomeRepository homeRepository;
     private final ImageRepository imageRepository;
-    public void createTarget(TargetRegisterDto objectRegisterDto) {
+    public Long createTarget(TargetRegisterDto objectRegisterDto) {
 
         Image image = imageRepository.findById(objectRegisterDto.getImageId())
                 .orElseThrow(IllegalArgumentException::new);
@@ -32,8 +32,8 @@ public class TargetService {
                 .home(home)
                 .build();
         //TODO: Target용 Repository 생성해놓고 save()
-        targetRepository.save(target);
-
+        Target target1 = targetRepository.save(target);
+        return target1.getId();
         // 알림 서비스 호출
 
     }

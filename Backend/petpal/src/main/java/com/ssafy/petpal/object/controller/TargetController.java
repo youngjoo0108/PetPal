@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class TargetController {
     private final TargetService objectService;
     @PostMapping
-    public ResponseEntity<Void> postObject(@RequestBody TargetRegisterDto targetRegisterDto){
+    public ResponseEntity<Long> postObject(@RequestBody TargetRegisterDto targetRegisterDto){
         log.info("Successfully parse Coordinate value if this is not null: "+targetRegisterDto.getCoordinate().getX());
-        objectService.createTarget(targetRegisterDto);
+        Long targetId = objectService.createTarget(targetRegisterDto);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(targetId);
     }
 }
