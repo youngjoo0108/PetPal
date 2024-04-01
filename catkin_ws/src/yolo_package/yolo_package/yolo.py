@@ -147,8 +147,8 @@ class IMGParser(Node):
 
             xmin, ymin, xmax, ymax = int(data[0]), int(data[1]), int(data[2]), int(data[3])
             label = int(data[5])
-            # cv2.rectangle(img_bgr, (xmin, ymin), (xmax, ymax), GREEN, 2)
-            # cv2.putText(img_bgr, class_list[label]+' '+str(round(confidence, 2)) + '%', (xmin, ymin), cv2.FONT_ITALIC, 0.5, WHITE, 1)
+            cv2.rectangle(img_bgr, (xmin, ymin), (xmax, ymax), GREEN, 2)
+            cv2.putText(img_bgr, class_list[label]+' '+str(round(confidence, 2)) + '%', (xmin, ymin), cv2.FONT_ITALIC, 0.5, WHITE, 1)
             
             self.ros_log_pub.publish_log('YOLO', f'{time_str}/{class_list[label]}/{str(round(confidence, 2))}%/{str(xmin)}-{str(ymin)}/{str(xmax)}-{str(ymax)}')
             
