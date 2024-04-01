@@ -5,6 +5,7 @@ import com.ssafy.petpal.room.dto.RoomResponseDTO;
 import com.ssafy.petpal.room.entity.Room;
 import com.ssafy.petpal.room.service.RoomService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/api/v1/rooms")
 public class RoomController {
     static String[] STR_ARR = {"거실","주방","침실1","침실2","침실3","화장실"};
@@ -33,6 +35,7 @@ public class RoomController {
                 }
             }
             if(isDuplicate){
+                log.info("흠...");
                 // 중복이 발생했을 경우의 로직
                 throw new IllegalArgumentException("중복된 방 이름입니다.");
             } else {
