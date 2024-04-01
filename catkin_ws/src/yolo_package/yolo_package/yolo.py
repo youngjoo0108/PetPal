@@ -137,7 +137,7 @@ class IMGParser(Node):
         detection = results[0]  # 탐지된 객체 정보
         
         puppy_list = []
-        knife_list = []
+        obstacle_list = []
 
         for data in detection.boxes.data.tolist(): # data : [xmin, ymin, xmax, ymax, confidence_score, class_id]
             # print(data)
@@ -160,7 +160,7 @@ class IMGParser(Node):
             if(class_list[label] == 'Knife'):
                 #2024-03-15-12-50-23/Desk/82.3%/0.1234-0.8743/0.4352-0.7657
                 knife_data = time_str + '/' + class_list[label] + '/'+str(round(confidence, 2)) + '%' + '/' + str(xmin) + '-' + str(ymin) + '/' + str(xmax) + '-' + str(ymax)
-                knife_list.append(knife_data)
+                obstacle_list.append(knife_data)
 
         if(len(puppy_list) != 0):
             topic_data = {'dog_list': puppy_list}
@@ -174,10 +174,11 @@ class IMGParser(Node):
             last_found_json_str = json.dumps(last_found_topic_data)
             last_found_msg = String()
             last_found_msg.data = last_found_json_str
+            print('send')
             self.to_server_callback(msg)
 
-        if(len(knife_list) != 0):
-            topic_data = {'knife_list': knife_list}
+        if(len(obstacle_list) != 0):
+            topic_data = {'knife_list': obstacle_list}
             json_str = json.dumps(topic_data)
             msg = String()
             msg.data = json_str
