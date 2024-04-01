@@ -51,8 +51,11 @@ class WebSocketClientReceiveNode(Node):
         try:
             self.websocket = await websockets.connect(self.ws_url, max_size=2**20, max_queue=2**5)
             await self.websocket.send("CONNECT\naccept-version:1.0,1.1,2.0\n\n\x00\n")
-            sub_offer = stomper.subscribe("/exchange/control.exchange/home.1", "user.2")
-            await self.websocket.send(sub_offer)
+            sub_offer1 = stomper.subscribe("/exchange/control.exchange/home.1", "user.1")
+            await self.websocket.send(sub_offer1)
+            sub_offer2 = stomper.subscribe("/exchange/control.exchange/home.1.yolo", "user.2")
+            await self.websocket.send(sub_offer2)
+            
         except Exception as e:
             self.ros_log_pub.publish_log('ERROR', 'WebSocket connection error: {}'.format(e))
             self.websocket = None # 변경: 연결 실패 시 websocket을 None으로 설정
@@ -103,6 +106,9 @@ class WebSocketClientReceiveNode(Node):
                             self.publisher_yolo.publish(msg)
                         else:
                             print(message_data)
+                            
+                            
+                            
                     except json.JSONDecodeError as e:
                         self.ros_log_pub.publish_log('ERROR', f'Decode Json message error: {e}')
             except Exception as e:
