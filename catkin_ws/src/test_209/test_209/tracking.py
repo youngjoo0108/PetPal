@@ -1,4 +1,4 @@
-import rclpy, time, json
+import rclpy, time, json, requests
 import numpy as np
 
 from rclpy.node import Node
@@ -9,6 +9,10 @@ from nav_msgs.msg import Odometry, Path, OccupancyGrid
 from std_msgs.msg import Int32, String
 from ros_log_package.RosLogPublisher import RosLogPublisher
 
+params = {
+    'homeId' : 1
+}
+
 class Tracking(Node):
 
     def __init__(self):
@@ -18,7 +22,6 @@ class Tracking(Node):
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
         self.timer = self.create_timer(0.2, self.timer_callback)
         self.tracking_pub = self.create_publisher(Int32, 'tracking_err', 10)
-        self.dog_sub = self.create_subscription(String, 'dog_position', self.dog_callback, 10)
         self.request_pub = self.create_publisher(String, 'request', 10)
 
         self.request_msg = String()
@@ -53,7 +56,7 @@ class Tracking(Node):
             self.get_logger().error('Subscription initialization error: {}'.format(e))
     
 
-    def dog_callback(self, msg):
+    def listener_callback(self, msg):
 
         data = json.loads(msg.data)
 
@@ -102,6 +105,9 @@ class Tracking(Node):
         if self.is_dog == False:
             if (current_time - self.last_dog_seen_time) > self.dog_seen_timeout:
                 self.ros_log_pub.publish_log('DEBUG', 'Subscription tracking: Cannot find Dog for 5 seconds')
+
+                self.put_api()
+
                 self.request_msg.data = "lost"
                 self.request_pub.publish(self.request_msg)
                 return
@@ -156,7 +162,11 @@ class Tracking(Node):
             self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
             self.goal_pub.publish(self.goal_msg)
 
-
+    def put_api(self):
+        url = "https://j10a209.p.ssafy.io/api/v1/homes/pet/" + str(params['homeId'])
+        data = {'x': self.robot_pose_x, 'y': self.robot_pose_y}
+        dt = data.json()
+        response = requests.put(url, params=dt)
 
 def main(args=None):
     rclpy.init(args=args)
