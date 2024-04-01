@@ -11,6 +11,7 @@ import com.ssafy.petpal.notification.dto.NotificationRequestDto;
 import com.ssafy.petpal.notification.service.FcmService;
 import com.ssafy.petpal.user.dto.UserDto;
 import com.ssafy.petpal.user.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class FcmServiceImpl implements FcmService {
     @Autowired
@@ -35,7 +37,9 @@ public class FcmServiceImpl implements FcmService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+
         headers.set("Authorization", "Bearer " + getAccessToken());
+        log.info(headers.get("Authorization").toString() + " ");
 
         HttpEntity entity = new HttpEntity<>(message, headers);
 
