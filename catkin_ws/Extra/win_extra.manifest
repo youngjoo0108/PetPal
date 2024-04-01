@@ -1,0 +1,19 @@
+ManifestFileVersion: 0
+CRC: 561856469
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: banana.obstacle
+      Dependencies: {}
+    Info_1:
+      Name: bookpile.obstacle
+      Dependencies: {}
+    Info_2:
+      Name: mug.obstacle
+      Dependencies: {}
+    Info_3:
+      Name: penholder.obstacle
+      Dependencies: {}
+    Info_4:
+      Name: stapler.obstacle
+      Dependencies: {}
