@@ -50,7 +50,7 @@ public class FcmServiceImpl implements FcmService {
         String API_URL = "https://fcm.googleapis.com/v1/projects/petpal-d6248/messages:send";
         ResponseEntity response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
 
-        System.out.println(response.getStatusCode());
+//        System.out.println(response.getStatusCode());
 
         return response.getStatusCode() == HttpStatus.OK ? 1 : 0;
     }

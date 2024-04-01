@@ -60,7 +60,6 @@ public class RoomController {
         try{
 
             List<RoomResponseDTO> list = roomService.fetchAllRoomById(homeId);
-            System.out.println(list.get(0).getRoomName());
             return ResponseEntity.ok(list);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
