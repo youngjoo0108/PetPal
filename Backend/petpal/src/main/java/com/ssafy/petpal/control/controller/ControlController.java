@@ -81,9 +81,10 @@ public class ControlController {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
                 String formattedTime = nowInKorea.format(formatter);
 
+                String downloadURL1 = imageService.generateURL(aComplete.getApplianceName()+".png", HttpMethod.GET);
                 NotificationRequestDto notificationRequestDto1
                         = new NotificationRequestDto(targetUserId, type, aComplete.getApplianceName()+"의 상태를 변경하였습니다.",
-                        formattedTime,"");
+                        formattedTime,downloadURL1);
                 fcmService.sendMessageTo(notificationRequestDto1);
                 notificationService.saveNotification(notificationRequestDto1); // DB에 저장
                 break;
