@@ -2,6 +2,7 @@ package com.ssafy.petpal.schedule.controller;
 import com.ssafy.petpal.schedule.dto.ScheduleActualResponseDto;
 import com.ssafy.petpal.schedule.dto.ScheduleDto;
 import com.ssafy.petpal.schedule.dto.ScheduleTemporalDto;
+import com.ssafy.petpal.schedule.dto.ScheduleUpdateDto;
 import com.ssafy.petpal.schedule.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,16 @@ public class ScheduleController {
     public ResponseEntity<Void> deleteSchedule(@PathVariable Long scheduleId){
         try{
             scheduleService.deleteSchedule(scheduleId);
+            return ResponseEntity.ok(null);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping("/{scheduleId}")
+    public ResponseEntity<Void> putSchedule(@PathVariable Long scheduleId, @RequestBody ScheduleUpdateDto scheduleUpdateDto){
+        try{
+            scheduleService.updateSchedule(scheduleId,scheduleUpdateDto);
             return ResponseEntity.ok(null);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

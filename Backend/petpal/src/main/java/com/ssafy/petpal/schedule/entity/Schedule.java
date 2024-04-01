@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity(name = "Schedules")
@@ -55,4 +56,14 @@ public class Schedule extends BaseEntity {
         this.isActive = isActive;
 
     }
+
+    public void update(Home home, Appliance appliance, LocalDate day, LocalTime time, String taskType, boolean isActive) {
+        this.home = home;
+        this.appliance = appliance;
+        this.scheduleDay = day;
+        this.scheduleTime = time;
+        this.taskType = taskType;
+        this.isActive = isActive;
+    }
+
 }

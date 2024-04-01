@@ -8,6 +8,7 @@ import com.ssafy.petpal.object.repository.ApplianceRepository;
 import com.ssafy.petpal.schedule.dto.ScheduleActualResponseDto;
 import com.ssafy.petpal.schedule.dto.ScheduleDto;
 import com.ssafy.petpal.schedule.dto.ScheduleTemporalDto;
+import com.ssafy.petpal.schedule.dto.ScheduleUpdateDto;
 import com.ssafy.petpal.schedule.entity.Schedule;
 import com.ssafy.petpal.schedule.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
@@ -69,5 +70,21 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(IllegalArgumentException::new);
         scheduleRepository.delete(schedule);
+    }
+
+    public void updateSchedule(Long scheduleId, ScheduleUpdateDto scheduleUpdateDto) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(IllegalArgumentException::new);
+// Home 엔티티 조회
+        Home home = homeRepository.findById(scheduleUpdateDto.getRoomId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid home ID: " + scheduleUpdateDto.getRoomId()));
+
+        // Appliance 엔티티 조회
+        Appliance appliance = applianceRepository.findById(scheduleUpdateDto.getApplianceId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid appliance ID: " + scheduleUpdateDto.getApplianceId()));
+
+        // Schedule 엔티티의 속성 갱신
+        schedule.update(home, appliance, scheduleUpdateDto.getDay(), scheduleUpdateDto.getTime(), scheduleUpdateDto.getTaskType(), scheduleUpdateDto.isActive());
+
     }
 }
