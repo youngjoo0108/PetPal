@@ -63,10 +63,10 @@ public class FcmServiceImpl implements FcmService {
                         .notification(FcmMessageDto.Notification.builder()
                                 .title("띵동")
                                 .body("ROS에서 보낸 메시지가 있습니다.")
-                                .category(notificationRequestDto.getCategory())
-                                .content(notificationRequestDto.getContent())
-                                .time(notificationRequestDto.getTime())
-                                .image(notificationRequestDto.getImage())
+//                                .category(notificationRequestDto.getCategory())
+//                                .content(notificationRequestDto.getContent())
+//                                .time(notificationRequestDto.getTime())
+//                                .image(notificationRequestDto.getImage())
                                 .build()
                         ).build()).validateOnly(false).build();
 
