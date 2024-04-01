@@ -4,6 +4,7 @@ import com.ssafy.petpal.object.dto.ApplianceRegisterDTO;
 import com.ssafy.petpal.object.dto.ApplianceResponseDto;
 import com.ssafy.petpal.object.entity.Appliance;
 import com.ssafy.petpal.object.service.ApplianceService;
+import com.ssafy.petpal.room.dto.RoomResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +22,25 @@ public class ApplianceController {
     @PostMapping
     public ResponseEntity<Void> postAppliance(@RequestBody ApplianceRegisterDTO applianceRegisterDTO){
         try{
-            applianceService.createAppliance(applianceRegisterDTO);
-            return ResponseEntity.ok(null);
+            String newApplianceName = applianceRegisterDTO.getApplianceType();
+            List<ApplianceResponseDto> list = applianceService.fetchAllApplianceByHomeId(applianceRegisterDTO.getHomeId());
+            boolean isDuplicate = false;
+            for(ApplianceResponseDto dto : list){
+                if(dto.getApplianceType().equals(newApplianceName)){
+                    isDuplicate = true;
+                    break;
+                }
+            }
+            if(isDuplicate){
+                // 중복이 발생했을 경우의 로직
+                throw new IllegalArgumentException("중복된 가전 이름입니다.");
+            } else {
+                // 중복이 없을 경우의 로직, 예를 들어 새로운 방을 추가하는 로직 등
+                applianceService.createAppliance(applianceRegisterDTO);
+                return ResponseEntity.ok(null);
+            }
+
+
         }catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
