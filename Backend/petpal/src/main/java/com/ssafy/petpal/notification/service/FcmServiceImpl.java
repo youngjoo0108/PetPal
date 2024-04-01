@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -52,23 +53,25 @@ public class FcmServiceImpl implements FcmService {
     }
     private String makeMessage(NotificationRequestDto notificationRequestDto) throws JsonProcessingException {
         Optional<UserDto> userDtoOptional = userService.findById(notificationRequestDto.getTargetUserId());
-
-        // Optional에서 토큰 추출하기. 값이 없으면 기본값으로 ""(빈 문자열) 사용
         String token = userDtoOptional.map(UserDto::getFcmToken).orElse("");
 
         ObjectMapper om = new ObjectMapper();
         FcmMessageDto fcmMessageDto = FcmMessageDto.builder()
+                .validateOnly(false)
                 .message(FcmMessageDto.Message.builder()
                         .token(token)
                         .notification(FcmMessageDto.Notification.builder()
                                 .title("띵동")
                                 .body("ROS에서 보낸 메시지가 있습니다.")
-//                                .category(notificationRequestDto.getCategory())
-//                                .content(notificationRequestDto.getContent())
-//                                .time(notificationRequestDto.getTime())
-//                                .image(notificationRequestDto.getImage())
-                                .build()
-                        ).build()).validateOnly(false).build();
+                                .build())
+                        .data(Map.of( // 사용자 정의 데이터
+                                "category", notificationRequestDto.getCategory(),
+                                "content", notificationRequestDto.getContent(),
+                                "time", notificationRequestDto.getTime(),
+                                "image", notificationRequestDto.getImage()
+                        ))
+                        .build())
+                .build();
 
         return om.writeValueAsString(fcmMessageDto);
     }
