@@ -6,10 +6,12 @@ import com.ssafy.petpal.map.entity.Map;
 import com.ssafy.petpal.map.entity.OriginMap;
 import com.ssafy.petpal.map.repository.MapRepository;
 import com.ssafy.petpal.map.repository.OriginMapRepository;
+import com.ssafy.petpal.object.dto.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.StringTokenizer;
+
 
 @Service
 public class MapService {
@@ -99,7 +101,7 @@ public class MapService {
 //    }
 
     public MapDto getMapData(Long homeId) {
-        return mapRepository.findByHomeId(homeId).map(map -> new MapDto(map.getHomeId(), map.getData()))
+        return mapRepository.findByHomeId(homeId).map(map -> new MapDto(map.getHomeId(), map.getData(), Location.pointToLocation(map.getPoint())))
                 .orElseThrow(() -> new RuntimeException("Map not found with homeId: " + homeId));
     }
 
@@ -108,6 +110,7 @@ public class MapService {
         Map mapEntity = new Map();
         mapEntity.setHomeId(mapDto.getHomeId());
         mapEntity.setData(mapDto.getData());
+        mapEntity.setPoint(MapDto.locationToPoint(mapDto.getStartGrid()));
         mapRepository.save(mapEntity);
         return mapDto;
     }

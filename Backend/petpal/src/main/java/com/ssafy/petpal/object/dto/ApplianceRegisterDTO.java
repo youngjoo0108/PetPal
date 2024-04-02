@@ -24,4 +24,6 @@ public class ApplianceRegisterDTO {
     public static Point locationToPoint(Location coordinate){
         return new GeometryFactory().createPoint(new Coordinate(coordinate.getX(), coordinate.getY()));
     }
+
+
 }
