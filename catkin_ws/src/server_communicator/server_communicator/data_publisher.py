@@ -17,6 +17,14 @@ from ros_log_package.RosLogPublisher import RosLogPublisher
 class WebSocketClientSendNode(Node):
     def __init__(self):
         super().__init__('websocket_client_send_node')
+
+        # full_path = 'C:\\Users\\SSAFY\\Desktop\\\S10P22A209\\catkin_ws\\src\\test_209\\homeId.txt'
+        # f = open(full_path, 'r')
+
+        # self.homeId = f.readlines[0]
+
+        # f.close()
+        self.homeId = '2'
         
         self.ros_log_pub = None
         try:
@@ -72,7 +80,7 @@ class WebSocketClientSendNode(Node):
             
     async def send_message(self, msg):
         await self.ensure_websocket_connected() # 변경: 메시지 전송 전에 웹소켓 연결 상태 확인
-        send = stomper.send("/pub/control.message.2", json.dumps(msg))
+        send = stomper.send("/pub/ros.control.message." + self.homeId, json.dumps(msg))
         await self.websocket.send(send)
         
     async def send_video(self, video_image):

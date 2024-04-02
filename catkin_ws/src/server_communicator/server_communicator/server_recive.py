@@ -21,8 +21,6 @@ dogs = ['Dog']
 humans = ['Person']
 iots = ['AirConditioner', 'TV']
 
-debug_mode = True
-
 class WebSocketClientReceiveNode(Node):
     def __init__(self):
         super().__init__('websocket_client_receive_node')
@@ -48,11 +46,6 @@ class WebSocketClientReceiveNode(Node):
         except:
             self.ros_log_pub.publish_log('ERROR', 'init publisher request error: {}'.format(e))
         
-        try:
-            self.request_pub = self.create_publisher(String, '/request', 10)
-        except:
-            self.ros_log_pub.publish_log('ERROR', 'init publisher iot control error: {}'.format(e))
-        
         self.ws_url = "wss://j10a209.p.ssafy.io/api/ws"
         self.websocket = None
 
@@ -67,12 +60,12 @@ class WebSocketClientReceiveNode(Node):
         
     async def connect_websocket(self):
         try:
-            self.websocket = await websockets.connect(self.ws_url, max_size=2**20, max_queue=2**5)
+            self.websocket = await websockets.connect(self.ws_url, max_size=2**20, max_queue=2**7)
             await self.websocket.send("CONNECT\naccept-version:1.0,1.1,2.0\n\n\x00\n")
             
             sub_offer1 = stomper.subscribe("/exchange/control.exchange/home.2", "home.2")
             await self.websocket.send(sub_offer1)
-            sub_offer2 = stomper.subscribe("/exchange/control.exchange/home.1.yolo", "user.2")
+            sub_offer2 = stomper.subscribe("/exchange/control.exchange/home.2.yolo", "user.2")
             await self.websocket.send(sub_offer2)
             
         except Exception as e:
@@ -84,15 +77,26 @@ class WebSocketClientReceiveNode(Node):
             await self.connect_websocket() # 변경: 웹소켓이 연결되지 않았거나 닫혀있으면 재연결 시도
             self.ros_log_pub.publish_log('INFO', f"connected {time.strftime('%X', time.localtime())}")
     
+    # {
+        # 'type': 'yolo_data', 
+        # 'sender': 'user_1', 
+        # 'time': '13:50:20', 
+        # 'message': '{
+            # "list": [
+                # "13:50:20/Chair/0.94%/254-200/336-357",
+                # "13:50:20/Chair/0.82%/310-227/364-354",
+                # "13:50:20/Chair/0.79%/308-228/391-348"
+            # ]
+        # }'
+    # }
+    
     async def receive_messages(self):
         while True:
             try:
                 await self.ensure_websocket_connected()
                 
                 message = await self.websocket.recv()
-                
-                if debug_mode:
-                    print(f"Received message: {message}")
+                # print(f"Received message: {message}")
                 
                 if message:
                     #print(message)
@@ -111,9 +115,8 @@ class WebSocketClientReceiveNode(Node):
                             json_str = json.dumps(topic_data)
                             msg = String()
                             msg.data = json_str
-                            # print('send list:', json_str)
+                            #print('send list:', json_str)
                             self.publisher_yolo.publish(msg)
-                            self.ros_log_pub.publish_log('INFO', f'Object detected message enter : {msg}')
                         elif message_data.get('type') == "IOT":
                             topic_data = message_data['message']
                             slice_point = topic_data.find('/')
@@ -159,8 +162,6 @@ class WebSocketClientReceiveNode(Node):
                     except json.JSONDecodeError as e:
                         self.ros_log_pub.publish_log('ERROR', f'Decode Json message error: {e}')
             except Exception as e:
-                if debug_mode:
-                    print('ERROR', f'Receiving message error: {e}')
                 self.ros_log_pub.publish_log('ERROR', f'Receiving message error: {e}')
                 self.websocket = None  # 연결 오류 시 websocket을 None으로 재설정
 
@@ -199,6 +200,9 @@ class WebSocketClientReceiveNode(Node):
                 'iot_list': iot_list
             }
         return topic_data
+    
+    # async def obj_component(self):
+    #     return time_str + '/' + class_list[label] + '/'+str(round(confidence, 2)) + '%' + '/' + str(xmin) + '-' + str(ymin) + '/' + str(xmax) + '-' + str(ymax)
         
 def main(args=None):
     rclpy.init(args=args)

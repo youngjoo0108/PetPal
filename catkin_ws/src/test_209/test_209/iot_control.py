@@ -7,10 +7,10 @@ from nav_msgs.msg import Odometry, Path
 from ssafy_msgs.msg import IotInfo, IotCmd
 from geometry_msgs.msg import PoseStamped
 
-class device(Node):
+class iotControl(Node):
 
     def __init__(self):
-        super().__init__('device')
+        super().__init__('iot_control')
 
         self.iot_sub = self.create_subscription(IotInfo, '/iot', self.iot_callback, 10)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 1)
@@ -122,7 +122,7 @@ class device(Node):
 def main(args=None):
     rclpy.init(args=args)
     try :
-        device_control = device()
+        device_control = iotControl()
         rclpy.spin(device_control)
         device_control.destroy_node()
         rclpy.shutdown()
