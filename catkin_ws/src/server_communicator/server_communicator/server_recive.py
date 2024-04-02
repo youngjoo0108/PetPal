@@ -70,19 +70,6 @@ class WebSocketClientReceiveNode(Node):
             await self.connect_websocket() # 변경: 웹소켓이 연결되지 않았거나 닫혀있으면 재연결 시도
             self.ros_log_pub.publish_log('INFO', f"connected {time.strftime('%X', time.localtime())}")
     
-    # {
-        # 'type': 'yolo_data', 
-        # 'sender': 'user_1', 
-        # 'time': '13:50:20', 
-        # 'message': '{
-            # "list": [
-                # "13:50:20/Chair/0.94%/254-200/336-357",
-                # "13:50:20/Chair/0.82%/310-227/364-354",
-                # "13:50:20/Chair/0.79%/308-228/391-348"
-            # ]
-        # }'
-    # }
-    
     async def receive_messages(self):
         while True:
             try:
