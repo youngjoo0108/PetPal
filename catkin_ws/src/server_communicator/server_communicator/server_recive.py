@@ -102,7 +102,9 @@ class WebSocketClientReceiveNode(Node):
                 if message:
                     #print(message)
                     try:
-                        self.publisher_data_classify.publish(message)
+                        msg = String()
+                        msg.data = message
+                        self.publisher_data_classify.publish(msg)
                     except json.JSONDecodeError as e:
                         self.ros_log_pub.publish_log('ERROR', f'Decode Json message error: {e}')
             except Exception as e:
