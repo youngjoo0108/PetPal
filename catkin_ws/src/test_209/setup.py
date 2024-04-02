@@ -62,6 +62,8 @@ setup(
             'drive_test=test_209.drive_test:main',
             'odomprint=test_209.odom_print:main',
             'iot_user=test_209.iot_user_input:main',
+            'scheduler=test_209.scheduler:main',
+            'tt=test_209.tt:main',
         ],
     },
 )

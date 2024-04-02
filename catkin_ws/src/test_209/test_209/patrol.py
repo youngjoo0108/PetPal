@@ -35,7 +35,7 @@ class patrolRoute(Node):
         self.is_goal = True
         self.is_param = False
         self.is_map = False
-        self.is_grid_update = False
+        self.is_start = False
 
         self.idx = 0
         self.route = []
@@ -50,11 +50,9 @@ class patrolRoute(Node):
     
     def patrol_callback(self, msg):
         if msg.data == 1:
-            if self.is_goal == False:
-                self.idx += 1
-                if self.idx >= len(self.route):
-                    self.idx = 0
-                self.is_goal = True
+            self.idx += 1
+            if self.idx >= len(self.route):
+                self.idx = 0
 
     def odom_callback(self, msg):
         if self.is_param == False and self.is_map == True:
@@ -65,57 +63,45 @@ class patrolRoute(Node):
 
         self.is_odom = True
         self.odom_msg = msg
+
     
     def map_callback(self,msg):
         self.is_map = True
         self.map_msg = msg
-        if not self.is_grid_update:
-            self.grid_update()
-            self.is_grid_update = True
-
-    def grid_update(self):
-        self.map_to_grid = np.array(self.map_msg.data).reshape((self.map_size_x, self.map_size_y)).transpose()
-
-        for i in range(self.map_size_x):
-            for j in range(self.map_size_y):
-                # 값이 100인 원소 찾기
-                if self.map_to_grid[i, j] == 100:
-                    # 주변 원소 탐색
-                    for dx in range(-5, 6):  # x 좌표 차이가 -2부터 2까지
-                        for dy in range(-5, 6):  # y 좌표 차이가 -2부터 2까지
-                            # 새로운 위치 계산
-                            new_i = i + dx
-                            new_j = j + dy
-                            # 새로운 위치가 배열 범위 내에 있는지 확인
-                            if 0 <= new_i < self.map_size_x and 0 <= new_j < self.map_size_y and self.map_to_grid[new_i, new_j] == 0:
-                                # 조건에 맞는 주변 원소의 값을 100으로 설정
-                                self.map_to_grid[new_i, new_j] = 101
 
     def timer_callback(self):
         if self.is_param and self.is_map and self.is_odom:
-            if self.is_goal:
 
-                x=self.odom_msg.pose.pose.position.x
-                y=self.odom_msg.pose.pose.position.y
-                now_grid_cell=self.pose_to_grid_cell(x,y)
+            x=self.odom_msg.pose.pose.position.x
+            y=self.odom_msg.pose.pose.position.y
+            now_grid_cell=self.pose_to_grid_cell(x,y)
 
-                #if 100 <= self.map_to_grid[now_grid_cell[0], now_grid_cell[1]]:
-                     
-                now_goal = self.route[self.idx]
-                #print(self.idx, 'th = ', now_goal)
-                goal_x, goal_y = self.grid_cell_to_pose(now_goal)
-                self.goal_msg.pose.position.x = goal_x
-                self.goal_msg.pose.position.y = goal_y
+            if not self.is_start:
+                min_dis = 10000
+                for num, crd in enumerate(self.route):
+                    if pow(now_grid_cell[0] - crd[0], 2) + pow(now_grid_cell[1] - crd[1], 2) < min_dis:
+                        min_dis = pow(now_grid_cell[0] - crd[0], 2) + pow(now_grid_cell[1] - crd[1], 2)
+                        self.idx = num
+                
+                self.is_start = True
 
-                q = Quaternion.from_euler(0, 0, 0)
-                self.goal_msg.pose.orientation.x = q.x
-                self.goal_msg.pose.orientation.y = q.y
-                self.goal_msg.pose.orientation.z = q.z
-                self.goal_msg.pose.orientation.w = q.w
+            if abs(now_grid_cell[0] - self.route[self.idx][0]) + abs(now_grid_cell[1] - self.route[self.idx][1]) <= 10:
+                self.idx += 1
 
-                self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
-                self.goal_pub.publish(self.goal_msg)
-                self.is_goal = False
+            now_goal = self.route[self.idx]
+            #print(self.idx, 'th = ', now_goal)
+            goal_x, goal_y = self.grid_cell_to_pose(now_goal)
+            self.goal_msg.pose.position.x = goal_x
+            self.goal_msg.pose.position.y = goal_y
+
+            q = Quaternion.from_euler(0, 0, 0)
+            self.goal_msg.pose.orientation.x = q.x
+            self.goal_msg.pose.orientation.y = q.y
+            self.goal_msg.pose.orientation.z = q.z
+            self.goal_msg.pose.orientation.w = q.w
+
+            self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
+            self.goal_pub.publish(self.goal_msg)
 
     def pose_to_grid_cell(self,x,y):
         map_point_x = int((x - self.map_offset_x) / self.map_resolution)

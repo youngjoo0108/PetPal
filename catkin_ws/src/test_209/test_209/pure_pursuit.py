@@ -65,7 +65,7 @@ class PurePursuit(Node):
         for angle,r in enumerate(msg.ranges):
             if angle < 25 or angle > 335:
                 if 0.0 < r < 0.2:
-                    self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit : collsion occur')
+                    #self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit : collsion occur')
                     return True
         return False
     
@@ -98,27 +98,35 @@ class PurePursuit(Node):
                 self.cmd_msg.linear.x = -1.0
                 self.cmd_msg.angular.z = 0.0
                 #self.cmd_pub.publish(self.cmd_msg)
-                self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance too short')
+                #self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance too short')
             
             if self.tracking_err_msg.data == 1:
                 self.cmd_msg.linear.x = 0.0
                 self.cmd_msg.angular.z = 0.0
                 #self.cmd_pub.publish(self.cmd_msg)
-                self.tracking_err_msg.data = False
-                self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, stop')
+                #self.tracking_err_msg.data = False
+                #self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, stop')
             
             elif self.tracking_err_msg.data == 2:
                 self.cmd_msg.linear.x = 0.0
-                self.cmd_msg.angular.z = 0.05
+                self.cmd_msg.angular.z = 0.1
                 #self.cmd_pub.publish(self.cmd_msg)
                 # self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, move clockwise')
            
-            else:
+            elif self.tracking_err_msg.data == 3:
                 self.cmd_msg.linear.x = 0.0
-                self.cmd_msg.angular.z = -0.05
+                self.cmd_msg.angular.z = -0.1
                 #self.cmd_pub.publish(self.cmd_msg)
                 # self.ros_log_pub.publish_log('DEBUG', 'Subscription PurePursuit_tracking : distance moderate, move counterclockwise')
             
+            elif self.tracking_err_msg.data == 5:
+                self.cmd_msg.linear.x = 0.0
+                self.cmd_msg.angular.z = 0.1
+
+            elif self.tracking_err_msg.data == 6:
+                self.cmd_msg.linear.x = 0.0
+                self.cmd_msg.angular.z = -0.1
+
             self.is_tracking_err = False
 
         elif self.fsm_msg.data == "scan" and self.scan_err_msg.data != 0:
@@ -146,7 +154,7 @@ class PurePursuit(Node):
                 lookahead_point = self.find_lookahead_point(path_points, robot_pose_x, robot_pose_y)
             
                 if lookahead_point is not None:
-                    if self.fsm_msg.data == "patrol":
+                    if self.fsm_msg.data == "patrol" or self.fsm_msg.data == 'search':
                         self.is_goal = False
                     robot_orientation_q = self.odom_msg.pose.pose.orientation
                     robot_orientation_euler = Quaternion(robot_orientation_q.w, robot_orientation_q.x, robot_orientation_q.y, robot_orientation_q.z).to_euler()
@@ -206,6 +214,10 @@ class PurePursuit(Node):
                     self.cmd_msg.linear.x = 0.0
                     self.cmd_msg.angular.z = 0.0
                     if self.fsm_msg.data == "patrol" and self.is_goal == False:
+                        self.patrol_msg.data = 1
+                        self.is_goal = True
+                        self.patrol_pub.publish(self.patrol_msg)
+                    elif self.fsm_msg.data == 'search' and self.is_goal == False:
                         self.patrol_msg.data = 1
                         self.is_goal = True
                         self.patrol_pub.publish(self.patrol_msg)

@@ -2,6 +2,7 @@ import rclpy, time
 import numpy as np
 from rclpy.node import Node
 import os
+from std_msgs.msg import String
 from geometry_msgs.msg import Pose,PoseStamped
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry,OccupancyGrid,MapMetaData,Path
@@ -20,6 +21,7 @@ class A_star(Node):
         self.odom_sub = self.create_subscription(Odometry,'odom',self.odom_callback,1)
         self.goal_sub = self.create_subscription(PoseStamped,'goal_pose',self.goal_callback,1)
         self.a_star_pub= self.create_publisher(Path, 'global_path', 1)
+        self.fsm_sub = self.create_subscription(String, '/fsm', self.fsm_callback, 10)
         
         self.map_msg=OccupancyGrid()
         self.odom_msg=Odometry()
@@ -81,6 +83,12 @@ class A_star(Node):
         y = grid_cell[1] * self.map_resolution + self.map_offset_y
 
         return [x,y]
+
+    def fsm_callback(self, msg):
+        global_path_msg=Path()
+        global_path_msg.header.frame_id='map'
+        global_path_msg.poses=[]
+        self.a_star_pub.publish(global_path_msg)
 
 
     def odom_callback(self,msg):

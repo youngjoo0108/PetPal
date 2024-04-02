@@ -63,7 +63,7 @@ class loadMap(Node):
         f=open(full_path,'w')
         data=''
         data += '{0} {1}\n'.format(self.map_size_x, self.map_size_y)
-        for pixel in self.map_msg.data :
+        for pixel in self.map_msg.data:
             data+='{0} '.format(pixel)
         
         #data += '\n{0} {1}'.format(node.map_msg.info.origin.position.x, node.map_msg.info.origin.position.y)

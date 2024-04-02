@@ -1,4 +1,4 @@
-import rclpy
+import rclpy, json, requests
 from rclpy.node import Node
 
 from geometry_msgs.msg import Twist
@@ -11,16 +11,6 @@ import tf2_ros
 import geometry_msgs.msg
 import time
 
-# odom 노드는 로봇의 속도(/turtlebot_status), Imu센서(/imu) 메시지를 받아서 로봇의 위치를 추정하는 노드입니다.
-# sub1_odom은 imu로 부터 받은 Quaternion을 사용하거나 각속도, 가속도 데이터를 이용해서 로봇의 포즈를 추정 할 것입니다.
-
-# 노드 로직 순서
-# 1. publisher, subscriber, broadcaster 만들기
-# 2. publish, broadcast 할 메시지 설정
-# 3. imu 에서 받은 quaternion을 euler angle로 변환해서 사용
-# 4. 로봇 위치 추정
-# 5. 추정한 로봇 위치를 메시지에 담아 publish, broadcast
-
 
 class odom(Node):
 
@@ -31,6 +21,7 @@ class odom(Node):
         self.subscription = self.create_subscription(TurtlebotStatus,'/turtlebot_status',self.listener_callback,10)
         self.imu_sub = self.create_subscription(Imu,'/imu',self.imu_callback,10)
         self.odom_publisher = self.create_publisher(Odometry, 'odom', 10)
+        self.sock_pub = self.create_publisher(String, '')
         self.broadcaster = tf2_ros.StaticTransformBroadcaster(self)
 
         # self.timer = self.create_timer(1, self.timer_callback)
@@ -150,7 +141,6 @@ class odom(Node):
                 self.broadcaster.sendTransform(self.laser_transform)
                 self.odom_publisher.publish(self.odom_msg)
                 self.prev_time=self.current_time
-
         
 def main(args=None):
     rclpy.init(args=args)
