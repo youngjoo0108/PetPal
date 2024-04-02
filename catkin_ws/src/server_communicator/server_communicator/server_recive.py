@@ -40,6 +40,11 @@ class WebSocketClientReceiveNode(Node):
             self.publisher_iot_control = self.create_publisher(IotCmd, '/iot_cmd', 10)
         except:
             self.ros_log_pub.publish_log('ERROR', 'init publisher iot control error: {}'.format(e))
+
+        try:
+            self.request_pub = self.create_publisher(String, '/request', 10)
+        except:
+            self.ros_log_pub.publish_log('ERROR', 'init publisher request error: {}'.format(e))
         
         self.ws_url = "wss://j10a209.p.ssafy.io/api/ws"
         self.websocket = None
@@ -125,8 +130,16 @@ class WebSocketClientReceiveNode(Node):
                             self.publisher_iot_control.publish(msg)
                             print(message_data)
                         elif message_data.get('type') == "SCAN":
-            
+                            msg = String()
+                            msg.data = "scan_on"
+                            self.request_pub.publish(msg)
                             print(message_data)
+                        elif message_data.get('type') == "REGISTER_REQUEST":
+                            msg = IotCmd()
+                            msg.iot_uuid = ""
+                            msg.control_action = "register"
+                            self.publisher_iot_control.publish(msg)
+
                             
                             
                     except json.JSONDecodeError as e:
