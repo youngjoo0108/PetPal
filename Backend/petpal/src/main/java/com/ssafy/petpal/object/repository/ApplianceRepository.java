@@ -12,7 +12,7 @@ public interface ApplianceRepository extends JpaRepository<Appliance,Long> {
 
 
     @Query("select new com.ssafy.petpal.object.dto." +
-            "ApplianceResponseDto(a.id, a.applianceType,a.home.id, a.room.id, a.room.roomName)" +
+            "ApplianceResponseDto(a.id,a.applianceUUID, a.applianceType,a.home.id, a.room.id, a.room.roomName)" +
             "from Appliance a " +
             "where a.room.id = :roomId "+
             "order by a.room.roomName"
@@ -21,7 +21,7 @@ public interface ApplianceRepository extends JpaRepository<Appliance,Long> {
 
 
     @Query("select new com.ssafy.petpal.object.dto." +
-            "ApplianceResponseDto(a.id, a.applianceType, a.home.id, a.room.id, a.room.roomName) " +
+            "ApplianceResponseDto(a.id, a.applianceUUID, a.applianceType, a.home.id, a.room.id, a.room.roomName) " +
             "from Appliance a " +
             "where a.home.id = :homeId " +
             "order by a.room.roomName")
@@ -29,7 +29,7 @@ public interface ApplianceRepository extends JpaRepository<Appliance,Long> {
 
 
     @Query("select new com.ssafy.petpal.object.dto." +
-            "ApplianceResponseDto(a.id, a.applianceType, a.home.id, a.room.id, a.room.roomName) " +
+            "ApplianceResponseDto(a.id,a.applianceUUID, a.applianceType, a.home.id, a.room.id, a.room.roomName) " +
             "from Appliance a " +
             "where a.applianceUUID = :uuid")
     ApplianceResponseDto findByApplianceUUID(String uuid);

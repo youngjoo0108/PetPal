@@ -1,5 +1,6 @@
 package com.ssafy.petpal.notification.entity;
 
+import com.ssafy.petpal.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor // Lombok을 사용하여 기본 생성자를 생성
-public class Notification {
+public class Notification extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
