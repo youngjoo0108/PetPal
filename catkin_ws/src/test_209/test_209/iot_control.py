@@ -4,7 +4,7 @@ from std_msgs.msg import String, Int32
 import numpy as np
 from ssafy_bridge.iot_udp import iot_udp
 from nav_msgs.msg import Odometry, Path
-from ssafy_msgs.msg import IotInfo
+from ssafy_msgs.msg import IotInfo, IotCmd
 from geometry_msgs.msg import PoseStamped
 
 class device(Node):
@@ -14,7 +14,7 @@ class device(Node):
 
         self.iot_sub = self.create_subscription(IotInfo, '/iot', self.iot_callback, 10)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 1)
-        self.iot_cmd_sub = self.create_subscription(Int32, '/iot_cmd', self.iot_cmd_callback, 10)
+        self.iot_cmd_sub = self.create_subscription(IotCmd, '/iot_cmd', self.iot_cmd_callback, 10)
         self.path_sub = self.create_subscription(Path, '/local_path', self.path_callback, 10)
         self.goal_pub = self.create_publisher(PoseStamped, 'goal_pose', 10)
         self.timer = self.create_timer(0.1, self.timer_callback)
@@ -64,12 +64,8 @@ class device(Node):
 
     def iot_cmd_callback(self, msg):
         if self.is_odom:
-            if msg.data >= len(self.devices):
-                print('no device', len(self.devices))
-            else:
-                self.is_state_change = False
-                self.now_device = self.device_uid[msg.data]
-                
+            self.is_state_change = False
+            self.now_device = msg.data
 
     def path_callback(self, msg):
         self.is_path = True
@@ -83,7 +79,7 @@ class device(Node):
                 self.now_device = None
             else:
                 goal = self.devices[self.now_device]
-                print(goal)
+                #print(goal)
                 self.goal_msg.pose.position.x = float(goal[0])
                 self.goal_msg.pose.position.y = float(goal[1])
 

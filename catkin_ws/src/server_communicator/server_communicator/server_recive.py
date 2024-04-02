@@ -102,7 +102,7 @@ class WebSocketClientReceiveNode(Node):
                             json_str = json.dumps(topic_data)
                             msg = String()
                             msg.data = json_str
-                            # print('send list:', json_str)
+                            print('send list:', json_str)
                             self.publisher_yolo.publish(msg)
                         else:
                             print(message_data)

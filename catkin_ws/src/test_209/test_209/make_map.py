@@ -1,4 +1,4 @@
-import rclpy
+import rclpy, json
 from rclpy.node import Node
 import ros2pkg
 from geometry_msgs.msg import Twist,PoseStamped,Pose,TransformStamped
@@ -153,6 +153,7 @@ class Mapper(Node):
         self.status_sub = self.create_subscription(TurtlebotStatus, '/turtlebot_status', self.status_callback, 10)
         self.end_sub = self.create_subscription(Int32, '/err', self.end_callback, 1)
         self.request_pub = self.create_publisher(String, 'request', 10)
+        self.sock_pub = self.create_publisher(String, '/to_server/data', 10)
 
         self.is_status = False
         self.is_end = False
@@ -165,6 +166,7 @@ class Mapper(Node):
             # 순찰 루트 계산 후 중앙 노드로 scan_off 요청 보내기
             self.is_end = True
             self.save_map()
+
             self.save_path()
 
             request_msg = String()
@@ -239,6 +241,16 @@ class Mapper(Node):
         f.write(data) 
         f.close()
 
+        # data_json = {
+        #         'type': 'COMPLETE',
+        #         'message': data,
+        #         }
+        # dt = json.dumps(data_json)
+        # msg = String()
+        # msg.data = dt
+        # self.sock_pub.publish(msg)
+    
+
     def save_path(self):
         self.path_maker = makeRoute(self.map_msg.data)
         patrol_path = self.path_maker.answer
@@ -250,6 +262,15 @@ class Mapper(Node):
             data+='{0} {1}\n'.format(pixel[0],pixel[1])
         f.write(data) 
         f.close()
+
+        # data_json = {
+        #         'type': 'ROUTE',
+        #         'message': data,
+        #         }
+        # dt = json.dumps(data_json)
+        # msg = String()
+        # msg.data = dt
+        # self.sock_pub.publish(msg)
 
         
 def main(args=None):    
