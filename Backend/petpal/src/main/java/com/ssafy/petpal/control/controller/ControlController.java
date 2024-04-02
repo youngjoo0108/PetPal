@@ -91,6 +91,7 @@ public class ControlController {
             case "ON": case "OFF":
             case "WEATHER": case "TURTLE":
             case "SCAN": case "IOT": case "MODE":
+            case "REGISTER_REQUEST" : case "REGISTER_RESPONSE":
                 rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
                 break;
             case "O_COMPLETE":
