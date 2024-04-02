@@ -4,6 +4,7 @@ import com.ssafy.petpal.auth.dto.OauthRequestDto;
 import com.ssafy.petpal.auth.dto.OauthResponseDto;
 import com.ssafy.petpal.auth.dto.RefreshTokenResponseDto;
 import com.ssafy.petpal.auth.service.OauthService;
+import com.ssafy.petpal.control.dto.ControlDto;
 import com.ssafy.petpal.exception.CustomException;
 import com.ssafy.petpal.exception.ErrorCode;
 import com.ssafy.petpal.home.dto.HomeRequestDTO;
@@ -13,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -25,6 +27,10 @@ public class OauthController {
 
     private final OauthService oauthService;
     private final HomeService homeService;
+
+    private final RabbitTemplate rabbitTemplate;
+    private static final String CONTROL_QUEUE_NAME = "control.queue";
+    private static final String CONTROL_EXCHANGE_NAME = "control.exchange";
 
     @PostMapping("/login/oauth/{provider}")
     public OauthResponseDto login(@PathVariable String provider, @RequestBody OauthRequestDto oauthRequestDto,
@@ -42,6 +48,10 @@ public class OauthController {
                 else
                     oauthResponseDto.setHomeId(homeService.fetchAllByUserId(Long.valueOf(arr[2])).get(0).getId());
         }
+        ControlDto controlDto = new ControlDto();
+        controlDto.setType("HOMEID");
+        controlDto.setMessage(String.valueOf(oauthResponseDto.getHomeId()));
+        rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + oauthResponseDto.getHomeId(), controlDto);
         return oauthResponseDto;
     }
 
