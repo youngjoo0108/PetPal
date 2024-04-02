@@ -58,6 +58,17 @@ public class ControlController {
     private static final String CONTROL_EXCHANGE_NAME = "control.exchange";
 
 
+    @MessageMapping("ros.control.message.{homeId}")
+    public void sendMessage(@Payload String rawMessage, @DestinationVariable Long homeId) throws IOException {
+        log.info("Ros Received message: {}", rawMessage);
+        ControlDto controlDto = objectMapper.readValue(rawMessage, ControlDto.class);
+        String type = controlDto.getType();
+        switch (type) {
+            case "WEATHER": case "TURTLE": case "REGISTER_RESPONSE": case "COMPLETE":
+            rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
+            break;
+        }
+    }
 
     @MessageMapping("control.message.{homeId}")
     public void sendMessage(@Payload ControlDto controlDto, @DestinationVariable Long homeId) throws IOException {
@@ -91,9 +102,9 @@ public class ControlController {
                 notificationService.saveNotification(notificationRequestDto1); // DB에 저장
                 break;
             case "ON": case "OFF":
-            case "WEATHER": case "TURTLE":
+//            case "WEATHER": case "TURTLE":
             case "SCAN": case "IOT": case "MODE":
-            case "REGISTER_REQUEST" : case "REGISTER_RESPONSE":
+            case "REGISTER_REQUEST" : // case "REGISTER_RESPONSE":
             case "COMPLETE": //이건 스캔 완료 COMPLETE
                 rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
                 break;
