@@ -102,6 +102,7 @@ class WebSocketClientReceiveNode(Node):
                             msg.data = json_str
                             # print('send list:', json_str)
                             self.publisher_yolo.publish(msg)
+                            self.ros_log_pub.publish_log('INFO', f'Object detected message enter : {msg}')
                         elif message_data.get('type') == "IOT":
                             topic_data = message_data['message']
                             slice_point = topic_data.find('/')
@@ -115,11 +116,14 @@ class WebSocketClientReceiveNode(Node):
                             msg.control_action = iot_control_data['control_action']
                             
                             self.publisher_iot_control.publish(msg)
+                            self.ros_log_pub.publish_log('INFO', f'IoT control message enter : {msg}')
                         elif message_data.get('type') == "SCAN":
                             msg = String()
                             msg.data = 'scan_on'
                             self.request_pub.publish(msg)
-                            
+                            self.ros_log_pub.publish_log('INFO', f'Scan start message enter : {msg}')
+                        else:
+                            self.ros_log_pub.publish_log('WARN', f'Not Defined message type enter : {msg}')
                             
                     except json.JSONDecodeError as e:
                         self.ros_log_pub.publish_log('ERROR', f'Decode Json message error: {e}')
