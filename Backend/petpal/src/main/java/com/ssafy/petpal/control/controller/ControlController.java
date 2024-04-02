@@ -60,9 +60,9 @@ public class ControlController {
 
 
     @MessageMapping("control.message.{homeId}")
-    public void sendMessage(@Payload String rawMessage, @DestinationVariable Long homeId) throws IOException {
-        log.info("Received message: {}", rawMessage);
-        ControlDto controlDto = objectMapper.readValue(rawMessage, ControlDto.class);
+    public void sendMessage(@Payload ControlDto controlDto, @DestinationVariable Long homeId) throws IOException {
+//        log.info("Received message: {}", rawMessage);
+//        ControlDto controlDto = objectMapper.readValue(rawMessage, ControlDto.class);
         String type = controlDto.getType();
         switch (type){
             //COMPLETE한게 가전 On/Off를 완료한 것인지 위험물 처리 프로세스를 완료한 것인지 구분을 할 필요가 있음.
