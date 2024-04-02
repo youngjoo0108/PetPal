@@ -1,8 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frontend/component/menu/appliance_management.dart';
 import 'package:frontend/component/menu/room_management.dart';
+import 'package:frontend/const/global_alert_dialog.dart';
+import 'package:frontend/controller/map_data_controller.dart';
 import 'package:frontend/controller/menu_tab_controller.dart';
 import 'package:frontend/const/colors.dart';
+import 'package:frontend/service/room_service.dart';
+import 'package:frontend/socket/socket.dart';
+import 'package:stomp_dart_client/stomp_frame.dart';
 import 'login_screen.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -14,22 +22,41 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> {
   MenuTabController menuTabController = MenuTabController();
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+  SocketService socketService = SocketService();
+  MapDataController mapDataController = MapDataController();
+
+  void _getHomeScanResponse(StompFrame frame) {
+    final data = json.decode(frame.body ?? '{}');
+    if (data['type'] == 'COMPLETE') {
+      mapDataController.fetchMapData();
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    socketService.initializeWebSocketConnection();
     // 콜백 함수를 포함하여 MenuTabController 초기화
     menuTabController = MenuTabController(
+      onHomeScan: () async {
+        final String? homeId = await secureStorage.read(key: "homeId");
+        socketService.subscribeToDestination(
+          "/exchange/control.exchange/home.$homeId",
+          _getHomeScanResponse,
+        );
+        socketService.sendMessage(
+          destination: '/pub/control.message.$homeId',
+          type: 'SCAN',
+          messageContent: '',
+        );
+      },
       onManageRoom: () {
         Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => const RoomManagement(), // '방 관리' 페이지로 이동
         ));
       },
-      onManageAppliance: () {
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const ApplianceManagement(), // '가전 관리' 페이지로 이동
-        ));
-      },
+      onManageAppliance: () => _handleApplianceManagementTap(),
       onLogout: () {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => const LoginScreen(), // 로그아웃 후 로그인 화면으로 전환
@@ -90,29 +117,6 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              // 두 번째 그룹: 사물 등록, 사물 제어
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 1,
-                      blurRadius: 1,
-                      offset: const Offset(0, 1), // 그림자 위치 조정
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    _buildMenuItem(Icons.camera_enhance, "사물 등록"),
-                    _buildDivider(),
-                    _buildMenuItem(Icons.control_camera, "사물 제어"),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
               // 세 번째 그룹: 로그아웃
               Container(
                 decoration: BoxDecoration(
@@ -144,5 +148,30 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
+  void _handleApplianceManagementTap() async {
+    RoomService roomService = RoomService();
+    // '가전 관리' 탭 로직 구현
+    final rooms = await roomService.getRooms();
+    if (rooms.isEmpty) {
+      // 방 목록이 비어있을 경우 알림 창을 띄움
+      GlobalAlertDialog.show(
+        context,
+        title: "알림",
+        message: "방을 먼저 등록해주세요.",
+      );
+    } else {
+      // 방 목록이 있을 경우 '가전 관리' 페이지로 이동
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => const ApplianceManagement(),
+      ));
+    }
+  }
+
   Widget _buildDivider() => const Divider(height: 1, thickness: 1);
+
+  @override
+  void dispose() {
+    socketService.deactivate();
+    super.dispose();
+  }
 }

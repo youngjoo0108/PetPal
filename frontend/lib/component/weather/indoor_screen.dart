@@ -1,37 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/service/fetch_weather.dart';
 import 'package:frontend/const/colors.dart';
+import 'package:logger/logger.dart';
+
+final Logger logger = Logger();
 
 class IndoorScreen extends StatefulWidget {
-  const IndoorScreen({super.key});
+  final int? inTemp;
+  final int? feelLike;
+  const IndoorScreen({super.key, required this.inTemp, required this.feelLike});
 
   @override
   State<IndoorScreen> createState() => _IndoorScreenState();
 }
 
 class _IndoorScreenState extends State<IndoorScreen> {
-  int? inTemp;
-  int? feelLike;
-
   @override
   void initState() {
     super.initState();
-    // 비동기 작업을 initState 내에서 스케줄링
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      fetchWeather('Seoul').then((data) {
-        if (mounted) {
-          setState(() {
-            // API에서 받은 데이터로 상태 업데이트
-            feelLike =
-                ((data['main']['feels_like'] as double) - 273.15).round();
-            inTemp = 15;
-          });
-        }
-      }).catchError((error) {
-        // 오류 처리
-        print("Error fetching weather data: $error");
-      });
-    });
   }
 
   @override
@@ -68,7 +53,9 @@ class _IndoorScreenState extends State<IndoorScreen> {
                     ),
                   ),
                   Text(
-                    feelLike?.toString() ?? 'Loading...',
+                    widget.feelLike != null
+                        ? '${widget.feelLike}°C'
+                        : 'Loading...',
                     style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
@@ -88,7 +75,7 @@ class _IndoorScreenState extends State<IndoorScreen> {
                     ),
                   ),
                   Text(
-                    inTemp?.toString() ?? 'Loading...',
+                    widget.inTemp.toString(),
                     style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,

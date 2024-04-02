@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frontend/const/secure_storage.dart';
 import 'package:frontend/screen/login_screen.dart';
 import 'package:frontend/screen/main_screen.dart';
@@ -11,6 +14,17 @@ import 'package:logger/logger.dart';
 import 'firebase_options.dart';
 
 final Logger logger = Logger();
+
+const AndroidNotificationChannel channel = AndroidNotificationChannel(
+  'high_importance_channel',
+  'High Importance Notifications',
+  description: 'This channel is used for important notifications.',
+  importance: Importance.max,
+);
+
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(); // .env load
@@ -18,12 +32,99 @@ void main() async {
   final kakaoApiKey = dotenv.env['KAKAO_API_KEY']; // load kakaoApiKey
   KakaoSdk.init(nativeAppKey: '$kakaoApiKey'); // KAKAO SDK init
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  String? fcmToken = await FirebaseMessaging.instance.getToken();
-  FirebaseMessaging.instance
-      .requestPermission(badge: true, alert: true, sound: true);
+  setFCM();
 
-  logger.e(fcmToken);
   runApp(MyApp());
+}
+
+Future<void> setFCM() async {
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true, // Required to display a heads up notification
+    badge: true,
+    sound: true,
+  );
+
+  androidNotiSet();
+
+  logger.d('User granted permission: ${settings.authorizationStatus}');
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    const AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails(
+            'high_importance_channel', 'High Importance Notifications',
+            channelDescription:
+                'This channel is used for important notifications.',
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker');
+
+    const NotificationDetails notificationDetails =
+        NotificationDetails(android: androidNotificationDetails);
+    await flutterLocalNotificationsPlugin.show(
+        0,
+        '${message.notification!.title}',
+        '${message.notification!.body}',
+        notificationDetails,
+        payload: 'item x');
+  });
+
+  String token = await FirebaseMessaging.instance.getToken() ?? '';
+  debugPrint("fcmToken : $token");
+}
+
+Future<void> androidNotiSet() async {
+  if (Platform.isAndroid) {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+    flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()!
+        .requestNotificationsPermission();
+
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+  }
+
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('app_icon');
+
+  const DarwinInitializationSettings initializationSettingsIOS =
+      DarwinInitializationSettings(
+    requestAlertPermission: true,
+    requestBadgePermission: true,
+    requestSoundPermission: true,
+  );
+
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+    iOS: initializationSettingsIOS,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  logger.d("Handling a background message: ${message.messageId}");
 }
 
 class MyApp extends StatelessWidget {

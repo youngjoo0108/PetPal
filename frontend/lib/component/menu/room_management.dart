@@ -44,14 +44,13 @@ class _RoomManagementScreenState extends State<RoomManagement> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          final newRoom = await Navigator.push(
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const RegisterRoom()),
           );
-          if (newRoom != null) {
-            setState(() {
-              rooms.add(newRoom);
-            });
+          if (result == true) {
+            // 방 등록 성공 시
+            _loadRooms(); // 방 목록을 다시 불러옵니다.
           }
         },
         child: const Icon(Icons.add),

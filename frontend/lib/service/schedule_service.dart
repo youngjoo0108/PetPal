@@ -5,6 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:frontend/model/appliance.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:logger/logger.dart';
+
+final Logger logger = Logger();
 
 class ScheduleService {
   final _storage = const FlutterSecureStorage();
@@ -18,52 +21,68 @@ class ScheduleService {
     required Appliance appliance,
     required DateTime date,
     required TimeOfDay time,
-    required String action,
-    required bool isActive,
+    required String taskType, // "ON" 또는 "OFF"
   }) async {
-    final uri = Uri.parse('$_baseUrl/reservations'); // 예약을 처리하는 서버의 엔드포인트
+    // homeId 가져오기
+    final String? homeIdString = await _storage.read(key: "homeId");
+    // String을 int로 안전하게 변환
+    final int? homeId = int.tryParse(homeIdString ?? '');
+
+    if (homeId == null) {
+      throw Exception('Invalid homeId');
+    }
+
+    // date를 YYYY-MM-DD 형식으로 변환
+    String formattedDate =
+        "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+
+    // time을 HH-MM 형식으로 변환
+    String formattedTime =
+        "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
+
+    final uri = Uri.parse('$_baseUrl/schedules');
     final response = await http.post(uri,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          'applianceId':
-              appliance.applianceId, // 예: Appliance 모델에 id 프로퍼티가 있다고 가정
-          'date': date.toIso8601String(),
-          'time': '${time.hour}:${time.minute}',
-          'action': action,
-          'isActive': isActive,
+          'roomId': appliance.roomId, // Appliance 객체에서 roomId를 가져옴
+          'homeId': homeId, // homeId를 int로 변환
+          'applianceId': appliance.applianceId,
+          'day': formattedDate,
+          'time': formattedTime,
+          'taskType': taskType, // "ON" 또는 "OFF"
+          'isActive': true, // 무조건 true로 설정
         }));
 
-    if (response.statusCode == 200) {
-      // 서버로부터 성공적인 응답을 받음
-      return true;
-    } else {
-      // 실패 응답 처리
-      return false;
-    }
+    return response.statusCode == 200;
   }
 
   Future<List<Schedule>> fetchSchedules() async {
-    String? homeId = await getHomeId();
+    final String? homeIdString = await _storage.read(key: "homeId");
+    // String을 int로 안전하게 변환
+    final int? homeId = int.tryParse(homeIdString ?? '');
+
     if (homeId == null) {
-      throw Exception('Home ID not found');
+      throw Exception('Invalid homeId');
     }
 
-    final uri = Uri.parse('$_baseUrl/reservations/$homeId');
+    final uri = Uri.parse('$_baseUrl/schedules/$homeId');
     final response =
         await http.get(uri, headers: {"Content-Type": "application/json"});
 
     if (response.statusCode == 200) {
-      List jsonResponse = json.decode(response.body);
-      return jsonResponse
-          .map((reservation) => Schedule.fromJson(reservation))
-          .toList();
+      final responseBody = utf8.decode(response.bodyBytes);
+      logger.d(responseBody);
+      List<dynamic> body = jsonDecode(responseBody);
+      List<Schedule> schedules =
+          body.map((dynamic item) => Schedule.fromJson(item)).toList();
+      return schedules;
     } else {
       throw Exception('Failed to load reservations');
     }
   }
 
   Future<bool> deleteSchedule(int scheduleId) async {
-    final uri = Uri.parse('$_baseUrl/reservations/$scheduleId');
+    final uri = Uri.parse('$_baseUrl/schedules/$scheduleId');
     final response =
         await http.delete(uri, headers: {"Content-Type": "application/json"});
 

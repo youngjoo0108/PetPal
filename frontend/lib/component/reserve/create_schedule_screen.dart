@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/const/colors.dart';
+import 'package:frontend/const/global_alert_dialog.dart';
 import 'package:frontend/const/time_creator.dart';
 import 'package:frontend/model/appliance.dart';
 import 'package:frontend/model/room.dart';
 import 'package:frontend/service/appliance_service.dart';
 import 'package:frontend/service/room_service.dart';
-import 'package:frontend/service/schedule_service.dart'; // 'Reservation' 클래스 경로
+import 'package:frontend/service/schedule_service.dart';
+import 'package:logger/logger.dart'; // 'Reservation' 클래스 경로
+
+Logger logger = Logger();
 
 class CreateScheduleScreen extends StatefulWidget {
   const CreateScheduleScreen({super.key});
@@ -184,58 +188,29 @@ class _CreateReservationScreenState extends State<CreateScheduleScreen> {
   }
 
   void createReservation() async {
-    if (selectedAppliance != null && selectedAction != null) {
-      // 서버로 예약 데이터 전송
-      bool success = await ScheduleService().addSchedule(
-        appliance: selectedAppliance!,
-        date: selectedDate,
-        time: selectedTime,
-        action: selectedAction!,
-        isActive: true,
-      );
+    logger.e(
+        "(${selectedAppliance!.applianceId})-($selectedDate)-($selectedTime)-($selectedAction)");
+    if (selectedRoom == null ||
+        selectedAppliance == null ||
+        selectedAction == null) {
+      GlobalAlertDialog.show(context, message: '모든 정보를 선택해주세요.');
+      return;
+    }
 
-      if (success) {
-        // 성공적으로 데이터를 전송했을 경우, 이전 화면으로 돌아감
-        Navigator.pop(context);
-      } else {
-        // 서버로부터 실패 응답을 받았을 경우, 사용자에게 알림
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Error'),
-              content: const Text('Failed to create reservation.'),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      }
+    // 서버로 예약 데이터 전송
+    bool success = await ScheduleService().addSchedule(
+      appliance: selectedAppliance!,
+      date: selectedDate,
+      time: selectedTime,
+      taskType: selectedAction!,
+    );
+
+    if (success) {
+      // 성공적으로 데이터를 전송했을 경우, 이전 화면으로 돌아감
+      Navigator.pop(context, true);
     } else {
-      // 필요한 모든 데이터가 선택되지 않았을 경우
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Missing Information'),
-            content: const Text('Please select an appliance and an action.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+      // 서버로부터 실패 응답을 받았을 경우, 사용자에게 알림
+      GlobalAlertDialog.show(context, message: '예약 생성에 실패했습니다.');
     }
   }
 }

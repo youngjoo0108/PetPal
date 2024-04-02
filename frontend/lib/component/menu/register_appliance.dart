@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/const/secure_storage.dart';
+import 'package:frontend/const/colors.dart';
+import 'package:frontend/const/global_alert_dialog.dart';
 import 'package:frontend/service/room_service.dart';
 import 'package:frontend/service/appliance_service.dart';
 import 'package:frontend/model/room.dart';
-import 'package:frontend/model/appliance.dart';
 
 class RegisterAppliance extends StatefulWidget {
-  const RegisterAppliance({super.key});
+  final String applianceUUID;
+  const RegisterAppliance({super.key, required this.applianceUUID});
 
   @override
   RegisterApplianceState createState() => RegisterApplianceState();
@@ -15,12 +16,11 @@ class RegisterAppliance extends StatefulWidget {
 class RegisterApplianceState extends State<RegisterAppliance> {
   final RoomService _roomService = RoomService();
   final ApplianceService _applianceService = ApplianceService();
-  final SecureStorage _secureStorage = SecureStorage();
 
   List<Room> rooms = [];
-  List<Appliance> appliances = [];
+  List<String> appliances = [];
   Room? selectedRoom;
-  Appliance? selectedAppliance;
+  String? selectedAppliance;
 
   @override
   void initState() {
@@ -44,21 +44,34 @@ class RegisterApplianceState extends State<RegisterAppliance> {
   }
 
   registerAppliance() async {
-    final homeId = await _secureStorage.getHomeId('homeId');
-    if (selectedRoom == null || selectedAppliance == null || homeId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please select both a room and an appliance')),
-      );
+    if (selectedRoom == null || selectedAppliance == null) {
+      // GlobalAlertDialog 사용하여 메시지 표시
+      GlobalAlertDialog.show(context,
+          message: 'Please select both a room and an appliance');
       return;
     }
-
-    try {
-      await _applianceService.registerAppliance(
-          homeId, selectedRoom!.roomId, selectedAppliance!.applianceType);
-      // 성공적으로 등록되었을 경우의 처리, 예: 사용자에게 성공 메시지 표시
-    } catch (e) {
-      // 에러 처리, 예: 사용자에게 에러 메시지 표시
+    int result = await _applianceService.registerAppliance(
+        selectedRoom!.roomId, selectedAppliance!, widget.applianceUUID);
+    if (result == 1) {
+      GlobalAlertDialog.show(
+        context,
+        title: "성공",
+        message: "가전 등록에 성공했습니다.",
+      ).then((_) {
+        Navigator.pop(context, true); // 성공적으로 방 등록 후 true를 반환하며 이전 페이지로 돌아감
+      });
+    } else if (result == 2) {
+      GlobalAlertDialog.show(
+        context,
+        title: "이미 등록된 가전입니다.",
+        message: "다시 시도해 주세요.",
+      );
+    } else {
+      GlobalAlertDialog.show(
+        context,
+        title: "실패",
+        message: "가전 등록에 실패했습니다.",
+      );
     }
   }
 
@@ -66,55 +79,73 @@ class RegisterApplianceState extends State<RegisterAppliance> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Register Appliance'),
+        title: const Text('가전 등록'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const Text('Select a Room:', style: TextStyle(fontSize: 16)),
-            DropdownButton<Room>(
-              hint: const Text("Select room"),
-              value: selectedRoom,
-              onChanged: (Room? newValue) {
-                setState(() {
-                  selectedRoom = newValue;
-                });
-              },
-              items: rooms.map((Room room) {
-                return DropdownMenuItem<Room>(
-                  value: room,
-                  child: Text(room.roomName),
-                );
-              }).toList(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Expanded(
+                    child: Text('방', style: TextStyle(fontSize: 16))),
+                Expanded(
+                  child: DropdownButton<Room>(
+                    hint: const Text("방 선택"),
+                    value: selectedRoom,
+                    onChanged: (Room? newValue) {
+                      setState(() {
+                        selectedRoom = newValue;
+                      });
+                    },
+                    items: rooms.map((Room room) {
+                      return DropdownMenuItem<Room>(
+                        value: room,
+                        child: Text(room.roomName),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
-            const Text('Select an Appliance:', style: TextStyle(fontSize: 16)),
-            DropdownButton<Appliance>(
-              hint: const Text("Select appliance"),
-              value: selectedAppliance,
-              onChanged: (Appliance? newValue) {
-                setState(() {
-                  selectedAppliance = newValue;
-                });
-              },
-              items: appliances.map((Appliance appliance) {
-                return DropdownMenuItem<Appliance>(
-                  value: appliance,
-                  child: Text(appliance.applianceType),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 40),
-            Center(
-              child: ElevatedButton(
-                onPressed: registerAppliance,
-                child: const Text('Register'),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Expanded(
+                    child: Text('가전', style: TextStyle(fontSize: 16))),
+                Expanded(
+                  child: DropdownButton<String>(
+                    hint: const Text("가전 선택"),
+                    value: selectedAppliance,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedAppliance = newValue;
+                      });
+                    },
+                    items: appliances.map((String applianceType) {
+                      return DropdownMenuItem<String>(
+                        value: applianceType,
+                        child: Text(applianceType),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: ElevatedButton(
+        onPressed: registerAppliance,
+        style: ElevatedButton.styleFrom(
+          foregroundColor: black,
+          backgroundColor: lightYellow, // 버튼 텍스트 색상
+        ),
+        child: const Text('등록하기'),
       ),
     );
   }

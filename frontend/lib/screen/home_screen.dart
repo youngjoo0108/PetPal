@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frontend/component/stream/camera_screen.dart';
 import 'package:frontend/component/stream/map_screen.dart';
 import 'package:frontend/component/weather/weather_screen.dart';
 import 'package:frontend/const/colors.dart';
+import 'package:frontend/socket/socket.dart';
 import 'package:logger/logger.dart';
 
 final Logger logger = Logger();
@@ -17,9 +19,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool isOn = false;
   bool isPatrollingMode = true;
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+  SocketService socketService = SocketService();
 
   @override
   void initState() {
+    socketService.initializeWebSocketConnection();
     super.initState();
   }
 
@@ -38,10 +43,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isOn = true;
-                        });
+                      onTap: () async {
+                        final String? homeId =
+                            await secureStorage.read(key: "homeId");
+                        if (homeId != null) {
+                          // 메시지 전송 로직
+                          socketService.sendMessage(
+                            destination: '/pub/control.message.$homeId',
+                            type: 'MODE',
+                            messageContent: 'patrol',
+                          );
+                          // UI 상태 업데이트
+                          setState(() {
+                            isOn = true;
+                          });
+                        } else {
+                          logger.e("Home ID not found");
+                        }
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -64,10 +82,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isOn = false;
-                        });
+                      onTap: () async {
+                        final String? homeId =
+                            await secureStorage.read(key: "homeId");
+                        if (homeId != null) {
+                          // 메시지 전송 로직
+                          socketService.sendMessage(
+                            destination: '/pub/control.message.$homeId',
+                            type: 'MODE',
+                            messageContent: 'stay',
+                          );
+                          // UI 상태 업데이트
+                          setState(() {
+                            isOn = false;
+                          });
+                        } else {
+                          logger.e("Home ID not found");
+                        }
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -97,10 +128,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 36,
                     width: 110,
                     child: TextButton(
-                      onPressed: () {
-                        setState(() {
-                          isPatrollingMode = !isPatrollingMode;
-                        });
+                      onPressed: () async {
+                        final String? homeId =
+                            await secureStorage.read(key: "homeId");
+                        final String message =
+                            isPatrollingMode ? "patrol" : "tracking";
+                        if (homeId != null) {
+                          // 메시지 전송 로직
+                          socketService.sendMessage(
+                            destination: '/pub/control.message.$homeId',
+                            type: 'MODE',
+                            messageContent: message,
+                          );
+                          // UI 상태 업데이트
+                          setState(() {
+                            isPatrollingMode = !isPatrollingMode;
+                          });
+                        } else {
+                          logger.e("Home ID not found");
+                        }
                       },
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(deepYellow),

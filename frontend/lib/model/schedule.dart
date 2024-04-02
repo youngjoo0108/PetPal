@@ -1,46 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/model/appliance.dart';
 
 class Schedule {
   final int scheduleId;
-  final Appliance appliance; // 가전
-  final DateTime date; // 날짜
-  final TimeOfDay time; // 시간
-  final String action; // 'on' || 'off'
-  bool isActive; // 인스턴스 활성화 여부
+  final int applianceId;
+  final String applianceType;
+  final String roomName;
+  final DateTime day;
+  final TimeOfDay time;
+  final String taskType;
+  bool isActive;
 
   Schedule({
     required this.scheduleId,
-    required this.appliance,
-    required this.date,
+    required this.applianceId,
+    required this.applianceType,
+    required this.roomName,
+    required this.day,
     required this.time,
-    required this.action,
-    this.isActive = true,
+    required this.taskType,
+    required this.isActive,
   });
 
   factory Schedule.fromJson(Map<String, dynamic> json) {
-    return Schedule(
-      scheduleId: json['scheduleId'] as int,
-      appliance:
-          Appliance.fromJson(json['appliance']), // Appliance의 fromJson 메서드가 필요
-      date: DateTime.parse(json['date']),
-      time: TimeOfDay(
-        hour: int.parse(json['time'].split(":")[0]),
-        minute: int.parse(json['time'].split(":")[1]),
-      ),
-      action: json['action'] as String,
-      isActive: json['isActive'] as bool,
-    );
-  }
+    final day = DateTime.parse(json['day']);
+    final timeParts = (json['time'] as String).split(':');
+    final time = TimeOfDay(
+        hour: int.parse(timeParts[0]), minute: int.parse(timeParts[1]));
 
-  Map<String, dynamic> toJson() {
-    return {
-      'scheduleId': scheduleId,
-      'appliance': appliance.toJson(), // Appliance의 toJson 메서드가 필요
-      'date': date.toIso8601String(),
-      'time': '${time.hour}:${time.minute}',
-      'action': action,
-      'isActive': isActive,
-    };
+    return Schedule(
+      scheduleId: json['scheduleId'],
+      applianceId: json['applianceId'],
+      applianceType: json['applianceType'],
+      roomName: json['roomName'],
+      day: day,
+      time: time,
+      taskType: json['taskType'],
+      isActive: json['active'],
+    );
   }
 }

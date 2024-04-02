@@ -1,40 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/service/fetch_weather.dart';
 // import 'package:frontend/component/weather_screen.dart';
 // import 'package:frontend/component/weather_text.dart';
 import 'package:frontend/const/colors.dart';
+import 'package:logger/logger.dart';
+
+final Logger logger = Logger();
 
 class OutdoorScreen extends StatefulWidget {
-  const OutdoorScreen({super.key});
+  final int? outTemp;
+  final int? outHum;
+  final String? weather;
+  const OutdoorScreen(
+      {super.key,
+      required this.outTemp,
+      required this.outHum,
+      required this.weather});
 
   @override
   State<OutdoorScreen> createState() => _OutdoorScreenState();
 }
 
 class _OutdoorScreenState extends State<OutdoorScreen> {
-  int? outTemp;
-  int? outHum;
-  String? weather;
-
   @override
   void initState() {
     super.initState();
-    // 비동기 작업을 initState 내에서 스케줄링
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      fetchWeather('Seoul').then((data) {
-        weather = 'Sunny';
-        if (mounted) {
-          setState(() {
-            // API에서 받은 데이터로 상태 업데이트
-            outTemp = ((data['main']['temp'] as double) - 273.15).round();
-            outHum = data['main']['humidity'] as int;
-          });
-        }
-      }).catchError((error) {
-        // 오류 처리
-        print("Error fetching weather data: $error");
-      });
-    });
   }
 
   @override
@@ -59,26 +48,26 @@ class _OutdoorScreenState extends State<OutdoorScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              weather == 'Cloudy'
+              widget.weather == 'Cloudy'
                   ? Image.asset(
                       'asset/img/cloudy.png',
                       width: MediaQuery.of(context).size.width / 18 * 2,
                       height: MediaQuery.of(context).size.height / 10 * 2,
                     )
-                  : weather == "Snowy"
+                  : widget.weather == "Snowy"
                       ? Image.asset(
                           'asset/img/snowy.png',
                           width: MediaQuery.of(context).size.width / 18 * 2,
                           height: MediaQuery.of(context).size.height / 10 * 2,
                         )
-                      : weather == "Foggy"
+                      : widget.weather == "Foggy"
                           ? Image.asset(
                               'asset/img/foggy.png',
                               width: MediaQuery.of(context).size.width / 18 * 2,
                               height:
                                   MediaQuery.of(context).size.height / 10 * 2,
                             )
-                          : weather == "Stormy"
+                          : widget.weather == "Stormy"
                               ? Image.asset(
                                   'asset/img/stormy.png',
                                   width: MediaQuery.of(context).size.width /
@@ -88,7 +77,7 @@ class _OutdoorScreenState extends State<OutdoorScreen> {
                                       10 *
                                       2,
                                 )
-                              : weather == "Sunny"
+                              : widget.weather == "Sunny"
                                   ? Image.asset(
                                       'asset/img/sunny.png',
                                       width: MediaQuery.of(context).size.width /
@@ -99,7 +88,7 @@ class _OutdoorScreenState extends State<OutdoorScreen> {
                                               10 *
                                               2,
                                     )
-                                  : weather == "Rainy"
+                                  : widget.weather == "Rainy"
                                       ? Image.asset(
                                           'asset/img/rainy.png',
                                           width: MediaQuery.of(context)
@@ -138,7 +127,9 @@ class _OutdoorScreenState extends State<OutdoorScreen> {
                     ),
                   ),
                   Text(
-                    outTemp?.toString() ?? 'Loading...',
+                    widget.outTemp != null
+                        ? '${widget.outTemp}°C'
+                        : 'Loading...',
                     style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
@@ -158,7 +149,9 @@ class _OutdoorScreenState extends State<OutdoorScreen> {
                     ),
                   ),
                   Text(
-                    outHum?.toString() ?? 'Loading...',
+                    widget.outHum != null
+                        ? widget.outHum.toString()
+                        : 'Loading...',
                     style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,

@@ -2,10 +2,12 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/component/reserve/create_schedule_screen.dart';
 import 'package:frontend/const/colors.dart';
+import 'package:frontend/const/global_alert_dialog.dart';
 import 'package:frontend/const/time_creator.dart';
 import 'package:frontend/model/schedule.dart';
 import 'package:frontend/model/room.dart';
 import 'package:frontend/service/schedule_service.dart';
+// import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 
 final Logger logger = Logger();
@@ -89,114 +91,85 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   itemCount: schedules.length,
                   itemBuilder: (context, index) {
                     final schedule = schedules[index];
+                    // 서버 응답에 따른 날짜 및 시간 포맷팅
+                    // final formattedDay =
+                    //     DateFormat('yyyy-MM-dd').format(schedule.day);
+                    final formattedTime = schedule.time.format(context);
                     return Dismissible(
                       key: Key(schedule.hashCode.toString()), // 고유한 키로 각 항목을 식별
                       onDismissed: (direction) async {
                         final scheduleId = schedules[index].scheduleId;
-                        final removedSchedule = schedules[index];
-                        // 우선 스케줄을 목록에서 제거
-                        setState(() {
-                          schedules.removeAt(index);
-                        });
                         // 서버에서 스케줄 삭제 시도
                         bool success =
                             await ScheduleService().deleteSchedule(scheduleId);
                         if (!success) {
-                          // 삭제 실패 시 스케줄을 목록에 다시 추가
+                          // 삭제 실패 시 GlobalAlertDialog로 실패 알림
+                          GlobalAlertDialog.show(
+                            context,
+                            title: "서버 에러",
+                            message: "예약 삭제에 실패했습니다.",
+                          );
+                          // 실패한 스케줄을 다시 리스트에 추가 (UI 업데이트)
                           setState(() {
-                            schedules.insert(index, removedSchedule);
+                            schedules.insert(index, schedule);
                           });
-                          // 실패 메시지와 함께 재시도 옵션 제공
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text(
-                                  "Failed to delete the schedule. Try again."),
-                              action: SnackBarAction(
-                                label: "RETRY",
-                                onPressed: () async {
-                                  // 재시도 로직: 사용자가 스낵바의 재시도를 탭했을 때 다시 시도
-                                  bool retrySuccess = await ScheduleService()
-                                      .deleteSchedule(scheduleId);
-                                  if (retrySuccess) {
-                                    setState(() {
-                                      schedules.removeWhere((schedule) =>
-                                          schedule.scheduleId == scheduleId);
-                                    });
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              "Schedule deleted successfully")),
-                                    );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              "Retry failed. Check your connection.")),
-                                    );
-                                  }
-                                },
-                              ),
-                            ),
+                        } else {
+                          // 삭제 성공 시 스케줄 리스트에서 해당 스케줄 제거
+                          setState(() {
+                            schedules.removeAt(index);
+                          });
+                          GlobalAlertDialog.show(
+                            context,
+                            title: "알림",
+                            message: "예약을 삭제했습니다.",
                           );
                         }
                       },
                       background: Container(
                         alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
                         color: white,
-                        child: const Icon(Icons.delete, color: Colors.white),
+                        child: const Icon(Icons.delete_forever,
+                            color: Colors.white),
                       ),
                       child: Container(
-                        margin: const EdgeInsets.all(12.0),
-                        padding: const EdgeInsets.all(16.0),
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 4.0, horizontal: 8.0),
                         decoration: BoxDecoration(
                           color: schedule.isActive
                               ? lightYellow
-                              : Colors.grey[100],
-                          borderRadius: BorderRadius.circular(10.0),
+                              : Colors.grey[200],
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              schedule.time.format(context),
-                              style: const TextStyle(fontSize: 16.0),
-                            ),
-                            Text(
-                              schedule.appliance.roomName,
-                              style: const TextStyle(fontSize: 16.0),
-                            ),
-                            Text(
-                              schedule.appliance.applianceType,
-                              style: const TextStyle(fontSize: 16.0),
-                            ),
-                            SizedBox(
-                              width: 60,
-                              height: 30,
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  color: deepYellow,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    schedule.action.toUpperCase(),
-                                    style: const TextStyle(
-                                      color: black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
+                        child: ListTile(
+                          leading: const Icon(Icons.event_available,
+                              color: Colors.black54),
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(
+                                "${schedule.roomName} - ${schedule.applianceType}",
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                            Switch(
-                              value: schedule.isActive,
-                              onChanged: (bool value) {
-                                setState(() {
-                                  schedule.isActive = value;
-                                });
-                              },
-                            ),
-                          ],
+                              Text(
+                                formattedTime,
+                                style: const TextStyle(color: Colors.black54),
+                              ),
+                              Text(
+                                schedule.taskType.toUpperCase(),
+                                style: const TextStyle(color: Colors.black54),
+                              ),
+                            ],
+                          ),
+                          trailing: Switch(
+                            value: schedule.isActive,
+                            onChanged: (bool value) {
+                              setState(() {
+                                schedule.isActive = value;
+                                // 스케줄 활성/비활성화 상태 업데이트 로직 추가
+                              });
+                            },
+                          ),
                         ),
                       ),
                     );
@@ -214,9 +187,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             context,
             MaterialPageRoute(
                 builder: (context) => const CreateScheduleScreen()),
-          ).then((_) {
-            fetchSchedules();
-            // 복귀 시 서버로부터 스케줄 리스트를 새로고침
+          ).then((result) {
+            // 예약 생성 화면에서 true가 반환된 경우, 최신 예약 리스트를 불러옵니다.
+            if (result == true) {
+              fetchSchedules(); // 예약 리스트를 새로 불러오는 메서드
+            }
           });
         },
         backgroundColor: lightYellow,
@@ -229,9 +204,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   String getTimeDifferenceMessage(Schedule reservation) {
     DateTime now = TimeCreator.nowInKorea();
     DateTime reservationDateTime = DateTime(
-      reservation.date.year,
-      reservation.date.month,
-      reservation.date.day,
+      reservation.day.year,
+      reservation.day.month,
+      reservation.day.day,
       reservation.time.hour,
       reservation.time.minute,
     );
@@ -255,7 +230,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     }
 
     message +=
-        '후에\n${reservation.appliance.roomName}-${reservation.appliance.applianceType} 을(를) 동작시킵니다.';
+        '후에\n${reservation.roomName}-${reservation.applianceType} 을(를) 동작시킵니다.';
     return message;
   }
 }

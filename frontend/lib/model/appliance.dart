@@ -2,57 +2,64 @@ class Appliance {
   final int roomId;
   final String roomName;
   final int applianceId;
+  final String applianceUUID;
   final String applianceType;
   String imagePath = "";
-  int applianceStatus;
+  String applianceStatus; // 상태를 String으로 변경
 
   Appliance({
     required this.roomId,
     required this.roomName,
     required this.applianceId,
+    required this.applianceUUID,
     required this.applianceType,
-    required this.applianceStatus,
+    required this.applianceStatus, // 타입 변경
   }) {
     imagePath = getImagePath(applianceType);
   }
 
-  // JSON 데이터로부터 Appliance 객체를 생성하는 팩토리 생성자
   factory Appliance.fromJson(Map<String, dynamic> json) {
     return Appliance(
-      roomId: json['roomId'] as int,
-      roomName: json['roomName'] as String,
-      applianceId: json['applianceId'] as int,
-      applianceType: json['applianceType'] as String,
-      applianceStatus: json['applianceStatus'] as int,
+      roomId: json['roomId'],
+      roomName: json['roomName'],
+      applianceId: json['applianceId'],
+      applianceUUID: json['applianceUUID'],
+      applianceType: json['applianceType'],
+      applianceStatus: json['applianceStatus'] == "NULL"
+          ? "OFF"
+          : json['applianceStatus'], // "ON" 또는 "OFF"
     );
   }
 
-  // Appliance 객체를 JSON 데이터로 변환하는 메서드
   Map<String, dynamic> toJson() {
     return {
       'roomId': roomId,
       'roomName': roomName,
       'applianceId': applianceId,
+      'applianceUUID': applianceUUID,
       'applianceType': applianceType,
-      'applianceStatus': applianceStatus,
+      'applianceStatus': applianceStatus, // String 타입 그대로 반환
     };
   }
 
   void togglePower() {
-    applianceStatus = applianceStatus == 1 ? 0 : 1;
+    applianceStatus = applianceStatus == "ON" ? "OFF" : "ON";
   }
 
   static String getImagePath(String applianceType) {
-    return applianceType == "에어컨"
-        ? "asset/img/airConditioner.png"
-        : applianceType == "에어컨"
-            ? "asset/img/curtains.png"
-            : applianceType == "전구"
-                ? "asset/img/light.png"
-                : applianceType == "공기청정기"
-                    ? "asset/img/purifier.png"
-                    : applianceType == "TV"
-                        ? "asset/img/tv.png"
-                        : "asset/img/washingMachine.png";
+    switch (applianceType) {
+      case "에어컨":
+        return "asset/img/airConditioner.png";
+      case "커튼":
+        return "asset/img/curtains.png";
+      case "전구":
+        return "asset/img/light.png";
+      case "공기청정기":
+        return "asset/img/purifier.png";
+      case "TV":
+        return "asset/img/tv.png";
+      default:
+        return "asset/img/washingMachine.png";
+    }
   }
 }

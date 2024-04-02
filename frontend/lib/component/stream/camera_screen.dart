@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:collection';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frontend/socket/socket.dart';
 import 'package:logger/logger.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
@@ -22,17 +23,20 @@ class CameraScreenState extends State<CameraScreen> {
   Uint8List? _currentImage;
   Uint8List? _prevImage;
   late SocketService socketService;
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
-    _initializeWebSocketConnection();
+    initWebSocket();
     _startRendering();
   }
 
-  void _initializeWebSocketConnection() {
-    socketService = SocketService(
-      destination: '/exchange/control.exchange/user.1',
+  void initWebSocket() async {
+    final String? homeId = await secureStorage.read(key: "homeId");
+    socketService = SocketService();
+    socketService.initializeWebSocketConnection(
+      destination: '/exchange/control.exchange/home.$homeId.images',
       onMessageReceived: _onMessageReceived,
     );
   }
@@ -78,6 +82,10 @@ class CameraScreenState extends State<CameraScreen> {
             if (_currentImage != null)
               Positioned.fill(
                 child: Image.memory(_currentImage!),
+              ),
+            if (_prevImage == null && _currentImage == null)
+              const Positioned.fill(
+                child: Text("Data Loading . . ."),
               ),
           ],
         ),

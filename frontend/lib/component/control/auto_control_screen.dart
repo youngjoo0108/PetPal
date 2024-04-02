@@ -1,9 +1,14 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:frontend/const/colors.dart';
 // import 'package:frontend/const/colors.dart';
 import 'package:frontend/model/appliance.dart';
 import 'package:frontend/model/room.dart';
 import 'package:frontend/service/appliance_service.dart';
 import 'package:frontend/service/room_service.dart';
+import 'package:frontend/socket/socket.dart';
 import 'package:logger/logger.dart';
 
 final Logger logger = Logger();
@@ -21,10 +26,13 @@ class _AutoControlScreenState extends State<AutoControlScreen> {
   List<Appliance> appliances = [];
   RoomService roomService = RoomService();
   ApplianceService applianceService = ApplianceService();
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+  SocketService socketService = SocketService();
 
   @override
   void initState() {
     super.initState();
+    socketService.initializeWebSocketConnection();
     _loadRoomsAndAppliances();
   }
 
@@ -51,13 +59,15 @@ class _AutoControlScreenState extends State<AutoControlScreen> {
         .where(
             (appliance) => appliance.roomId == rooms[_selectedRoomIndex].roomId)
         .toList();
+    const int itemsPerPage = 4;
+    final int pageCount = (currentRoomAppliances.length / itemsPerPage).ceil();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           margin: const EdgeInsets.only(left: 30),
-          width: 60,
+          width: 100,
           child: DropdownButton<int>(
             isExpanded: true,
             value: _selectedRoomIndex,
@@ -78,59 +88,28 @@ class _AutoControlScreenState extends State<AutoControlScreen> {
         ),
         Expanded(
           child: PageView.builder(
-            itemCount: currentRoomAppliances.length,
+            itemCount: pageCount,
             itemBuilder: (context, pageIndex) {
+              // 현재 페이지에 표시할 가전제품의 시작 인덱스
+              final int pageStartIndex = pageIndex * itemsPerPage;
+
+              // 현재 페이지에 표시할 가전제품의 종료 인덱스
+              final int pageEndIndex = min(
+                  pageStartIndex + itemsPerPage, currentRoomAppliances.length);
+
               return GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2, // 한 줄에 2개씩
                 ),
-                itemCount: 1,
+                itemCount: pageEndIndex - pageStartIndex,
                 itemBuilder: (context, itemIndex) {
-                  final appliance = currentRoomAppliances[pageIndex];
+                  // 페이지별 인덱스를 전체 목록의 인덱스로 변환
+                  final appliance =
+                      currentRoomAppliances[pageStartIndex + itemIndex];
+
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Card(
-                      color: appliance.applianceStatus == 1
-                          ? Colors.lightGreenAccent
-                          : Colors.grey[100],
-                      child: Stack(
-                        children: [
-                          Center(
-                            child: FractionallySizedBox(
-                              widthFactor: 3 / 7, // 카드 너비의 약 2/3만큼 차지
-                              heightFactor: 3 / 7, // 카드 높이의 약 2/3만큼 차지
-                              child: Image.asset(appliance.imagePath,
-                                  fit: BoxFit.contain),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 10,
-                            left: 0,
-                            right: 0,
-                            child: Text(
-                              appliance.applianceType,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            top: 10,
-                            right: 10,
-                            child: Switch(
-                              value: appliance.applianceStatus == 1,
-                              onChanged: (bool newValue) {
-                                setState(() {
-                                  appliance.applianceStatus = newValue ? 1 : 0;
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    child: buildApplianceCard(appliance),
                   );
                 },
               );
@@ -138,6 +117,59 @@ class _AutoControlScreenState extends State<AutoControlScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget buildApplianceCard(Appliance appliance) {
+    return Card(
+      color: appliance.applianceStatus == "ON" ? lightYellow : Colors.grey[100],
+      child: Stack(
+        children: [
+          Center(
+            child: FractionallySizedBox(
+              widthFactor: 3 / 7,
+              heightFactor: 3 / 7,
+              child: Image.asset(appliance.imagePath, fit: BoxFit.contain),
+            ),
+          ),
+          Positioned(
+            bottom: 10,
+            left: 0,
+            right: 0,
+            child: Text(
+              appliance.applianceType,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+            ),
+          ),
+          Positioned(
+            top: 10,
+            right: 10,
+            child: Switch(
+              value: appliance.applianceStatus == "ON",
+              onChanged: (bool newValue) async {
+                final String? homeId = await secureStorage.read(key: "homeId");
+
+                if (homeId != null) {
+                  // 메시지 전송 로직
+                  final String messageStatus = newValue ? "ON" : "OFF";
+                  socketService.sendMessage(
+                    destination: '/pub/control.message.$homeId',
+                    type: 'IOT',
+                    messageContent: '${appliance.applianceUUID}/$messageStatus',
+                  );
+                  // UI 상태 업데이트
+                  setState(() {
+                    appliance.applianceStatus = newValue ? "ON" : "OFF";
+                  });
+                } else {
+                  logger.e("Home ID not found");
+                }
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

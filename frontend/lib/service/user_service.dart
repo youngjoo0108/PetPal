@@ -1,4 +1,5 @@
 // import 'package:flutter/material.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
@@ -28,8 +29,9 @@ class UserService {
 
       // 로그인 성공 후, 토큰을 안전하게 저장하고 서버에 전송
       await secureStorage.write(key: "isLoggedIn", value: "true");
-      await sendTokenToServer(token.accessToken); // 서버에 토큰 전송 로직 추가
-      await saveUserInfo(token.accessToken);
+      await saveUserInfo(token.accessToken); // 카카오로부터 유저 정보 불러와서 클라에 저장
+      await sendTokenToServer(token.accessToken); // 서버에 토큰 전송 로직
+      await sendFCMTokenToServer(); // FCM 토큰 서버에 저장
 
       return true; // 로그인 성공 반환
     } catch (error) {
@@ -60,6 +62,8 @@ class UserService {
       final Map<String, dynamic> userInfo = json.decode(response.body);
       // final String userName = userInfo['properties']['nickname'];
       await secureStorage.write(
+          key: "userId", value: userInfo['id'].toString());
+      await secureStorage.write(
           key: "nickname", value: userInfo['properties']['nickname']);
       await secureStorage.write(
           key: "profileUrl",
@@ -72,26 +76,6 @@ class UserService {
       // 사용자 정보를 가져오는데 실패한 경우
       throw Exception('Failed to get user info: ${response.statusCode}');
     }
-
-    // 토큰 유효성 검증
-    // final Uri uri1 =
-    //     Uri.parse('https://kapi.kakao.com/v1/user/access_token_info');
-
-    // final http.Response response = await http.get(
-    //   uri1,
-    //   headers: {
-    //     'Authorization': 'Bearer $accessToken',
-    //   },
-    // );
-
-    // if (response.statusCode == 200) {
-    //   // AccessToken이 유효한 경우
-    //   print('Succeeded in validate access token: ${json.decode(response.body)}');
-    // } else {
-    //   // AccessToken이 유효하지 않은 경우
-    //   throw Exception(
-    //       'Failed to validate access token: ${response.statusCode}');
-    // }
   }
 
   // 서버에 토큰을 전송하는 함수
@@ -139,6 +123,32 @@ class UserService {
       }
     } catch (e) {
       logger.e('Error sending token to the server: $e');
+    }
+  }
+
+  Future<void> sendFCMTokenToServer() async {
+    try {
+      // FCM 토큰 가져오기
+      String? fcmToken = await FirebaseMessaging.instance.getToken();
+
+      // 저장된 카카오 사용자 ID 가져오기
+      String? userId = await secureStorage.read(key: "userId");
+      if (userId == null) throw Exception('사용자 ID를 가져올 수 없습니다.');
+
+      // 서버로 FCM 토큰과 카카오 사용자 ID 전송
+      final response = await http.post(
+        Uri.parse('$baseUrl/user/fcm/$userId'),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: jsonEncode({'token': fcmToken}),
+      );
+
+      if (response.statusCode == 200) {
+        logger.d('FCM 토큰이 서버에 성공적으로 전송되었습니다.');
+      } else {
+        logger.e('FCM 토큰 전송 실패: ${response.body}');
+      }
+    } catch (e) {
+      logger.e('FCM 토큰을 서버로 전송하는 중 오류가 발생했습니다: $e');
     }
   }
 }

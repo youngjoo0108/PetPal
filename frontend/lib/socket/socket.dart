@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:frontend/const/time_creator.dart';
 import 'package:logger/logger.dart';
 import 'package:stomp_dart_client/stomp.dart';
 import 'package:stomp_dart_client/stomp_config.dart';
@@ -7,49 +11,76 @@ import 'package:stomp_dart_client/stomp_frame.dart';
 class SocketService {
   late StompClient stompClient;
   final Logger logger = Logger();
-  final String? wsUrl = dotenv.env['WS_URL']; // WebSocket URL
-  Function(StompFrame)? onConnectCallback;
-  Function(dynamic)? onWebSocketError;
-  String destination;
-  Function(StompFrame) onMessageReceived;
+  final String? wsUrl = dotenv.env['WS_URL'];
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
-  SocketService({
-    required this.destination,
-    required this.onMessageReceived,
-    this.onConnectCallback,
-    this.onWebSocketError,
-  }) {
-    _initializeWebSocketConnection();
-  }
-
-  void _initializeWebSocketConnection() {
+  // 연결 초기화 및 선택적으로 구독 시작
+  void initializeWebSocketConnection(
+      {String? destination, Function(StompFrame)? onMessageReceived}) {
     stompClient = StompClient(
       config: StompConfig(
         url: wsUrl!,
-        onConnect: onConnectCallback ?? _defaultOnConnect,
+        onConnect: (StompFrame frame) {
+          logger.d('Connected to WebSocket');
+          if (destination != null && onMessageReceived != null) {
+            subscribeToDestination(destination, onMessageReceived);
+          }
+        },
         beforeConnect: () async {
           logger.d('Waiting to connect...');
-          logger.d('Connecting...');
         },
-        onWebSocketError: onWebSocketError ?? _defaultWebSocketError,
+        onWebSocketError: _defaultWebSocketError,
       ),
     );
     stompClient.activate();
   }
 
-  void _defaultOnConnect(StompFrame frame) {
-    subscribeToDestination(destination);
-  }
-
-  void subscribeToDestination(String destination) {
+  void subscribeToDestination(
+      String destination, Function(StompFrame) onMessageReceived) {
     stompClient.subscribe(
       destination: destination,
       callback: onMessageReceived,
     );
+    logger.d('Subscribed to $destination');
+  }
+
+  void sendMessage({
+    required String destination,
+    required String type,
+    required String messageContent,
+  }) async {
+    logger.d('stompClient Connection: ${stompClient.connected}');
+    final String? userId = await secureStorage.read(key: "userId");
+    var message = jsonEncode({
+      'type': type,
+      'sender': '$userId',
+      'time': TimeCreator.nowInKorea().toIso8601String(),
+      'message': messageContent,
+    });
+
+    send(destination, message);
+  }
+
+  void send(String destination, String message,
+      {Map<String, String>? headers}) {
+    final Map<String, String> defaultHeaders = {
+      'Content-Type': 'application/json',
+    };
+
+    final Map<String, String> resolvedHeaders = {}
+      ..addAll(defaultHeaders)
+      ..addAll(headers ?? {});
+
+    stompClient.send(
+      destination: destination,
+      body: message,
+      headers: resolvedHeaders,
+    );
+    logger.d('Message sent to $destination: $message');
   }
 
   void _defaultWebSocketError(dynamic error) {
-    logger.e(error.toString());
+    logger.e('WebSocket Error: $error');
   }
 
   void deactivate() {
