@@ -1,11 +1,11 @@
 package com.ssafy.petpal.home.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
+import lombok.*;
 
 @Data
 @Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class HomeRequestDTO {
 
