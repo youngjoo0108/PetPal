@@ -84,7 +84,7 @@ class mapSetting(Node):
             # if self.is_goal: # 도착한 경우 새 목적지 설정
                 #print(now_grid_cell)
             if 100 <= self.map_to_grid[now_grid_cell[0], now_grid_cell[1]]:
-                if self.count2 >= 10:
+                if self.count2 >= 5:
                     self.count2 = 0
                     self.error_msg.data = 4
                     #print('error4')

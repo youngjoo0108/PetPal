@@ -65,7 +65,8 @@ class device(Node):
     def iot_cmd_callback(self, msg):
         if self.is_odom:
             self.is_state_change = False
-            self.now_device = msg.data
+            self.now_device = msg.iot_uuid
+            self.cmd = msg.control_action
 
     def path_callback(self, msg):
         self.is_path = True
