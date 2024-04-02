@@ -61,7 +61,7 @@ public class ControlController {
 
     @MessageMapping("control.message.{homeId}")
     public void sendMessage(@Payload String rawMessage, @DestinationVariable Long homeId) throws IOException {
-//        logger.info("Received message: {}", rawMessage);
+        log.info("Received message: {}", rawMessage);
         ControlDto controlDto = objectMapper.readValue(rawMessage, ControlDto.class);
         String type = controlDto.getType();
         switch (type){
