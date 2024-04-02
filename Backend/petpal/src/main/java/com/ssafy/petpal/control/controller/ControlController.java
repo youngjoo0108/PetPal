@@ -19,6 +19,7 @@ import com.ssafy.petpal.route.service.RouteService;
 import com.ssafy.petpal.user.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,7 @@ import java.time.format.DateTimeFormatter;
 @Controller
 //@RequiredArgsConstructor
 @AllArgsConstructor
+@Slf4j
 public class ControlController {
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
@@ -153,7 +155,7 @@ public class ControlController {
 
     @RabbitListener(queues = CONTROL_QUEUE_NAME)
     public void receive(ControlDto controlDto) {
-//        logger.info(" log : " + controlDto);
+        log.info(" log : " + controlDto);
     }
 
 
