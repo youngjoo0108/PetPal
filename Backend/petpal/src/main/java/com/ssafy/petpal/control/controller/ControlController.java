@@ -92,6 +92,7 @@ public class ControlController {
             case "WEATHER": case "TURTLE":
             case "SCAN": case "IOT": case "MODE":
             case "REGISTER_REQUEST" : case "REGISTER_RESPONSE":
+            case "COMPLETE": //이건 스캔 완료 COMPLETE
                 rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
                 break;
             case "O_COMPLETE":
