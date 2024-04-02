@@ -42,7 +42,7 @@ setup(
             'astarlocal=test_209.a_star_local:main',
 
             # iot control
-            'iot=test_209.iot_control:main',
+            'iot_con=test_209.iot_control:main',
             'handcontrol=test_209.hand_control:main',
             'iot_test=test_209.iot_test:main',
             'iot_room1=test_209.iot_room1:main',
@@ -64,6 +64,7 @@ setup(
             'iot_user=test_209.iot_user_input:main',
             'scheduler=test_209.scheduler:main',
             'tt=test_209.tt:main',
+            'ttt=test_209.ttt:main',
         ],
     },
 )

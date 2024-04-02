@@ -30,14 +30,14 @@ FSM = {
         "scan_off" : "stay",
     },
     "patrol" : {
-        "patrol_off" : "stay",
+        "off" : "stay",
         "tracking_on" : "search",
         "interrupt_on" : "interrupt",
         "iot_on" : "iot",
         "obstacle_on" : "obstacle",
     },
     "search" : {
-        "tracking_off" : "stay",
+        "off" : "stay",
         "patrol_on" : "patrol",
         "found" : "tracking",
         "interrupt_on" : "interrupt",
@@ -45,7 +45,7 @@ FSM = {
         "obstacle_on" : "obstacle",
     },
     "tracking" : {
-        "tracking_off" : "stay",
+        "off" : "stay",
         "patrol_on" : "patrol",
         "lost" : "search",
         "interrupt_on" : "interrupt",

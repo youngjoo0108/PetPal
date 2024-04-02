@@ -1,4 +1,4 @@
-import rclpy
+import rclpy, json
 from rclpy.node import Node
 from std_msgs.msg import String, Int32
 import numpy as np
@@ -15,8 +15,10 @@ class device(Node):
         self.iot_sub = self.create_subscription(IotInfo, '/iot', self.iot_callback, 10)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 1)
         self.iot_cmd_sub = self.create_subscription(IotCmd, '/iot_cmd', self.iot_cmd_callback, 10)
-        self.path_sub = self.create_subscription(Path, '/local_path', self.path_callback, 10)
         self.goal_pub = self.create_publisher(PoseStamped, 'goal_pose', 10)
+        self.request_pub = self.create_publisher(String, 'request', 10)
+        self.err_pub = self.create_publisher(Int32, 'err', 10)
+        self.data_pub = self.create_publisher(String, '/to_server/data', 10)
         self.timer = self.create_timer(0.1, self.timer_callback)
 
         self.iot_control = iot_udp()
@@ -28,10 +30,10 @@ class device(Node):
         self.odom_msg = Odometry()
         self.goal_msg = PoseStamped()
         self.goal_msg.header.frame_id = 'map'
-        self.path_msg = Path()
+        self.request_msg = String()
+        self.data_msg = String()
 
         self.is_odom = False
-        self.is_iot = False
         self.is_path = False
         self.is_state_change = True
 
@@ -48,15 +50,14 @@ class device(Node):
 
     def iot_callback(self, msg):
         self.iot_msg = msg
-        self.is_iot = True
 
-        if self.is_odom:
-            if not msg.uid in self.devices:
-                x = self.odom_msg.pose.pose.position.x
-                y = self.odom_msg.pose.pose.position.y
-                self.devices[msg.uid] = (x, y)
-                self.device_uid.append(msg.uid)
-                self.f.write('{0} {1} {2}\n'.format(msg.uid, x, y))
+        # if self.is_odom:
+        #     if not msg.uid in self.devices:
+        #         x = self.odom_msg.pose.pose.position.x
+        #         y = self.odom_msg.pose.pose.position.y
+        #         self.devices[msg.uid] = (x, y)
+        #         self.device_uid.append(msg.uid)
+        #         self.f.write('{0} {1} {2}\n'.format(msg.uid, x, y))
 
     def odom_callback(self, msg):
         self.is_odom = True
@@ -64,21 +65,46 @@ class device(Node):
 
     def iot_cmd_callback(self, msg):
         if self.is_odom:
-            self.is_state_change = False
             self.now_device = msg.iot_uuid
             self.cmd = msg.control_action
 
-    def path_callback(self, msg):
-        self.is_path = True
-        self.path_msg = msg
+            if self.cmd == "register":
+                if not self.iot_msg.uid in self.devices:
+                    x = self.odom_msg.pose.pose.position.x
+                    y = self.odom_msg.pose.pose.position.y
+                    self.devices[self.iot_msg.uid] = (x, y)
+                    self.device_uid.append(self.iot_msg.uid)
+                    self.f.write('{0} {1} {2}\n'.format(self.iot_msg.uid, x, y))
+                
+                temp = {
+                    'type' : 'REGISTER_RESPONSE',
+                    'message' : self.iot_msg.uid
+                }
+                data = json.dumps(temp)
+                self.data_msg.data = data
+                self.data_pub.publish(self.data_msg)
+            else:
+                self.request_msg.data = "iot_on"
+                self.request_pub.publish(self.request_msg)
+                self.is_state_change = False
+
 
     def timer_callback(self):
-        if self.is_iot and self.is_state_change == False:
+        if self.is_state_change == False:
+
             if self.now_device == self.iot_msg.uid:
+                err_msg = Int32()
+                err_msg.data = 0
+                self.err_pub.publish(err_msg)
                 self.iot_control.user_cmd(self.now_device, self.cmd)
                 self.is_state_change = True
                 self.now_device = None
+                self.request_msg.data = "iot_off"
+                self.request_pub.publish(self.request_msg)
             else:
+                err_msg = Int32()
+                err_msg.data = 1
+                self.err_pub.publish(err_msg)
                 goal = self.devices[self.now_device]
                 #print(goal)
                 self.goal_msg.pose.position.x = float(goal[0])

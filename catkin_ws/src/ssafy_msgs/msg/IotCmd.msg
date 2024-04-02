@@ -1,2 +1,2 @@
 string iot_uuid
-string control_actoin
+string control_action
