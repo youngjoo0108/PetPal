@@ -67,15 +67,13 @@ public class ApplianceService {
         list.forEach(appliance -> {
             String applianceStatus = getApplianceStatus(appliance.getHomeId(), appliance.getApplianceId());
             if(applianceStatus==null){
-                appliance.setApplianceStatus(
-                    "OFF"
-                );
-            }else{
-                appliance.setApplianceStatus(
-                    applianceStatus
-                );
+                redisTemplate.opsForValue().set("home:"+appliance.getHomeId()+":appliance:"+appliance.getApplianceId(),"OFF");
+                applianceStatus="OFF";
             }
 
+            appliance.setApplianceStatus(
+                applianceStatus
+            );
         });
         return list;
 
