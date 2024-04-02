@@ -10,8 +10,12 @@ import 'package:frontend/controller/menu_tab_controller.dart';
 import 'package:frontend/const/colors.dart';
 import 'package:frontend/service/room_service.dart';
 import 'package:frontend/socket/socket.dart';
+import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
 import 'login_screen.dart';
+
+Logger logger = Logger();
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -23,12 +27,13 @@ class MenuScreen extends StatefulWidget {
 class _MenuScreenState extends State<MenuScreen> {
   MenuTabController menuTabController = MenuTabController();
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-  SocketService socketService = SocketService();
+  final SocketController socketController = Get.find<SocketController>();
   MapDataController mapDataController = MapDataController();
 
   void _getHomeScanResponse(StompFrame frame) {
     final data = json.decode(frame.body ?? '{}');
     if (data['type'] == 'COMPLETE') {
+      logger.d("HOME SCAN COMPLETE");
       mapDataController.fetchMapData();
     }
   }
@@ -36,19 +41,23 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   void initState() {
     super.initState();
-    socketService.initializeWebSocketConnection();
     // 콜백 함수를 포함하여 MenuTabController 초기화
     menuTabController = MenuTabController(
       onHomeScan: () async {
         final String? homeId = await secureStorage.read(key: "homeId");
-        socketService.subscribeToDestination(
+        socketController.subscribeToDestination(
           "/exchange/control.exchange/home.$homeId",
           _getHomeScanResponse,
         );
-        socketService.sendMessage(
+        socketController.sendMessage(
           destination: '/pub/control.message.$homeId',
           type: 'SCAN',
           messageContent: '',
+        );
+        GlobalAlertDialog.show(
+          context,
+          title: "알림",
+          message: "홈스캔을 시작합니다.\n홈스캔이 완료되면 알림이 제공됩니다.",
         );
       },
       onManageRoom: () {
@@ -171,7 +180,6 @@ class _MenuScreenState extends State<MenuScreen> {
 
   @override
   void dispose() {
-    socketService.deactivate();
     super.dispose();
   }
 }

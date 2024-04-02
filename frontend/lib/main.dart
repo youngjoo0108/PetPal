@@ -7,6 +7,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frontend/const/secure_storage.dart';
 import 'package:frontend/screen/login_screen.dart';
 import 'package:frontend/screen/main_screen.dart';
+import 'package:frontend/socket/socket.dart';
+import 'package:get/get.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -134,6 +136,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(SocketController());
     return MaterialApp(
       home: FutureBuilder(
         future: secureStorage.getLoginStatus("isLoggedIn"),

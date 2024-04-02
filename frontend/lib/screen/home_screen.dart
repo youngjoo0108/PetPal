@@ -4,7 +4,9 @@ import 'package:frontend/component/stream/camera_screen.dart';
 import 'package:frontend/component/stream/map_screen.dart';
 import 'package:frontend/component/weather/weather_screen.dart';
 import 'package:frontend/const/colors.dart';
+import 'package:frontend/const/global_alert_dialog.dart';
 import 'package:frontend/socket/socket.dart';
+import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 final Logger logger = Logger();
@@ -20,11 +22,10 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isOn = false;
   bool isPatrollingMode = true;
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-  SocketService socketService = SocketService();
+  final SocketController socketController = Get.find<SocketController>();
 
   @override
   void initState() {
-    socketService.initializeWebSocketConnection();
     super.initState();
   }
 
@@ -48,10 +49,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             await secureStorage.read(key: "homeId");
                         if (homeId != null) {
                           // 메시지 전송 로직
-                          socketService.sendMessage(
+                          socketController.sendMessage(
                             destination: '/pub/control.message.$homeId',
                             type: 'MODE',
                             messageContent: 'patrol',
+                          );
+                          GlobalAlertDialog.show(
+                            context,
+                            title: "알림",
+                            message: "기기 동작을 시작합니다.",
                           );
                           // UI 상태 업데이트
                           setState(() {
@@ -87,10 +93,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             await secureStorage.read(key: "homeId");
                         if (homeId != null) {
                           // 메시지 전송 로직
-                          socketService.sendMessage(
+                          socketController.sendMessage(
                             destination: '/pub/control.message.$homeId',
                             type: 'MODE',
                             messageContent: 'stay',
+                          );
+                          GlobalAlertDialog.show(
+                            context,
+                            title: "알림",
+                            message: "기기 동작을 종료합니다.",
                           );
                           // UI 상태 업데이트
                           setState(() {
@@ -133,12 +144,19 @@ class _HomeScreenState extends State<HomeScreen> {
                             await secureStorage.read(key: "homeId");
                         final String message =
                             isPatrollingMode ? "patrol" : "tracking";
+                        String messageInDialog =
+                            message == "patrol" ? "순찰" : "트래킹";
                         if (homeId != null) {
                           // 메시지 전송 로직
-                          socketService.sendMessage(
+                          socketController.sendMessage(
                             destination: '/pub/control.message.$homeId',
                             type: 'MODE',
                             messageContent: message,
+                          );
+                          GlobalAlertDialog.show(
+                            context,
+                            title: "알림",
+                            message: "$messageInDialog모드로 전환합니다.",
                           );
                           // UI 상태 업데이트
                           setState(() {

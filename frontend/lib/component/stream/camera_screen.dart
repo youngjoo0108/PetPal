@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frontend/socket/socket.dart';
+import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
 
@@ -22,7 +23,7 @@ class CameraScreenState extends State<CameraScreen> {
   late Timer _renderTimer;
   Uint8List? _currentImage;
   Uint8List? _prevImage;
-  late SocketService socketService;
+  final SocketController socketController = Get.find<SocketController>();
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
   @override
@@ -34,8 +35,7 @@ class CameraScreenState extends State<CameraScreen> {
 
   void initWebSocket() async {
     final String? homeId = await secureStorage.read(key: "homeId");
-    socketService = SocketService();
-    socketService.initializeWebSocketConnection(
+    socketController.initializeWebSocketConnection(
       destination: '/exchange/control.exchange/home.$homeId.images',
       onMessageReceived: _onMessageReceived,
     );
@@ -95,7 +95,6 @@ class CameraScreenState extends State<CameraScreen> {
 
   @override
   void dispose() {
-    socketService.deactivate();
     _renderTimer.cancel();
     super.dispose();
   }

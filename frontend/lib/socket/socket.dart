@@ -1,5 +1,5 @@
+import 'package:get/get.dart';
 import 'dart:convert';
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frontend/const/time_creator.dart';
@@ -8,11 +8,17 @@ import 'package:stomp_dart_client/stomp.dart';
 import 'package:stomp_dart_client/stomp_config.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
 
-class SocketService {
+class SocketController extends GetxController {
   late StompClient stompClient;
   final Logger logger = Logger();
   final String? wsUrl = dotenv.env['WS_URL'];
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+
+  @override
+  void onInit() {
+    super.onInit();
+    initializeWebSocketConnection();
+  }
 
   // 연결 초기화 및 선택적으로 구독 시작
   void initializeWebSocketConnection(
@@ -83,7 +89,15 @@ class SocketService {
     logger.e('WebSocket Error: $error');
   }
 
+  @override
+  void onClose() {
+    super.onClose();
+    deactivate();
+  }
+
   void deactivate() {
-    stompClient.deactivate();
+    if (stompClient.connected) {
+      stompClient.deactivate();
+    }
   }
 }

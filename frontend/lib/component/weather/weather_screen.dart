@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frontend/component/weather/indoor_screen.dart';
 import 'package:frontend/component/weather/outdoor_screen.dart';
 import 'package:frontend/service/fetch_weather.dart';
 import 'package:frontend/socket/socket.dart';
+import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
 
@@ -23,12 +25,13 @@ class _WeatherScreenState extends State<WeatherScreen> {
   int? outHum;
   int? feelLike;
   String? weather;
-  late SocketService socketService;
+  final SocketController socketController = Get.find<SocketController>();
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
-    _initializeWebSocketConnection();
+    initWebSocket();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       fetchWeather('Seoul').then((data) {
         if (mounted) {
@@ -48,14 +51,18 @@ class _WeatherScreenState extends State<WeatherScreen> {
     });
   }
 
-  void _initializeWebSocketConnection() {
-    socketService = SocketService();
+  void initWebSocket() async {
+    final String? homeId = await secureStorage.read(key: "homeId");
+    socketController.initializeWebSocketConnection(
+      destination: '/exchange/control.exchange/home.$homeId',
+      onMessageReceived: _onMessageReceived,
+    );
   }
 
   void _onMessageReceived(StompFrame frame) {
     if (frame.body != null) {
       final data = json.decode(frame.body!);
-      if (data['type'] == "video_streaming") {
+      if (data['type'] == "weather") {
         /*
         날씨 data + 실내 온도 data 받아서 처리
          */

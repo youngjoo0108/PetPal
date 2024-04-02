@@ -27,6 +27,7 @@ class MapDataController extends GetxController {
       final responseBody = utf8.decode(response.bodyBytes);
       // 서버로부터 받은 mapData를 업데이트합니다.
       mapData.value = jsonDecode(responseBody);
+      logger.d("SUCCEED TO FETCH MAP DATA");
     } else {
       // 요청 실패 처리
       logger.e('Failed to fetch mapdata'); // 실제 앱에서는 logger 등을 사용할 수 있습니다.

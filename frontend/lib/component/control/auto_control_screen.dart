@@ -3,12 +3,14 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frontend/const/colors.dart';
+import 'package:frontend/const/global_alert_dialog.dart';
 // import 'package:frontend/const/colors.dart';
 import 'package:frontend/model/appliance.dart';
 import 'package:frontend/model/room.dart';
 import 'package:frontend/service/appliance_service.dart';
 import 'package:frontend/service/room_service.dart';
 import 'package:frontend/socket/socket.dart';
+import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 final Logger logger = Logger();
@@ -27,12 +29,11 @@ class _AutoControlScreenState extends State<AutoControlScreen> {
   RoomService roomService = RoomService();
   ApplianceService applianceService = ApplianceService();
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-  SocketService socketService = SocketService();
+  final SocketController socketController = Get.find<SocketController>();
 
   @override
   void initState() {
     super.initState();
-    socketService.initializeWebSocketConnection();
     _loadRoomsAndAppliances();
   }
 
@@ -153,10 +154,17 @@ class _AutoControlScreenState extends State<AutoControlScreen> {
                 if (homeId != null) {
                   // 메시지 전송 로직
                   final String messageStatus = newValue ? "ON" : "OFF";
-                  socketService.sendMessage(
+                  socketController.sendMessage(
                     destination: '/pub/control.message.$homeId',
                     type: 'IOT',
                     messageContent: '${appliance.applianceUUID}/$messageStatus',
+                  );
+                  String message = messageStatus == "ON" ? "켭" : "끕";
+                  GlobalAlertDialog.show(
+                    context,
+                    title: "알림",
+                    message:
+                        "${appliance.roomName}-${appliance.applianceType}을(를) $message니다.",
                   );
                   // UI 상태 업데이트
                   setState(() {

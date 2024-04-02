@@ -52,7 +52,7 @@ class Appliance {
         return "asset/img/airConditioner.png";
       case "커튼":
         return "asset/img/curtains.png";
-      case "전구":
+      case "전등":
         return "asset/img/light.png";
       case "공기청정기":
         return "asset/img/purifier.png";

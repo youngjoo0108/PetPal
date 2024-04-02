@@ -8,7 +8,11 @@ import 'package:frontend/const/global_alert_dialog.dart';
 import 'package:frontend/model/appliance.dart';
 import 'package:frontend/service/appliance_service.dart';
 import 'package:frontend/socket/socket.dart';
+import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
+
+final Logger logger = Logger();
 
 class ApplianceManagement extends StatefulWidget {
   const ApplianceManagement({super.key});
@@ -21,7 +25,7 @@ class ApplianceManagementState extends State<ApplianceManagement> {
   final ApplianceService _applianceService = ApplianceService();
   List<Appliance> appliances = [];
   bool isLoading = true;
-  SocketService socketService = SocketService();
+  final SocketController socketController = Get.find<SocketController>();
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   late String scannedApplianceUUID;
   bool _isRegistering = false;
@@ -29,7 +33,6 @@ class ApplianceManagementState extends State<ApplianceManagement> {
   @override
   void initState() {
     super.initState();
-    socketService.initializeWebSocketConnection();
     _fetchAppliances();
   }
 
@@ -119,11 +122,11 @@ class ApplianceManagementState extends State<ApplianceManagement> {
           setState(() {
             _isRegistering = true; // 로딩 시작
           });
-          socketService.subscribeToDestination(
+          socketController.subscribeToDestination(
             "/exchange/control.exchange/home.$homeId",
             _getApplianceUUID,
           );
-          socketService.sendMessage(
+          socketController.sendMessage(
             destination: '/pub/control.message.$homeId',
             type: 'REGISTER_REQUEST',
             messageContent: '',
@@ -138,10 +141,12 @@ class ApplianceManagementState extends State<ApplianceManagement> {
   void _getApplianceUUID(StompFrame frame) {
     final data = json.decode(frame.body ?? '{}');
     if (data['type'] == 'REGISTER_RESPONSE') {
+      logger.d("Succeed to register IOT");
       setState(() {
         _isRegistering = false; // 로딩 종료
       });
       scannedApplianceUUID = data['message'];
+      logger.d("scannedApplianceUUID: $scannedApplianceUUID");
       GlobalAlertDialog.show(
         context,
         title: "알림",
