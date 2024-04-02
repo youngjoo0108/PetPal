@@ -11,6 +11,8 @@ public class ApplianceResponseDto {
     // roomName(roomId), applianceType(applianceId), applianceStatus
     private Long applianceId;
 
+    private String applianceUUID;
+
     private String applianceType;
 
     private String applianceStatus;
@@ -25,8 +27,9 @@ public class ApplianceResponseDto {
         this.applianceStatus = status;
     }
 
-    public ApplianceResponseDto(Long applianceId, String applianceType, Long homeId, Long roomId, String roomName) {
+    public ApplianceResponseDto(Long applianceId, String applianceUUID, String applianceType, Long homeId, Long roomId, String roomName) {
         this.applianceId = applianceId;
+        this.applianceUUID = applianceUUID;
         this.applianceType = applianceType;
         this.applianceStatus = null;
         this.homeId = homeId;
