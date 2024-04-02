@@ -38,6 +38,7 @@ class WebSocketClientReceiveNode(Node):
         except:
             self.ros_log_pub.publish_log('ERROR', 'init publisher_data_classify error: {}'.format(e))
         
+        '''
         # try:
         #     self.publisher_yolo = self.create_publisher(String, 'captured_object', 10)
         # except:
@@ -57,7 +58,7 @@ class WebSocketClientReceiveNode(Node):
         #     self.request_pub = self.create_publisher(String, '/request', 10)
         # except:
         #     self.ros_log_pub.publish_log('ERROR', 'init publisher iot control error: {}'.format(e))
-        
+        '''
         self.ws_url = "wss://j10a209.p.ssafy.io/api/ws"
         self.websocket = None
 
