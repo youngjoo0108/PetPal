@@ -136,18 +136,18 @@ public class ControlController {
 //            case "SCAN":
 //                rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
 //                break;
-            case "COMPLETE":
-                // 날것의 맵
-                // dtoMapper로 만들어서
-                // mapService.createMap(dto)
-                // 메세지 발행(깎은 맵이 들어가있다)
-                MapDto mapDto = mapService.createMap(homeId, controlDto.getMessage());
-                rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, mapDto);
-                break;
-            case "ROUTE":
-                // 경로 저장 repository
-                RouteDto routeDto = routeService.saveRoute(homeId, controlDto.getMessage());
-                break;
+//            case "COMPLETE":
+//                // 날것의 맵
+//                // dtoMapper로 만들어서
+//                // mapService.createMap(dto)
+//                // 메세지 발행(깎은 맵이 들어가있다)
+//                MapDto mapDto = mapService.createMap(homeId, controlDto.getMessage());
+//                rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, mapDto);
+//                break;
+//            case "ROUTE":
+//                // 경로 저장 repository
+//                RouteDto routeDto = routeService.saveRoute(homeId, controlDto.getMessage());
+//                break;
         }
     }
 

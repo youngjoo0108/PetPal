@@ -1,6 +1,7 @@
 package com.ssafy.petpal.map.controller;
 
 import com.ssafy.petpal.map.dto.MapDto;
+import com.ssafy.petpal.map.dto.OriginMapDto;
 import com.ssafy.petpal.map.entity.Map;
 import com.ssafy.petpal.map.repository.MapRepository;
 import com.ssafy.petpal.map.service.MapService;
@@ -30,7 +31,27 @@ public class MapController {
     @PostMapping
     public ResponseEntity<MapDto> saveMapData(@RequestBody MapDto mapDto) {
         try {
-            MapDto savedMapDto = mapService.createMap(mapDto.getHomeId().toString(), mapDto.getData());
+            MapDto savedMapDto = mapService.saveMapData(mapDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedMapDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/{homeId}/origin")
+    public ResponseEntity<OriginMapDto> getOriginMapData(@PathVariable Long homeId) {
+        try {
+            OriginMapDto originMapDto = mapService.getOriginMapData(homeId);
+            return ResponseEntity.ok(originMapDto);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/origin")
+    public ResponseEntity<OriginMapDto> saveOriginMapData(@RequestBody OriginMapDto originMapDto) {
+        try {
+            OriginMapDto savedMapDto = mapService.saveOriginMapData(originMapDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedMapDto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
