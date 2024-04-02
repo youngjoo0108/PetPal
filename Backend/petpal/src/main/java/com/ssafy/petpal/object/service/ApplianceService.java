@@ -65,9 +65,17 @@ public class ApplianceService {
     public List<ApplianceResponseDto> fetchAllApplianceByRoomId(Long roomId){
         List<ApplianceResponseDto> list = applianceRepository.findAllByRoomId(roomId);
         list.forEach(appliance -> {
-            appliance.setApplianceStatus(
-                    getApplianceStatus(appliance.getHomeId(), appliance.getApplianceId())
-            );
+            String applianceStatus = getApplianceStatus(appliance.getHomeId(), appliance.getApplianceId());
+            if(applianceStatus==null){
+                appliance.setApplianceStatus(
+                    "OFF"
+                );
+            }else{
+                appliance.setApplianceStatus(
+                    applianceStatus
+                );
+            }
+
         });
         return list;
 
