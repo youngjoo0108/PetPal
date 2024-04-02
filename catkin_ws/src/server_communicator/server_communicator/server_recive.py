@@ -34,6 +34,11 @@ class WebSocketClientReceiveNode(Node):
             self.publisher_yolo = self.create_publisher(String, 'captured_object', 10)
         except:
             self.ros_log_pub.publish_log('ERROR', 'init publisher yolo error: {}'.format(e))
+            
+        try:
+            self.publisher_iot_control = self.create_publisher(String, '/iot_cmd', 10)
+        except:
+            self.ros_log_pub.publish_log('ERROR', 'init publisher iot control error: {}'.format(e))
         
         self.ws_url = "wss://j10a209.p.ssafy.io/api/ws"
         self.websocket = None
@@ -104,9 +109,22 @@ class WebSocketClientReceiveNode(Node):
                             msg.data = json_str
                             # print('send list:', json_str)
                             self.publisher_yolo.publish(msg)
-                        else:
-                            print(message_data)
+                        elif message_data.get('type') == "IOT":
+                            topic_data = message_data['message']
+                            slice_point = topic_data.find('/')
+                            iot_control_data = {
+                                'iot_uuid': topic_data[:slice_point - 1],
+                                'control_action': topic_data[slice_point + 1:]
+                            }
                             
+                            msg = String()
+                            msg.data = json.dumps(iot_control_data)
+                            
+                            self.publisher_iot_control.publish(msg)
+                            print(message_data)
+                        elif message_data.get('type') == "SCAN":
+            
+                            print(message_data)
                             
                             
                     except json.JSONDecodeError as e:
