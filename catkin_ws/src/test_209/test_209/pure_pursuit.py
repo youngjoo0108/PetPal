@@ -153,7 +153,9 @@ class PurePursuit(Node):
 
                 lookahead_point = self.find_lookahead_point(path_points, robot_pose_x, robot_pose_y)
             
-                if lookahead_point is not None:
+                # if lookahead_point is not None:
+                if len(self.path_msg.poses) > 1 and lookahead_point is not None:
+
                     if self.fsm_msg.data == "patrol" or self.fsm_msg.data == 'search':
                         self.is_goal = False
                     robot_orientation_q = self.odom_msg.pose.pose.orientation
@@ -221,6 +223,9 @@ class PurePursuit(Node):
                         self.patrol_msg.data = 1
                         self.is_goal = True
                         self.patrol_pub.publish(self.patrol_msg)
+                    elif self.fsm_msg.data == 'iot' and self.scan_err_msg.data == 1:
+                        self.cmd_msg.linear.x = 0.2
+                        self.cmd_msg.angular.z = 0.0
 
         self.cmd_pub.publish(self.cmd_msg)
 

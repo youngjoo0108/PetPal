@@ -195,7 +195,7 @@ class iot_udp(Node):
             self.connect(uid)
 
         time.sleep(0.5)
-        
+
         if cmd == "ON":
             while True:
                 if self.recv_data[2] == 0:
@@ -213,10 +213,12 @@ class iot_udp(Node):
             if self.recv_data[1] == 0:
                 break
             self.disconnect(uid)
+        
+        self.now_device = None
 
     def __del__(self):
         self.sock.close()
-        print('del')
+        #print('del')
 
 
 def main(args=None):

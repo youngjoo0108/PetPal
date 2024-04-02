@@ -25,9 +25,9 @@ def generate_launch_description():
             node_executable = 'purefollow',
             node_name = 'purefollow',
         ),
-        # Node(
-        #     package = 'yolo_package',
-        #     node_executable = 'yolo',
-        #     node_name = 'yolo',
-        # ),
+        Node(
+            package = 'test_209',
+            node_executable = 'iot_con',
+            node_name = 'iot_con',
+        ),
     ])

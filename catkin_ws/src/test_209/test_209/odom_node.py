@@ -21,7 +21,7 @@ class odom(Node):
         self.subscription = self.create_subscription(TurtlebotStatus,'/turtlebot_status',self.listener_callback,10)
         self.imu_sub = self.create_subscription(Imu,'/imu',self.imu_callback,10)
         self.odom_publisher = self.create_publisher(Odometry, 'odom', 10)
-        self.sock_pub = self.create_publisher(String, '')
+        #self.sock_pub = self.create_publisher(String, '')
         self.broadcaster = tf2_ros.StaticTransformBroadcaster(self)
 
         # self.timer = self.create_timer(1, self.timer_callback)
