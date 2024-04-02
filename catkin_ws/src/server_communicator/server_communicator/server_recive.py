@@ -21,6 +21,8 @@ dogs = ['Dog']
 humans = ['Person']
 iots = ['AirConditioner', 'TV']
 
+debug_mode = True
+
 class WebSocketClientReceiveNode(Node):
     def __init__(self):
         super().__init__('websocket_client_receive_node')
@@ -82,7 +84,9 @@ class WebSocketClientReceiveNode(Node):
                 await self.ensure_websocket_connected()
                 
                 message = await self.websocket.recv()
-                # print(f"Received message: {message}")
+                
+                if debug_mode:
+                    print(f"Received message: {message}")
                 
                 if message:
                     try:
@@ -128,6 +132,8 @@ class WebSocketClientReceiveNode(Node):
                     except json.JSONDecodeError as e:
                         self.ros_log_pub.publish_log('ERROR', f'Decode Json message error: {e}')
             except Exception as e:
+                if debug_mode:
+                    print('ERROR', f'Receiving message error: {e}')
                 self.ros_log_pub.publish_log('ERROR', f'Receiving message error: {e}')
                 self.websocket = None  # 연결 오류 시 websocket을 None으로 재설정
 
@@ -166,9 +172,6 @@ class WebSocketClientReceiveNode(Node):
                 'iot_list': iot_list
             }
         return topic_data
-    
-    # async def obj_component(self):
-    #     return time_str + '/' + class_list[label] + '/'+str(round(confidence, 2)) + '%' + '/' + str(xmin) + '-' + str(ymin) + '/' + str(xmax) + '-' + str(ymax)
         
 def main(args=None):
     rclpy.init(args=args)
