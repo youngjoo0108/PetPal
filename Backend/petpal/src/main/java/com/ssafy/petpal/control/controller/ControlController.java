@@ -90,6 +90,7 @@ public class ControlController {
                 break;
             case "ON": case "OFF":
             case "WEATHER": case "TURTLE":
+            case "SCAN": case "TRACK": case "PATROL":
                 rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
                 break;
             case "O_COMPLETE":
@@ -130,9 +131,9 @@ public class ControlController {
         ControlDto controlDto = objectMapper.readValue(rawMessage, ControlDto.class);
         String type = controlDto.getType();
         switch (type){
-            case "SCAN":
-                rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
-                break;
+//            case "SCAN":
+//                rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
+//                break;
             case "COMPLETE":
                 // 날것의 맵
                 // dtoMapper로 만들어서

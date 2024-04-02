@@ -96,4 +96,12 @@ public class MapService {
             System.out.println();
         }
     }
+
+    public MapDto getMapData(Long homeId) {
+        return mapRepository.findByHomeId(homeId).map(map -> new MapDto(map.getHomeId(), map.getData()))
+                .orElseThrow(() -> new RuntimeException("Map not found with homeId: " + homeId));
+    }
+
+
+
 }
