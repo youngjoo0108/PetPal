@@ -95,10 +95,10 @@ class WebSocketClientSendNode(Node):
             }
             
             await self.ensure_websocket_connected() # 변경: 메시지 전송 전에 웹소켓 연결 상태 확인
-            send = stomper.send("/pub/images.stream.1.images", json.dumps(msg))
+            send = stomper.send("/pub/images.stream.2.images", json.dumps(msg))
             await self.websocket.send(send)
             
-            # print("sended image")
+            print("sended image")
         except Exception as e:
             self.ros_log_pub.publish_log('ERROR', 'Sending video error: {}'.format(e))
             self.websocket = None # 변경: 오류 발생 시 websocket을 None으로 재설정하여 재연결 로직을 트리거
