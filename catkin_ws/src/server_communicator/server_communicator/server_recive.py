@@ -24,7 +24,7 @@ iots = ['AirConditioner', 'TV']
 class WebSocketClientReceiveNode(Node):
     def __init__(self):
         super().__init__('websocket_client_receive_node')
-        
+        logging.basicConfig(level=logging.DEBUG) 
         self.ros_log_pub = None
         try:
             self.ros_log_pub = RosLogPublisher(self)
@@ -62,7 +62,8 @@ class WebSocketClientReceiveNode(Node):
         try:
             self.websocket = await websockets.connect(self.ws_url, max_size=2**20, max_queue=2**5)
             await self.websocket.send("CONNECT\naccept-version:1.0,1.1,2.0\n\n\x00\n")
-            sub_offer1 = stomper.subscribe("/exchange/control.exchange/home.1", "user.1")
+            
+            sub_offer1 = stomper.subscribe("/exchange/control.exchange/home.2", "home.2")
             await self.websocket.send(sub_offer1)
             sub_offer2 = stomper.subscribe("/exchange/control.exchange/home.1.yolo", "user.2")
             await self.websocket.send(sub_offer2)
@@ -98,6 +99,7 @@ class WebSocketClientReceiveNode(Node):
                 # print(f"Received message: {message}")
                 
                 if message:
+                    #print(message)
                     try:
                         message = message.rstrip('\0')
                         json_start = message.find('{')
@@ -113,7 +115,7 @@ class WebSocketClientReceiveNode(Node):
                             json_str = json.dumps(topic_data)
                             msg = String()
                             msg.data = json_str
-                            print('send list:', json_str)
+                            #print('send list:', json_str)
                             self.publisher_yolo.publish(msg)
                         elif message_data.get('type') == "IOT":
                             topic_data = message_data['message']
@@ -128,17 +130,32 @@ class WebSocketClientReceiveNode(Node):
                             msg.control_action = iot_control_data['control_action']
                             
                             self.publisher_iot_control.publish(msg)
-                            print(message_data)
+                            #print(message_data)
                         elif message_data.get('type') == "SCAN":
                             msg = String()
                             msg.data = "scan_on"
                             self.request_pub.publish(msg)
-                            print(message_data)
+                            #print('scan')
                         elif message_data.get('type') == "REGISTER_REQUEST":
                             msg = IotCmd()
                             msg.iot_uuid = ""
                             msg.control_action = "register"
                             self.publisher_iot_control.publish(msg)
+                        elif message_data.get('type') == "MODE":
+                            mode_data = message_data['message']
+                            msg = String()
+                            if mode_data == "stay":
+                                msg.data = "off"
+                            else:
+                                msg.data = mode_data + "_on"
+                            self.request_pub.publish(msg)
+                        elif message_data.get('type') == "HOMEID":
+                            homeId = message_data['message']
+                            full_path = 'C:\\Users\\SSAFY\\Desktop\\\S10P22A209\\catkin_ws\\src\\test_209\\homeId.txt'
+                            f=open(full_path,'w')
+                            data=homeId
+                            f.write(data)
+                            f.close()
 
                             
                             

@@ -72,7 +72,7 @@ class WebSocketClientSendNode(Node):
             
     async def send_message(self, msg):
         await self.ensure_websocket_connected() # 변경: 메시지 전송 전에 웹소켓 연결 상태 확인
-        send = stomper.send("/pub/control.message.1", json.dumps(msg))
+        send = stomper.send("/pub/control.message.2", json.dumps(msg))
         await self.websocket.send(send)
         
     async def send_video(self, video_image):

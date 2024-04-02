@@ -27,12 +27,14 @@ class resize(Node):
         self.map_resolution=0.05
         # self.map_offset_x = -8 - (self.map_size_x * self.map_resolution) / 2
         # self.map_offset_y = -4 - (self.map_size_y * self.map_resolution) / 2
-        self.map_data = [0 for i in range(self.map_size_x*self.map_size_y)]
-
         
         self.range = [[0, 700], [0, 700]]
 
-        self.save_map()
+        grid = np.array(self.map_msg.data)
+        grid = np.reshape(grid,(self.map_size_x, self.map_size_y))
+
+        new_grid = self.resize_map(grid)
+        self.save_map(new_grid)
 
     def resize_map(self, grid):
         x_range = [self.map_size_x, 0]
@@ -55,18 +57,26 @@ class resize(Node):
 
         return grid[x_range[0]-5:x_range[1]+6, y_range[0]-5:y_range[1]+6]
 
-    def save_map(self):
+    def save_map(self, map_data):
         data=''
         data += '{0} {1}\n'.format(self.map_size_x, self.map_size_y)
-        for pixel in self.map_msg.data:
-            data+='{0} '.format(pixel)
+        for x in range(self.map_size_x):
+            for y in range(self.map_size_y):
+                data+='{0} '.format(map_data[x][y])
+
+        # for pixel in map_data:
+        #     data+='{0} '.format(pixel)
 
         full_path = 'C:\\Users\\SSAFY\\Desktop\\\S10P22A209\\catkin_ws\\src\\test_209\\map\\new_map.txt'
 
         url = "https://j10a209.p.ssafy.io/api/v1/maps"
         body = {
             'homeId': 1,
-            'data': data
+            'data': data,
+            'startGrid': {
+                'x': self.range[0][0],
+                'y': self.range[1][0],
+            }
         }
         response = requests.post(url, json=body)
         print(response)
@@ -77,33 +87,33 @@ class resize(Node):
         f.write(data)
         f.close()
 
-    def read_txt(self):
-        full_path = 'C:\\Users\\SSAFY\\Desktop\\\S10P22A209\\catkin_ws\\src\\test_209\\map\\map.txt'
-        self.f = open(full_path, 'r')
+    # def read_txt(self):
+    #     full_path = 'C:\\Users\\SSAFY\\Desktop\\\S10P22A209\\catkin_ws\\src\\test_209\\map\\map.txt'
+    #     self.f = open(full_path, 'r')
         
-        lines = self.f.readlines()
-        line_data = lines[0].split()
-        offset = lines[1].split()
-        offset_x, offset_y = float(offset[0]), float(offset[1])
+    #     lines = self.f.readlines()
+    #     line_data = lines[0].split()
+    #     offset = lines[1].split()
+    #     offset_x, offset_y = float(offset[0]), float(offset[1])
         
-        for num,data in enumerate(line_data) :
-            self.map_data[num] = int(data)
+    #     for num,data in enumerate(line_data) :
+    #         self.map_data[num] = int(data)
 
-        self.f.close()
+    #     self.f.close()
 
-        grid = np.array(self.map_data)
-        grid = np.reshape(grid,(self.map_size_x, self.map_size_y))
+    #     grid = np.array(self.map_data)
+    #     grid = np.reshape(grid,(self.map_size_x, self.map_size_y))
 
-        new_grid = self.resize_map(grid)
+    #     new_grid = self.resize_map(grid)
         
-        np_map_data=new_grid.reshape(1,self.map_size_x*self.map_size_y)
-        list_map_data=np_map_data.tolist()
+    #     np_map_data=new_grid.reshape(1,self.map_size_x*self.map_size_y)
+    #     list_map_data=np_map_data.tolist()
 
-        ## 로직2를 완성하고 주석을 해제 시켜주세요.
+    #     ## 로직2를 완성하고 주석을 해제 시켜주세요.
 
-        self.map_msg.info.width = self.map_size_y
-        self.map_msg.info.height = self.map_size_x
+    #     self.map_msg.info.width = self.map_size_y
+    #     self.map_msg.info.height = self.map_size_x
 
-        self.map_msg.data=list_map_data[0]
-        self.map_msg.info.origin.position.x = offset_x + (self.range[1][0] - 5)*self.map_resolution
-        self.map_msg.info.origin.position.y = offset_y + (self.range[0][0] - 5)*self.map_resolution
+    #     self.map_msg.data=list_map_data[0]
+    #     self.map_msg.info.origin.position.x = offset_x + (self.range[1][0] - 5)*self.map_resolution
+    #     self.map_msg.info.origin.position.y = offset_y + (self.range[0][0] - 5)*self.map_resolution

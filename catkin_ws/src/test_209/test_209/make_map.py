@@ -167,7 +167,7 @@ class Mapper(Node):
             # 순찰 루트 계산 후 중앙 노드로 scan_off 요청 보내기
             self.is_end = True
             self.save_map()
-            self.resize = resize(self.map_msg.data)
+            self.resize = resize(self.map_msg)
 
             self.save_path()
 

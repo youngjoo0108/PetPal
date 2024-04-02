@@ -76,12 +76,9 @@ class device(Node):
                     self.device_uid.append(self.iot_msg.uid)
                     self.f.write('{0} {1} {2}\n'.format(self.iot_msg.uid, x, y))
                 
-                body = {
-                    'applianceUUID' : self.iot_msg.uid
-                }
                 temp = {
                     'type' : 'REGISTER_RESPONSE',
-                    'message' : body
+                    'message' : self.iot_msg.uid
                 }
                 data = json.dumps(temp)
                 self.data_msg.data = data

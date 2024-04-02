@@ -27,7 +27,7 @@ def generate_launch_description():
         ),
         Node(
             package = 'test_209',
-            node_executable = 'iot',
-            node_name = 'iot',
+            node_executable = 'iot_con',
+            node_name = 'iot_con',
         ),
     ])
