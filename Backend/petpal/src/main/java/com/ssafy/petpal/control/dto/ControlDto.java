@@ -9,5 +9,5 @@ public class ControlDto {
     private String type;
     private String sender;
     private String time;
-    private Object message;
+    private String message;
 }
