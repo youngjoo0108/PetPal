@@ -75,7 +75,7 @@ class device(Node):
     def timer_callback(self):
         if self.is_iot and self.is_state_change == False:
             if self.now_device == self.iot_msg.uid:
-                self.iot_control.all_procedures(self.now_device)
+                self.iot_control.user_cmd(self.now_device, self.cmd)
                 self.is_state_change = True
                 self.now_device = None
             else:
