@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import CompressedImage
+from ssafy_msgs.msg import IotCmd
 from std_msgs.msg import String
 import asyncio
 import websockets
@@ -34,6 +35,11 @@ class WebSocketClientReceiveNode(Node):
             self.publisher_yolo = self.create_publisher(String, 'captured_object', 10)
         except:
             self.ros_log_pub.publish_log('ERROR', 'init publisher yolo error: {}'.format(e))
+            
+        try:
+            self.publisher_iot_control = self.create_publisher(IotCmd, '/iot_cmd', 10)
+        except:
+            self.ros_log_pub.publish_log('ERROR', 'init publisher iot control error: {}'.format(e))
         
         self.ws_url = "wss://j10a209.p.ssafy.io/api/ws"
         self.websocket = None
@@ -102,11 +108,25 @@ class WebSocketClientReceiveNode(Node):
                             json_str = json.dumps(topic_data)
                             msg = String()
                             msg.data = json_str
-                            # print('send list:', json_str)
+                            print('send list:', json_str)
                             self.publisher_yolo.publish(msg)
-                        else:
-                            print(message_data)
+                        elif message_data.get('type') == "IOT":
+                            topic_data = message_data['message']
+                            slice_point = topic_data.find('/')
+                            iot_control_data = {
+                                'iot_uuid': topic_data[:slice_point - 1],
+                                'control_action': topic_data[slice_point + 1:]
+                            }
                             
+                            msg = IotCmd()
+                            msg.iot_uuid = iot_control_data['iot_uuid']
+                            msg.control_action = iot_control_data['control_action']
+                            
+                            self.publisher_iot_control.publish(msg)
+                            print(message_data)
+                        elif message_data.get('type') == "SCAN":
+            
+                            print(message_data)
                             
                             
                     except json.JSONDecodeError as e:

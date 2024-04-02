@@ -165,8 +165,8 @@ class Tracking(Node):
     def put_api(self):
         url = "https://j10a209.p.ssafy.io/api/v1/homes/pet/" + str(params['homeId'])
         data = {'x': self.robot_pose_x, 'y': self.robot_pose_y}
-        dt = data.json()
-        response = requests.put(url, params=dt)
+
+        response = requests.put(url, params=data)
 
 def main(args=None):
     rclpy.init(args=args)

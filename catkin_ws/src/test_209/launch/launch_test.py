@@ -9,12 +9,12 @@ def generate_launch_description():
             node_name = 'odom',
             output = 'screen',
         ),
-        Node(
-            package = 'test_209',
-            node_executable = 'lidar',
-            node_name = 'lidar',
-            output = 'screen',
-        ),
+        # Node(
+        #     package = 'test_209',
+        #     node_executable = 'lidar',
+        #     node_name = 'lidar',
+        #     output = 'screen',
+        # ),
         # Node(
         #     package = 'test_209',
         #     node_executable = 'follow',
@@ -49,9 +49,14 @@ def generate_launch_description():
         #     node_name = 'iotcontrol',
         #     output = 'screen' ,
         # ),
-        # Node(
-        #     package = 'test_209',
-        #     node_executable = 'odomprint',
-        #     node_name = 'odomprint',
-        # ),
+        Node(
+            package = 'test_209',
+            node_executable = 'setting',
+            node_name = 'setting',
+        ),
+        Node(
+            package = 'test_209',
+            node_executable = 'purefollow',
+            node_name = 'purefollow',
+        ),
     ])

@@ -186,7 +186,33 @@ class iot_udp(Node):
             self.disconnect(uid)
 
         self.now_device = None
+    
+    def user_cmd(self, uid, cmd):
+        self.now_device = uid
+        while True:
+            if self.recv_data[1] == 1:
+                break
+            self.connect(uid)
 
+        time.sleep(0.5)
+        
+        if cmd == "ON":
+            while True:
+                if self.recv_data[2] == 0:
+                    break
+                self.send_data(uid,params_control_cmd["SWITCH_ON"])
+        elif cmd == "OFF":
+            while True:
+                if self.recv_data[2] == 1:
+                    break
+                self.send_data(uid,params_control_cmd["SWITCH_OFF"])
+        
+        time.sleep(0.5)
+
+        while True:
+            if self.recv_data[1] == 0:
+                break
+            self.disconnect(uid)
 
     def __del__(self):
         self.sock.close()
