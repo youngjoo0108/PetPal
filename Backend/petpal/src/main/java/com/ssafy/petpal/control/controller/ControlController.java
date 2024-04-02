@@ -88,8 +88,8 @@ public class ControlController {
                 fcmService.sendMessageTo(notificationRequestDto1);
                 notificationService.saveNotification(notificationRequestDto1); // DB에 저장
                 break;
-            case "ON":
-            case "OFF":
+            case "ON": case "OFF":
+            case "WEATHER": case "TURTLE":
                 rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
                 break;
             case "O_COMPLETE":
