@@ -23,8 +23,17 @@ class WebSocketClientSendNode(Node):
             self.ros_log_pub = RosLogPublisher(self)
         except Exception as e:
             self.get_logger().error('ERROR', 'Subscription initialization error: {}'.format(e))
-        
+            
         try:
+            self.data_subscription = self.create_subscription(
+                String,
+                'to_server/encode_data',
+                self.data_callback,
+                10**3)
+        except Exception as e:
+            self.ros_log_pub.publish_log('ERROR', 'Subscription initialization error: {}'.format(e))   
+        
+        '''try:
             self.video_subscription = self.create_subscription(
                 CompressedImage,
                 '/image_jpeg/compressed',
@@ -40,7 +49,7 @@ class WebSocketClientSendNode(Node):
                 self.data_callback,
                 20)
         except Exception as e:
-            self.ros_log_pub.publish_log('ERROR', 'Subscription initialization error: {}'.format(e))
+            self.ros_log_pub.publish_log('ERROR', 'Subscription initialization error: {}'.format(e))'''
             
         self.loop = asyncio.new_event_loop()
         threading.Thread(target=self.run_asyncio_loop, args=(self.loop,), daemon=True).start()
@@ -72,10 +81,17 @@ class WebSocketClientSendNode(Node):
             
     async def send_message(self, msg):
         await self.ensure_websocket_connected() # 변경: 메시지 전송 전에 웹소켓 연결 상태 확인
-        send = stomper.send("/pub/control.message.2", json.dumps(msg))
+        try:
+            if(msg[0] == 'D'):
+                send = stomper.send("/pub/control.message.2", msg[1:])
+            elif(msg[0] == 'V'):
+                send = stomper.send("/pub/images.stream.2.images", msg[1:])    
+        except:
+            self.ros_log_pub.publish_log('ERROR', f"wrong encoded data {msg}")
+            
         await self.websocket.send(send)
         
-    async def send_video(self, video_image):
+    '''async def send_video(self, video_image):
         try:
             video_image_base64 = base64.b64encode(video_image).decode('utf-8')
             now = time.localtime()
@@ -87,10 +103,10 @@ class WebSocketClientSendNode(Node):
             }
             
             await self.ensure_websocket_connected() # 변경: 메시지 전송 전에 웹소켓 연결 상태 확인
-            send = stomper.send("/pub/images.stream.2.images", json.dumps(msg))
-            await self.websocket.send(send)
+            # send = stomper.send("/pub/images.stream.2.images", json.dumps(msg))
+            # await self.websocket.send(send)
             
-            print("sended image")
+            # print("sended image")
         except Exception as e:
             self.ros_log_pub.publish_log('ERROR', 'Sending video error: {}'.format(e))
             self.websocket = None # 변경: 오류 발생 시 websocket을 None으로 재설정하여 재연결 로직을 트리거
@@ -109,13 +125,13 @@ class WebSocketClientSendNode(Node):
             await self.send_message(msg) # 변경: send_message 함수를 통해 메시지 전송
         except Exception as e:
             self.ros_log_pub.publish_log('ERROR', 'Sending video error: {}'.format(e))
-            self.websocket = None
+            self.websocket = None'''
     
-    def video_callback(self, msg):
-        asyncio.run_coroutine_threadsafe(self.send_video(msg.data), self.loop) # 변경 없음
+    # def video_callback(self, msg):
+    #     asyncio.run_coroutine_threadsafe(self.send_video(msg.data), self.loop) # 변경 없음
         
     def data_callback(self, msg):
-        asyncio.run_coroutine_threadsafe(self.send_data(msg.data), self.loop) # 변경 없음
+        asyncio.run_coroutine_threadsafe(self.send_message(msg.data), self.loop) # 변경 없음
         
 def main(args=None):
     rclpy.init(args=args)

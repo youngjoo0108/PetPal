@@ -2,12 +2,7 @@ import rclpy
 from rclpy.node import Node
 from ssafy_msgs.msg import IotCmd
 from std_msgs.msg import String
-import asyncio
-import websockets
-import threading
-import stomper
 import json
-import base64
 import logging
 import time
 

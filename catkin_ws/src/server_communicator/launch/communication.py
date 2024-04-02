@@ -25,4 +25,9 @@ def generate_launch_description():
             node_executable = 'data_classify',
             node_name = 'data_classify',
         ),
+        Node(
+            package = 'server_communicator',
+            node_executable = 'send_data_classify',
+            node_name = 'send_data_classify',
+        ),
     ])
