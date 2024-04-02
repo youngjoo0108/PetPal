@@ -30,7 +30,7 @@ public class RouteController {
     }
 
     @PostMapping("/{homeId}")
-    public ResponseEntity<RouteDto> saveRoute(@RequestParam("homeId") String homeId, @RequestBody String data) {
+    public ResponseEntity<RouteDto> saveRoute(@PathVariable String homeId, @RequestBody String data) {
         try {
             RouteDto savedRouteDto = routeService.saveRoute(homeId, data);
             return new ResponseEntity<>(savedRouteDto, HttpStatus.CREATED);
