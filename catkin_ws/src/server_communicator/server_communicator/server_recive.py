@@ -30,21 +30,32 @@ class WebSocketClientReceiveNode(Node):
             self.ros_log_pub = RosLogPublisher(self)
         except Exception as e:
             self.get_logger().error('ERROR', 'Subscription initialization error: {}'.format(e))
-        
-        try:
-            self.publisher_yolo = self.create_publisher(String, 'captured_object', 10)
-        except:
-            self.ros_log_pub.publish_log('ERROR', 'init publisher yolo error: {}'.format(e))
             
         try:
-            self.publisher_iot_control = self.create_publisher(IotCmd, '/iot_cmd', 10)
+            self.publisher_data_classify = self.create_publisher(String, '/data/classify', 10**3)
         except:
-            self.ros_log_pub.publish_log('ERROR', 'init publisher iot control error: {}'.format(e))
+            self.ros_log_pub.publish_log('ERROR', 'init publisher_data_classify error: {}'.format(e))
+        
+        '''
+        # try:
+        #     self.publisher_yolo = self.create_publisher(String, 'captured_object', 10)
+        # except:
+        #     self.ros_log_pub.publish_log('ERROR', 'init publisher yolo error: {}'.format(e))
+            
+        # try:
+        #     self.publisher_iot_control = self.create_publisher(IotCmd, '/iot_cmd', 10)
+        # except:
+        #     self.ros_log_pub.publish_log('ERROR', 'init publisher iot control error: {}'.format(e))
 
+        # try:
+        #     self.request_pub = self.create_publisher(String, '/request', 10)
+        # except:
+        #     self.ros_log_pub.publish_log('ERROR', 'init publisher request error: {}'.format(e))
+        
         try:
             self.request_pub = self.create_publisher(String, '/request', 10)
         except:
-            self.ros_log_pub.publish_log('ERROR', 'init publisher request error: {}'.format(e))
+            self.ros_log_pub.publish_log('ERROR', 'init publisher iot control error: {}'.format(e))
         
         self.ws_url = "wss://j10a209.p.ssafy.io/api/ws"
         self.websocket = None
@@ -77,19 +88,6 @@ class WebSocketClientReceiveNode(Node):
             await self.connect_websocket() # 변경: 웹소켓이 연결되지 않았거나 닫혀있으면 재연결 시도
             self.ros_log_pub.publish_log('INFO', f"connected {time.strftime('%X', time.localtime())}")
     
-    # {
-        # 'type': 'yolo_data', 
-        # 'sender': 'user_1', 
-        # 'time': '13:50:20', 
-        # 'message': '{
-            # "list": [
-                # "13:50:20/Chair/0.94%/254-200/336-357",
-                # "13:50:20/Chair/0.82%/310-227/364-354",
-                # "13:50:20/Chair/0.79%/308-228/391-348"
-            # ]
-        # }'
-    # }
-    
     async def receive_messages(self):
         while True:
             try:
@@ -115,8 +113,9 @@ class WebSocketClientReceiveNode(Node):
                             json_str = json.dumps(topic_data)
                             msg = String()
                             msg.data = json_str
-                            #print('send list:', json_str)
+                            # print('send list:', json_str)
                             self.publisher_yolo.publish(msg)
+                            self.ros_log_pub.publish_log('INFO', f'Object detected message enter : {msg}')
                         elif message_data.get('type') == "IOT":
                             topic_data = message_data['message']
                             slice_point = topic_data.find('/')
@@ -164,33 +163,114 @@ class WebSocketClientReceiveNode(Node):
             except Exception as e:
                 self.ros_log_pub.publish_log('ERROR', f'Receiving message error: {e}')
                 self.websocket = None  # 연결 오류 시 websocket을 None으로 재설정
-
-
-    async def classification_object(self, obj_list):
-        # print("object list:")
-        # print(obj_list)
-        obstacle_list = []
-        furniture_list = []
-        dog_list = []
-        human_list = []
-        iot_list = []
-        
-        for obj in obj_list:
-            start_type = obj.find('/')
-            end_type = obj.find('/', start_type+1)
-
-            obj_type = obj[start_type+1 : end_type]
+    
+    '''
+    # async def receive_messages(self):
+    #     while True:
+    #         try:
+    #             await self.ensure_websocket_connected()
                 
-            if obj_type in obstacles:
-                obstacle_list.append(obj)
-            elif obj_type in furnitures:
-                furniture_list.append(obj)
-            elif obj_type in dogs:
-                dog_list.append(obj)
-            elif obj_type in humans:
-                human_list.append(obj)
-            elif obj_type in iots:
-                iot_list.append(obj)
+    #             message = await self.websocket.recv()
+                
+    #             if debug_mode:
+    #                 print(f"Received message: {message}")
+                
+    #             if message:
+    #                 #print(message)
+    #                 try:
+    #                     message = message.rstrip('\0')
+    #                     json_start = message.find('{')
+    #                     json_data = message[json_start:]
+    #                     message_data = json.loads(json_data)
+                        
+    #                     if message_data.get('type') == "yolo_data":
+    #                         # print("yolo")
+    #                         obj_list = json.loads(message_data['message'])
+    #                         obj_list = obj_list['list']
+                            
+    #                         topic_data = await self.classification_object(obj_list)
+    #                         json_str = json.dumps(topic_data)
+    #                         msg = String()
+    #                         msg.data = json_str
+    #                         # print('send list:', json_str)
+    #                         self.publisher_yolo.publish(msg)
+    #                         self.ros_log_pub.publish_log('INFO', f'Object detected message enter : {msg}')
+    #                     elif message_data.get('type') == "IOT":
+    #                         topic_data = message_data['message']
+    #                         slice_point = topic_data.find('/')
+    #                         iot_control_data = {
+    #                             'iot_uuid': topic_data[:slice_point - 1],
+    #                             'control_action': topic_data[slice_point + 1:]
+    #                         }
+                            
+    #                         msg = IotCmd()
+    #                         msg.iot_uuid = iot_control_data['iot_uuid']
+    #                         msg.control_action = iot_control_data['control_action']
+                            
+    #                         self.publisher_iot_control.publish(msg)
+    #                         #print(message_data)
+    #                     elif message_data.get('type') == "SCAN":
+    #                         msg = String()
+    #                         msg.data = "scan_on"
+    #                         self.request_pub.publish(msg)
+    #                         #print('scan')
+    #                     elif message_data.get('type') == "REGISTER_REQUEST":
+    #                         msg = IotCmd()
+    #                         msg.iot_uuid = ""
+    #                         msg.control_action = "register"
+    #                         self.publisher_iot_control.publish(msg)
+    #                     elif message_data.get('type') == "MODE":
+    #                         mode_data = message_data['message']
+    #                         msg = String()
+    #                         if mode_data == "stay":
+    #                             msg.data = "off"
+    #                         else:
+    #                             msg.data = mode_data + "_on"
+    #                         self.request_pub.publish(msg)
+    #                     elif message_data.get('type') == "HOMEID":
+    #                         homeId = message_data['message']
+    #                         full_path = 'C:\\Users\\SSAFY\\Desktop\\\S10P22A209\\catkin_ws\\src\\test_209\\homeId.txt'
+    #                         f=open(full_path,'w')
+    #                         data=homeId
+    #                         f.write(data)
+    #                         f.close()
+
+                            
+                            
+    #                 except json.JSONDecodeError as e:
+    #                     self.ros_log_pub.publish_log('ERROR', f'Decode Json message error: {e}')
+    #         except Exception as e:
+    #             if debug_mode:
+    #                 print('ERROR', f'Receiving message error: {e}')
+    #             self.ros_log_pub.publish_log('ERROR', f'Receiving message error: {e}')
+    #             self.websocket = None  # 연결 오류 시 websocket을 None으로 재설정
+
+
+    # async def classification_object(self, obj_list):
+    #     # print("object list:")
+    #     # print(obj_list)
+    #     obstacle_list = []
+    #     furniture_list = []
+    #     dog_list = []
+    #     human_list = []
+    #     iot_list = []
+        
+    #     for obj in obj_list:
+    #         start_type = obj.find('/')
+    #         end_type = obj.find('/', start_type+1)
+
+    #         obj_type = obj[start_type+1 : end_type]
+                
+    #         if obj_type in obstacles:
+    #             obstacle_list.append(obj)
+    #         elif obj_type in furnitures:
+    #             furniture_list.append(obj)
+    #         elif obj_type in dogs:
+    #             dog_list.append(obj)
+    #         elif obj_type in humans:
+    #             human_list.append(obj)
+    #         elif obj_type in iots:
+    #             iot_list.append(obj)
             
             topic_data = {
                 'obstacle_list': obstacle_list,
@@ -200,9 +280,6 @@ class WebSocketClientReceiveNode(Node):
                 'iot_list': iot_list
             }
         return topic_data
-    
-    # async def obj_component(self):
-    #     return time_str + '/' + class_list[label] + '/'+str(round(confidence, 2)) + '%' + '/' + str(xmin) + '-' + str(ymin) + '/' + str(xmax) + '-' + str(ymax)
         
 def main(args=None):
     rclpy.init(args=args)

@@ -20,4 +20,9 @@ def generate_launch_description():
             node_executable = 'server_recive',
             node_name = 'server_recive',
         ),
+        Node(
+            package = 'server_communicator',
+            node_executable = 'data_classify',
+            node_name = 'data_classify',
+        ),
     ])
