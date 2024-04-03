@@ -65,6 +65,7 @@ setup(
             'scheduler=test_209.scheduler:main',
             'tt=test_209.tt:main',
             'ttt=test_209.ttt:main',
+            'obs=test_209.obs_tt:main',
         ],
     },
 )

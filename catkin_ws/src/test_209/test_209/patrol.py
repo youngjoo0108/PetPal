@@ -89,6 +89,7 @@ class patrolRoute(Node):
                 self.idx += 1
                 if self.idx >= len(self.route):
                     self.idx = 0
+
             now_goal = self.route[self.idx]
             #print(self.idx, 'th = ', now_goal)
             goal_x, goal_y = self.grid_cell_to_pose(now_goal)

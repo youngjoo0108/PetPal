@@ -60,13 +60,12 @@ class Tracking(Node):
 
         data = json.loads(msg.data)
 
-        if 'dog_list' in data:
-            if not data['dog_list']:
-                self.is_dog = False
-            
-            for dog in data['dog_list']:
+        if data['dog_list']:
+            self.is_dog = True
+
+            dogs = data['dog_list']
+            for dog in dogs:
                 
-                self.is_dog = True
                 self.last_dog_seen_time = time.time()
 
                 left_top = dog.split('/')[-2]
@@ -86,6 +85,8 @@ class Tracking(Node):
                 self.goal_x = self.robot_pose_x + (self.turtlebot_to_dog_distance - 2.0) * np.cos(self.robot_yaw + self.turtlebot_to_dog_theta)
                 self.goal_y = self.robot_pose_y + (self.turtlebot_to_dog_distance -2.0) * np.sin(self.robot_yaw + self.turtlebot_to_dog_theta)
                 self.goal_yaw = self.turtlebot_to_dog_theta + self.robot_yaw
+        else:
+            self.is_dog = False
 
          
     def odom_callback(self, msg):
