@@ -17,7 +17,7 @@ class Tracking(Node):
 
     def __init__(self):
         super().__init__('minimal_subscriber')
-        self.yolo_sub = self.create_subscription(String,'captured_object',self.listener_callback, 10)
+        self.yolo_sub = self.create_subscription(String,'captured_object',self.listener_callback, 10**3)
         self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
         self.timer = self.create_timer(0.2, self.timer_callback)

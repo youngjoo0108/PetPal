@@ -14,7 +14,7 @@ class YoloSub(Node):
     def __init__(self):
         super().__init__('yolo_sub')
 
-        self.yolo_sub = self.create_subscription(String, 'captured_object', self.yolo_callback, 10)
+        self.yolo_sub = self.create_subscription(String, 'captured_object', self.yolo_callback, 10**3)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
         self.request_pub = self.create_publisher(String, 'request', 10)
         try:
