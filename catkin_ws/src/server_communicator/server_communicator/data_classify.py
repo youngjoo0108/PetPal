@@ -83,14 +83,14 @@ class DataClassifyNode(Node):
                         topic_data = message_data['message']
                         slice_point = topic_data.find('/')
                         iot_control_data = {
-                            'iot_uuid': topic_data[:slice_point - 1],
+                            'iot_uuid': topic_data[:slice_point],
                             'control_action': topic_data[slice_point + 1:]
                         }
-                        
+                        print
                         msg = IotCmd()
                         msg.iot_uuid = iot_control_data['iot_uuid']
                         msg.control_action = iot_control_data['control_action']
-                        
+                        print(msg)
                         self.publisher_iot_control.publish(msg)
                         self.ros_log_pub.publish_log('INFO', f'IoT control message enter : {msg}')
                     elif message_data.get('type') == "SCAN":

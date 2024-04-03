@@ -20,8 +20,8 @@ class loadMap(Node):
 
     def __init__(self):
         super().__init__('load_map')
-        self.odom_sub = self.create_subscription(Odometry,'odom',self.odom_callback,1)
-        self.map_pub = self.create_publisher(OccupancyGrid, 'map', 1)
+        self.odom_sub = self.create_subscription(Odometry,'odom',self.odom_callback,10)
+        self.map_pub = self.create_publisher(OccupancyGrid, 'map', 10)
         
         self.timer = self.create_timer(1, self.timer_callback)
         self.is_odom = False
