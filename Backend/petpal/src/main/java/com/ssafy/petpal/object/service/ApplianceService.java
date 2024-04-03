@@ -56,8 +56,14 @@ public class ApplianceService {
 
     public ApplianceResponseDto fetchApplianceByUUID(String uuid){
         ApplianceResponseDto appliance = applianceRepository.findByApplianceUUID(uuid);
+        String applianceStatus = getApplianceStatus(appliance.getHomeId(), appliance.getApplianceId());
+
+        if(applianceStatus==null){
+            redisTemplate.opsForValue().set("home:"+appliance.getHomeId()+":appliance:"+appliance.getApplianceId(),"OFF");
+            applianceStatus="OFF";
+        }
         appliance.setApplianceStatus(
-                getApplianceStatus(appliance.getHomeId(), appliance.getApplianceId())
+            applianceStatus
         );
         return appliance;
     }
@@ -82,8 +88,13 @@ public class ApplianceService {
     public List<ApplianceResponseDto> fetchAllApplianceByHomeId(Long homeId){
         List<ApplianceResponseDto> list = applianceRepository.findAllByHomeId(homeId);
         list.forEach(appliance -> {
+            String applianceStatus = getApplianceStatus(appliance.getHomeId(), appliance.getApplianceId());
+            if(applianceStatus==null){
+                redisTemplate.opsForValue().set("home:"+appliance.getHomeId()+":appliance:"+appliance.getApplianceId(),"OFF");
+                applianceStatus="OFF";
+            }
             appliance.setApplianceStatus(
-                    getApplianceStatus(appliance.getHomeId(), appliance.getApplianceId())
+                    applianceStatus
             );
         });
         return list;
