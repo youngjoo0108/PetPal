@@ -98,6 +98,19 @@ class DataClassifyNode(Node):
                         msg.data = 'scan_on'
                         self.request_pub.publish(msg)
                         self.ros_log_pub.publish_log('INFO', f'Scan start message enter : {msg}')
+                    elif message_data.get('type') == "REGISTER_REQUEST":
+                        msg = IotCmd()
+                        msg.iot_uuid = ""
+                        msg.control_action = "register"
+                        self.publisher_iot_control.publish(msg)
+                    elif message_data.get('type') == "MODE":
+                        mode_data = message_data['message']
+                        msg = String()
+                        if mode_data == "stay":
+                            msg.data = "off"
+                        else:
+                            msg.data = mode_data + "_on"
+                        self.request_pub.publish(msg)
                     else:
                         self.ros_log_pub.publish_log('WARN', f'Not Defined message type enter : {msg}')
                         
