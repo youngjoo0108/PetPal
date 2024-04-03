@@ -113,8 +113,8 @@ class ObstacleControl(Node):
                     left_top_x, left_top_y = map(float, left_top.split('-'))
                     right_bottom_x, right_bottom_y = map(float, right_bottom.split('-'))
 
-                    self.obstacle_height = right_bottom_y - left_top_y
-                    self.obstacle_width = right_bottom_x - left_top_x
+                    # self.obstacle_height = right_bottom_y - left_top_y
+                    # self.obstacle_width = right_bottom_x - left_top_x
                     self.obstacle_x_in_camera = 160 - (left_top_x + right_bottom_x) / 2.0   # 카메라 중심으로부터의 x 거리
                     self.obstacle_y_in_camera = 240 - (left_top_y + right_bottom_y) / 2.0   # 카메라 바닥으로부터의 y 거리
                     
