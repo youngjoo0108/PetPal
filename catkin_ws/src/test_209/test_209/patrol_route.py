@@ -18,7 +18,7 @@ class patrolRoute(Node):
         self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
         self.patrol_sub = self.create_subscription(Int32, '/patrol', self.patrol_callback, 10)
         self.reqeust_pub = self.create_publisher(String, '/request', 20)
-        self.yolo_sub = self.create_subscription(String,'captured_object',self.yolo_callback, 10)
+        self.yolo_sub = self.create_subscription(String,'captured_object',self.yolo_callback, 10**3)
 
         self.timer = self.create_timer(0.5, self.timer_callback)
 

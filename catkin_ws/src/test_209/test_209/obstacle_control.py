@@ -14,7 +14,7 @@ class ObstacleControl(Node):
 
     def __init__(self):
         super().__init__('obstacle_controller')
-        self.yolo_sub = self.create_subscription(String, 'captured_object', self.obstacle_callback, 10)
+        self.yolo_sub = self.create_subscription(String, 'captured_object', self.obstacle_callback, 10**3)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
         self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
         self.cmd_pub = self.create_publisher(Twist, 'cmd_vel', 10)
