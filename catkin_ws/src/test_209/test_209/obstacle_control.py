@@ -27,8 +27,9 @@ class ObstacleControl(Node):
         self.subscriber_save_camera = self.create_subscription(CompressedImage, '/screen_shot/pub', self.capture_callback , 10)
         self.data_pub = self.create_publisher(String, '/to_server/data', 10)
         self.request_pub = self.create_publisher(String, '/request', 10)
+        self.fsm_sub = self.create_subscription(String, '/fsm', self.fsm_callback, 10)
 
-        
+        self.fsm_msg = String()
         self.hand_control_msg=HandControl()        
         self.turtlebot_status_msg = TurtlebotStatus()
         self.goal_msg = PoseStamped()
@@ -83,6 +84,8 @@ class ObstacleControl(Node):
         except Exception as e:
             self.get_logger().error('Subscription initialization error: {}'.format(e))
 
+    def fsm_callback(self, msg):
+        self.fsm_msg.data = msg
 
     def obstacle_callback(self, msg):
         data = json.loads(msg.data)
@@ -131,6 +134,9 @@ class ObstacleControl(Node):
 
 
                     self.tracking_obstacle()
+        elif data['dog_list'] and self.fsm_msg.data == 'search':
+            self.request_msg.data = "found"
+            self.request_pub.publish(self.request_msg)
 
 
     def odom_callback(self, msg):
