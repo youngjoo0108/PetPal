@@ -1,59 +1,70 @@
 import rclpy
 from rclpy.node import Node
-from apscheduler.schedulers.background import BackgroundScheduler
-from datetime import datetime, timedelta
+from rclpy.clock import Clock, ClockType
 import requests
+import threading
+import datetime
 
-class CommandExecutorNode(Node):
+class TimedTaskExecutor(Node):
     def __init__(self):
-        super().__init__('command_executor_node')
-        self.scheduler = BackgroundScheduler()
-        self.fetch_and_schedule()  # 시작 시 스케줄 정보를 가져오고 스케줄링
-        self.scheduler.add_job(self.fetch_and_schedule, 'interval', minutes=60)  # 매 시간마다 스케줄 정보 업데이트
-        self.scheduler.start()
-        self.get_logger().info('Scheduler has started.')
+        super().__init__('timed_task_executor')
+        self.homeId = '2'
+        self.ros_clock = Clock(clock_type=ClockType.ROS_TIME)
+        self.scheduled_tasks = {}  # 실행할 작업 목록을 저장하는 딕셔너리
+        self.fetch_schedule_period = 60  # 스케줄 정보를 가져오는 주기(초)
+        self.api_url = "https://j10a209.p.ssafy.io/api/v1/schedules/" + self.homeId  # API URL
+        self.init_schedule_update()
 
-    def fetch_and_schedule(self):
-        home_id = 1
-        url = f'https://j10a209.p.ssafy.io/api/v1/schedules/{home_id}'
+    def fetch_and_update_schedules(self):
         try:
-            response = requests.get(url)
+            response = requests.get(self.api_url)
             if response.status_code == 200:
                 schedules = response.json()
+                # 스케줄 정보 업데이트
                 for schedule in schedules:
-                    if schedule['isActivated']:
-                        self.schedule_command(schedule)
+                    if schedule['isActive']:
+                        task_time = schedule['day'].strftime('%Y-%m-%d') + ' ' + schedule['time'].strftime('%H:%M')
+                        task_name = schedule['taskType']  # 예: 'task1', 'task2' 등의 작업 이름
+                        self.scheduled_tasks[task_time] = getattr(self, task_name, self.unknown_task)
             else:
-                self.get_logger().error('Failed to fetch schedule information.')
+                self.get_logger().error('Failed to fetch schedules from API.')
         except Exception as e:
-            self.get_logger().error(f'Exception occurred during request: {e}')
+            self.get_logger().error(f'Exception occurred during API request: {e}')
 
-    def schedule_command(self, schedule):
-        start_time = schedule['startTime']  # "HH:MM" 형식
-        now = datetime.now()
-        start_datetime = now.replace(hour=int(start_time.split(':')[0]), minute=int(start_time.split(':')[1]), second=0, microsecond=0)
-        if start_datetime < now:
-            start_datetime += timedelta(days=1)  # 이미 시간이 지났다면 다음 날로 설정
+    def unknown_task(self):
+        self.get_logger().info('Attempting to execute an unknown task.')
 
-        if schedule['isRepeat']:
-            self.scheduler.add_job(self.execute_command, 'cron', day_of_week='*', hour=start_time.split(':')[0], minute=start_time.split(':')[1], args=[schedule])
-        else:
-            self.scheduler.add_job(self.execute_command, 'date', run_date=start_datetime, args=[schedule])
+    def task1(self):
+        self.get_logger().info('Executing Task 1')
 
-    def execute_command(self, schedule):
-        appliance_uuid = schedule['uuid']
-        command = schedule['command']  # "ON" 또는 "OFF"
-        position = schedule['position']  # 가전 제품의 위치
-        self.get_logger().info(f'Moving to position: {position} and executing {command} command on appliance with UUID: {appliance_uuid}')
-        # 위치 이동 및 명령 실행 로직 구현
+    def task2(self):
+        self.get_logger().info('Executing Task 2')
+
+    def init_schedule_update(self):
+        # 스케줄 정보 주기적 업데이트
+        threading.Thread(target=self.periodic_schedule_update, daemon=True).start()
+
+    def periodic_schedule_update(self):
+        while rclpy.ok():
+            self.fetch_and_update_schedules()
+            rclpy.spin_once(self, timeout_sec=self.fetch_schedule_period)
+
+    def check_time_and_execute(self):
+        while rclpy.ok():
+            now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+            if now in self.scheduled_tasks:
+                self.scheduled_tasks[now]()
+                # 실행 후 해당 작업을 목록에서 제거
+                del self.scheduled_tasks[now]
+            rclpy.spin_once(self, timeout_sec=60)  # 매 분마다 현재 시간 확인
 
 def main(args=None):
     rclpy.init(args=args)
-    node = CommandExecutorNode()
+    node = TimedTaskExecutor()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
-        node.scheduler.shutdown()
+        pass
     finally:
         node.destroy_node()
         rclpy.shutdown()

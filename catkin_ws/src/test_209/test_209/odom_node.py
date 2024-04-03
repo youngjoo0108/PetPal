@@ -1,8 +1,8 @@
 import rclpy, json, requests
 from rclpy.node import Node
-
+from std_msgs.msg import String
 from geometry_msgs.msg import Twist
-from ssafy_msgs.msg import TurtlebotStatus
+from ssafy_msgs.msg import TurtlebotStatus, EnviromentStatus
 from sensor_msgs.msg import Imu
 from squaternion import Quaternion
 from nav_msgs.msg import Odometry
@@ -19,15 +19,17 @@ class odom(Node):
         
         # 로직 1. publisher, subscriber, broadcaster 만들기
         self.subscription = self.create_subscription(TurtlebotStatus,'/turtlebot_status',self.listener_callback,10)
+        self.envir_sub = self.create_subscription(EnviromentStatus, '/envir_status', self.envir_callback, 10)
         self.imu_sub = self.create_subscription(Imu,'/imu',self.imu_callback,10)
         self.odom_publisher = self.create_publisher(Odometry, 'odom', 10)
-        self.sock_pub = self.create_publisher(String, '')
+        self.data_pub = self.create_publisher(String, '/to_server/data', 10)
         self.broadcaster = tf2_ros.StaticTransformBroadcaster(self)
 
-        # self.timer = self.create_timer(1, self.timer_callback)
+        self.timer = self.create_timer(10, self.timer_callback)
 
 
         # 로봇의 pose를 저장해 publish 할 메시지 변수 입니다.
+        self.envir_msg=EnviromentStatus()
         self.odom_msg=Odometry()
         # Map -> base_link 좌표계에 대한 정보를 가지고 있는 변수 입니다.
         self.base_link_transform=geometry_msgs.msg.TransformStamped()
@@ -36,6 +38,7 @@ class odom(Node):
         self.is_status=False
         self.is_imu=False
         self.is_calc_theta=False
+        self.is_envir = False
         # x,y,theta는 추정한 로봇의 위치를 저장할 변수 입니다.
         self.x= -8.75
         self.y= -8.75
@@ -61,6 +64,9 @@ class odom(Node):
         self.laser_transform.transform.translation.z = 1.0
         self.laser_transform.transform.rotation.w = 1.0
 
+    def envir_callback(self, msg):
+        self.is_envir=True
+        self.envir_msg=msg
 
     def imu_callback(self,msg):
         # 로직 3. IMU 에서 받은 quaternion을 euler angle로 변환해서 사용
@@ -141,6 +147,21 @@ class odom(Node):
                 self.broadcaster.sendTransform(self.laser_transform)
                 self.odom_publisher.publish(self.odom_msg)
                 self.prev_time=self.current_time
+
+    def timer_callback(self):
+        if self.is_envir:
+            msg = String()
+            dt = {
+                'weather' : self.envir_msg.weather,
+                'temp' : self.envir_msg.temperature,
+            }
+            temp = {
+                'type' : 'WEATHER',
+                'message' : dt
+            }
+            data = json.dumps(temp)
+            msg.data = data
+            self.data_pub.publish(msg)
         
 def main(args=None):
     rclpy.init(args=args)

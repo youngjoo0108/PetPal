@@ -64,6 +64,7 @@ setup(
             'iot_user=test_209.iot_user_input:main',
             'scheduler=test_209.scheduler:main',
             'tt=test_209.tt:main',
+            'ttt=test_209.ttt:main',
         ],
     },
 )

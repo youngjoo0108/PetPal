@@ -8,6 +8,7 @@ from squaternion import Quaternion
 from nav_msgs.msg import Odometry,OccupancyGrid,MapMetaData
 from std_msgs.msg import String
 from math import pi
+from test_209.resize_map import resize
 
 # load_map 노드는 맵 데이터를 읽어서, 맵 상에서 점유영역(장애물) 근처에 로봇이 움직일 수 없는 영역을 설정하고 맵 데이터로 publish 해주는 노드입니다.
 # 추 후 a_star 알고리즘에서 맵 데이터를 subscribe 해서 사용합니다.
@@ -25,7 +26,7 @@ class loadMap(Node):
         self.map_pub = self.create_publisher(OccupancyGrid, 'map', 10)
         self.data_pub = self.create_publisher(String, '/to_server/data', 10)
         
-        self.timer = self.create_timer(1, self.timer_callback)
+        #self.timer = self.create_timer(1, self.timer_callback)
         self.is_odom = False
 
         self.odom_msg = Odometry()
@@ -44,6 +45,7 @@ class loadMap(Node):
         line = f.readlines()[0].split()
         self.start_grid = (int(line[0]), int(line[1]))
         f.close()
+        #print(self.start_grid)
 
         # m = MapMetaData()
         # m.resolution = self.map_resolution
@@ -100,6 +102,7 @@ class loadMap(Node):
             self.map_msg.info=self.map_meta_data
 
             self.read_txt()
+            self.resize = resize(self.map_msg)
 
 
     def timer_callback(self):
@@ -111,17 +114,13 @@ class loadMap(Node):
             y=self.odom_msg.pose.pose.position.y
             now_grid_cell=self.pose_to_grid_cell(x,y)
             new_grid_cell=(now_grid_cell[0]-self.start_grid[0], now_grid_cell[1]-self.start_grid[1])
-            # print(now_grid_cell)
-            # print(new_grid_cell)
+            print(now_grid_cell)
+            print(new_grid_cell)
 
             msg = String()
-            crd = {
-                'x' : new_grid_cell[0],
-                'y' : new_grid_cell[1]
-            }
             temp = {
                 'type' : 'TURTLE',
-                'message' : crd
+                'message' : ""
             }
             data = json.dumps(temp)
             msg.data = data

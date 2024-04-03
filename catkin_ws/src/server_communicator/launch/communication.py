@@ -9,15 +9,25 @@ def generate_launch_description():
             node_name = 'data_publisher',
             output = 'screen',
         ),
-        Node(
-            package = 'server_communicator',
-            node_executable = 'log_publisher',
-            node_name = 'log_publisher',
-            output = 'screen' ,
-        ),
+        # Node(
+        #     package = 'server_communicator',
+        #     node_executable = 'log_publisher',
+        #     node_name = 'log_publisher',
+        #     output = 'screen' ,
+        # ),
         Node(
             package = 'server_communicator',
             node_executable = 'server_recive',
             node_name = 'server_recive',
+        ),
+        Node(
+            package = 'server_communicator',
+            node_executable = 'data_classify',
+            node_name = 'data_classify',
+        ),
+        Node(
+            package = 'server_communicator',
+            node_executable = 'send_data_classify',
+            node_name = 'send_data_classify',
         ),
     ])

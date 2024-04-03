@@ -1,4 +1,4 @@
-import rclpy, json
+import rclpy, json, requests
 from rclpy.node import Node
 import ros2pkg
 from geometry_msgs.msg import Twist,PoseStamped,Pose,TransformStamped
@@ -12,6 +12,7 @@ import tf2_ros
 import os
 import test_209.utils as utils
 from test_209.make_route import makeRoute
+from test_209.resize_map import resize
 import numpy as np
 import cv2
 import time
@@ -166,8 +167,18 @@ class Mapper(Node):
             # 순찰 루트 계산 후 중앙 노드로 scan_off 요청 보내기
             self.is_end = True
             self.save_map()
+            self.resize = resize(self.map_msg)
 
             self.save_path()
+
+            data_json = {
+                'type': 'COMPLETE',
+                'message': ""
+                }
+            temp = json.dumps(data_json)
+            msg = String()
+            msg.data = temp
+            self.sock_pub.publish(msg)
 
             request_msg = String()
             request_msg.data = "scan_off"
@@ -241,20 +252,18 @@ class Mapper(Node):
         f.write(data) 
         f.close()
 
-        # data_json = {
-        #         'type': 'COMPLETE',
-        #         'message': data,
-        #         }
-        # dt = json.dumps(data_json)
-        # msg = String()
-        # msg.data = dt
-        # self.sock_pub.publish(msg)
-    
+        # url = "https://j10a209.p.ssafy.io/api/v1/maps/origin"
+        # body = {
+        #     'homeId': 1,
+        #     'data': data
+        # }
+        # response = requests.post(url, json=body)
+
 
     def save_path(self):
         self.path_maker = makeRoute(self.map_msg.data)
         patrol_path = self.path_maker.answer
-        full_path = 'C:\\Users\\SSAFY\\Desktop\\pppp.txt'
+        full_path = 'C:\\Users\\SSAFY\\Desktop\\\S10P22A209\\catkin_ws\\src\\test_209\\route\\route.txt'
         f=open(full_path,'w')
         data=''
 
