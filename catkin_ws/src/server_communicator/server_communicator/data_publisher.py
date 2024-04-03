@@ -1,6 +1,5 @@
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import String
 import asyncio
 import websockets
@@ -83,7 +82,7 @@ class WebSocketClientSendNode(Node):
         await self.ensure_websocket_connected() # 변경: 메시지 전송 전에 웹소켓 연결 상태 확인
         try:
             if(msg[0] == 'D'):
-                send = stomper.send("/pub/control.message.2", msg[1:])
+                send = stomper.send("/pub/ros.control.message.2", msg[1:])
             elif(msg[0] == 'V'):
                 send = stomper.send("/pub/images.stream.2.images", msg[1:])    
         except:

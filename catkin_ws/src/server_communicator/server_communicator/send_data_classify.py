@@ -54,7 +54,7 @@ class SendDataClassifyNode(Node):
     
     def video_callback(self, video_image):
         try:
-            video_image_base64 = base64.b64encode(video_image).decode('utf-8')
+            video_image_base64 = base64.b64encode(video_image.data).decode('utf-8')
             now = time.localtime()
             msg = {
                 "type": "video_streaming", 
@@ -72,7 +72,7 @@ class SendDataClassifyNode(Node):
     def data_callback(self, data_msg):
         try:
             now = time.localtime()
-            json_data = json.loads(data_msg)
+            json_data = json.loads(data_msg.data)
             
             msg = {
                 "type": json_data['type'], 
@@ -85,7 +85,7 @@ class SendDataClassifyNode(Node):
             
             self.publisher_data.publish(msg_string)
         except Exception as e:
-            self.ros_log_pub.publish_log('ERROR', 'Sending video error: {}'.format(e))
+            self.ros_log_pub.publish_log('ERROR', 'Sending data error: {}'.format(e))
 
 
         
