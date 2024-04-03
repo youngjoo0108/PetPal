@@ -67,34 +67,43 @@ class ObstacleControl(Node):
 
 
     def obstacle_callback(self, msg):
-        data = json.loads(msg.data)
-        if 'knife_list' in data and not self.turtlebot_status_msg.can_use_hand:
-            for obstacle in data['knife_list']:
-                self.is_obstacle = True
-                #print(obstacle)
-                left_top = obstacle.split('/')[-2]
-                right_bottom = obstacle.split('/')[-1]
-                left_top_x, left_top_y = map(float, left_top.split('-'))
-                right_bottom_x, right_bottom_y = map(float, right_bottom.split('-'))
+        obstacle = msg.data
+     
+        if obstacle and not self.turtlebot_status_msg.can_use_hand:
+            # for obstacle in data:
+            self.is_obstacle = True
 
-                self.obstacle_height = right_bottom_y - left_top_y
-                self.obstacle_width = right_bottom_x - left_top_x
-                self.obstacle_x_in_camera = 160 - (left_top_x + right_bottom_x) / 2.0   # 카메라 중심으로부터의 x 거리
-                self.obstacle_y_in_camera = 240 - (left_top_y + right_bottom_y) / 2.0   # 카메라 바닥으로부터의 y 거리
-                
-                self.obstacle_distance_in_camera = np.sqrt(self.obstacle_x_in_camera ** 2 + self.obstacle_y_in_camera ** 2)
+            # BookPile, Mug, PenHolder, Stapler
+            obstacle_name = obstacle.split('/')[1]
+            print(obstacle_name)
+            if obstacle_name == "Mug":
+                self.obstacle_real_height = 0.3
+            elif obstacle_name == "BookPile":
+                self.obstacle_real_height = 0.7
+            elif obstacle_name == "PenHolder":
+                self.obstacle_real_height = 0.25
+            elif obstacle_name == "Stapler":
+                self.obstacle_real_height = 0.3
+        
+            left_top = obstacle.split('/')[-2]
+            right_bottom = obstacle.split('/')[-1]
+            left_top_x, left_top_y = map(float, left_top.split('-'))
+            right_bottom_x, right_bottom_y = map(float, right_bottom.split('-'))
 
-                self.turtlebot_to_obstacle_theta = np.arctan2(self.obstacle_x_in_camera * 3, self.obstacle_y_in_camera * 4)
+            self.obstacle_height = right_bottom_y - left_top_y
+            self.obstacle_width = right_bottom_x - left_top_x
+            self.obstacle_x_in_camera = 160 - (left_top_x + right_bottom_x) / 2.0   # 카메라 중심으로부터의 x 거리
+            self.obstacle_y_in_camera = 240 - (left_top_y + right_bottom_y) / 2.0   # 카메라 바닥으로부터의 y 거리
+            
+            self.obstacle_distance_in_camera = np.sqrt(self.obstacle_x_in_camera ** 2 + self.obstacle_y_in_camera ** 2)
+            self.turtlebot_to_obstacle_theta = np.arctan2(self.obstacle_x_in_camera * 3, self.obstacle_y_in_camera * 4)
 
-                if self.obstacle_height > self.obstacle_width:
-                    self.turtlebot_to_obstacle_distance = self.obstacle_distance_in_camera / (self.obstacle_height * np.cos(self.turtlebot_to_obstacle_theta))  
-                else:
-                    self.turtlebot_to_obstacle_distance = self.obstacle_distance_in_camera / (self.obstacle_width * np.cos(self.turtlebot_to_obstacle_theta))
-                self.goal_x = self.robot_pose_x + (self.turtlebot_to_obstacle_distance - 0.3) * np.cos(self.robot_yaw + self.turtlebot_to_obstacle_theta)
-                self.goal_y = self.robot_pose_y + (self.turtlebot_to_obstacle_distance - 0.3) * np.sin(self.robot_yaw + self.turtlebot_to_obstacle_theta)
-                self.goal_yaw = self.turtlebot_to_obstacle_theta + self.robot_yaw
-           
-                self.tracking_obstacle()
+            self.turtlebot_to_obstacle_distance = self.obstacle_distance_in_camera * self.obstacle_real_height / (self.obstacle_width * np.cos(self.turtlebot_to_obstacle_theta))
+            self.goal_x = self.robot_pose_x + (self.turtlebot_to_obstacle_distance - 0.3) * np.cos(self.robot_yaw + self.turtlebot_to_obstacle_theta)
+            self.goal_y = self.robot_pose_y + (self.turtlebot_to_obstacle_distance - 0.3) * np.sin(self.robot_yaw + self.turtlebot_to_obstacle_theta)
+            self.goal_yaw = self.turtlebot_to_obstacle_theta + self.robot_yaw
+        
+            self.tracking_obstacle()
 
 
     def odom_callback(self, msg):
