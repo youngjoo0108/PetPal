@@ -1,5 +1,5 @@
 # PetPal
-![favicon](/uploads/f9ac05aa72518162315779eea6234e6f/favicon.jpg)
+![favicon.jpg](./favicon.jpg)
 # 프로젝트 소개
 
 ## 프로젝트 기간
