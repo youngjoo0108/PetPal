@@ -129,6 +129,8 @@ public class ControlController {
                 NotificationRequestDto notificationRequestDto2
                         = new NotificationRequestDto(targetUserId2, "처리", oComplete.getObjectType()+"를 처리하였습니다.",
                         formattedTime2,downloadURL);
+                fcmService.sendMessageTo(notificationRequestDto2);
+                notificationService.saveNotification(notificationRequestDto2);
             break;
         }
     }
