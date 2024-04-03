@@ -16,7 +16,9 @@ public class ExecutionTimeLoggingAspect {
 
     @Around("execution(* com.ssafy.petpal..controller.*Controller.*(..))"
             +
-            " && !execution(* com.ssafy.petpal.control.controller.ControlController.*(..))")
+            " && !execution(* com.ssafy.petpal.control.controller.ControlController.*(..))"
+            +
+            " && !execution(* com.ssafy.petpal.schedule.controller.ScheduleController.*(..))")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.nanoTime();
         Object result = joinPoint.proceed(); // 메서드 실행

@@ -27,21 +27,18 @@ public class RoomController {
         try{
             String newRoomName = roomRegisterDTO.getRoomName();
             List<RoomResponseDTO> list = roomService.fetchAllRoomById(roomRegisterDTO.getHomeId());
-            log.info("30");
+
             boolean isDuplicate = false;
             for(RoomResponseDTO dto : list){
                 if(dto.getRoomName().equals(newRoomName)){
-                    log.info("34");
                     isDuplicate = true;
                     break;
                 }
             }
             if(isDuplicate){
-                log.info("40");
                 // 중복이 발생했을 경우의 로직
                 throw new IllegalArgumentException("중복된 방 이름입니다.");
             } else {
-                log.info("44");
                 // 중복이 없을 경우의 로직, 예를 들어 새로운 방을 추가하는 로직 등
                 roomService.createRoom(roomRegisterDTO);
                 return ResponseEntity.ok(null);
@@ -49,11 +46,9 @@ public class RoomController {
 
 
         }catch (IllegalArgumentException e){
-            log.info("52");
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         catch (Exception e) {
-            log.info("56");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
