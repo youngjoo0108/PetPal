@@ -88,9 +88,6 @@ class SendDataClassifyNode(Node):
             
     def save_camera_callback(self, msg):
         self.screenShot = True
-        encode_msg = json.loads(msg.data)
-        self.screenShot_type = encode_msg['type']
-        self.screenShot_position = encode_msg['position']
             
     
     def video_callback(self, video_image):
