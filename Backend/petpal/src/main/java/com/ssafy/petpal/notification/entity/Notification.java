@@ -20,6 +20,7 @@ public class Notification extends BaseEntity {
     private String category;
     private String content;
     private String time;
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String image;
 
     // 모든 필드를 초기화하는 생성자 직접 정의
