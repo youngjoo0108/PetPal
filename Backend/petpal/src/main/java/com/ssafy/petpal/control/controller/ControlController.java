@@ -88,7 +88,8 @@ public class ControlController {
             case "ACOMPLETE":
                 // ROS에서 입증한 실제 가전상태 데이터를 redis에 올린다.
 //                controlDto.getMessage() //parsing
-                MessageContainer.A_Complete aComplete = objectMapper.readValue(controlDto.getMessage(),MessageContainer.A_Complete.class);
+//                MessageContainer.A_Complete aComplete = objectMapper.readValue(controlDto.getMessage(),MessageContainer.A_Complete.class);
+                MessageContainer.A_Complete aComplete = (MessageContainer.A_Complete) controlDto.getMessage();
                 if(aComplete.getIsSuccess()){
                     applianceService.updateApplianceStatus(homeId,aComplete.getApplianceId(),aComplete.getCurrentStatus());
                 }else{
@@ -111,7 +112,7 @@ public class ControlController {
             break;
 
             case "OCOMPLETE":
-                MessageContainer.O_Complete oComplete =  objectMapper.readValue(controlDto.getMessage(), MessageContainer.O_Complete.class);
+                MessageContainer.O_Complete oComplete = (MessageContainer.O_Complete) controlDto.getMessage();
                 String filename = targetService.fetchFilenameByTargetId(oComplete.getObjectId());
                 String downloadURL = imageService.generateURL(filename, HttpMethod.GET);
 
