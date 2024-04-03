@@ -11,6 +11,7 @@ import json
 import base64
 import logging
 import time
+import requests
 
 from ros_log_package.RosLogPublisher import RosLogPublisher
 
@@ -18,11 +19,29 @@ from ros_log_package.RosLogPublisher import RosLogPublisher
 
 debug_mode = True
 
+# 서버의 엔드포인트 주소
+# endpoint = "http://localhost:8081/api/v1/images"
+base_endpoint = "https://j10a209.p.ssafy.io/api/v1/"
+# 파일 확장자명
+params = {'homeId':2,'extension': 'png'}
+
 class SendDataClassifyNode(Node):
     def __init__(self):
         super().__init__('send_data_classify_node')
         self.half_frame = True
+        
         self.screenShot = False
+        
+        # # 서버의 엔드포인트 주소
+        # # endpoint = "http://localhost:8081/api/v1/images"
+        # base_endpoint = "https://j10a209.p.ssafy.io/api/v1/"
+        # # 파일 확장자명
+        # params = {'homeId':2,'extension': 'png'}
+        # self.screenShot_type = ''
+        # self.screenShot_position = {
+        #     "x": 209,
+        #     "y": 209
+        # }
         
         self.ros_log_pub = None
         try:
@@ -67,8 +86,11 @@ class SendDataClassifyNode(Node):
         except Exception as e:
             self.ros_log_pub.publish_log('ERROR', 'init publisher save_camera error: {}'.format(e))
             
-    def save_camera_callback(self):
+    def save_camera_callback(self, msg):
         self.screenShot = True
+        encode_msg = json.loads(msg.data)
+        self.screenShot_type = encode_msg['type']
+        self.screenShot_position = encode_msg['position']
             
     
     def video_callback(self, video_image):
@@ -79,6 +101,49 @@ class SendDataClassifyNode(Node):
                     self.publisher_save_camera.publish(video_image)
                 except Exception as e:
                     self.ros_log_pub.publish_log('ERROR', 'Publisher save_camera error: {}'.format(e))
+
+
+                # # POST 요청을 보내 URL과 image_id 받아오기
+                # response = requests.post(base_endpoint+"images", json=params)
+                # if response.status_code == 200:
+                #     data = response.json()
+                #     upload_url = data['presignedURL']
+                #     image_id = data['imageId']
+                #     if debug_mode:
+                #         print(f"Received upload URL: {upload_url}")
+                #         print(f"Image ID: {image_id}")
+                # else:
+                #     if debug_mode:
+                #         print("Failed to get upload URL and Image ID")
+                #     # 에러 처리
+
+
+                # # # S3 업로드 파트
+                # # file_path = "C:/Users/SSAFY/Desktop/과제2.PNG" # 여기에 전송할 사진의 절대경로
+
+                # # with open(file_path, 'rb') as f:
+                # #     # 파일의 바이너리 데이터를 PUT 요청의 본문으로 전송
+                # upload_response = requests.put(upload_url, data=video_image.data)
+
+
+                # if upload_response.status_code == 200:
+                #     print("Upload successful")
+                # else:
+                #     print(upload_response.status_code)
+                #     print("Upload failed")
+
+
+
+                # # Target 생성
+                # params = {
+                #             'homeId':2,
+                #             'imageId':image_id,
+                #             'objectType':self.screenShot_type, 
+                #             "coordinate":self.screenShot_position
+                #         }
+                # response = requests.post(base_endpoint+"images", json=params)
+                # target_id = int(response.text)
+                
             
             if self.half_frame:
                 video_image_base64 = base64.b64encode(video_image.data).decode('utf-8')
