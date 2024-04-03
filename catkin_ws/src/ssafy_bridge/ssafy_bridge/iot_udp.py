@@ -7,7 +7,7 @@ import socket
 import threading
 import struct
 import binascii
-from ssafy_msgs.msg import IotInfo
+from ssafy_msgs.msg import IotInfo, IotCmd
 
 params_status = {
     (0xa,0x25 ) : ("IDLE", 0),
@@ -32,6 +32,7 @@ class iot_udp(Node):
         super().__init__('iot_udp')
 
         self.iot_pub = self.create_publisher(IotInfo, 'iot', 10)
+        self.iot_user_sub = self.create_subscription(IotCmd, 'iot_user', self.iot_user_callback, 10)
 
         self.ip='127.0.0.1'
         self.port=7502
@@ -215,6 +216,9 @@ class iot_udp(Node):
             self.disconnect(uid)
         
         self.now_device = None
+
+    def iot_user_callback(self, msg):
+        self.user_cmd(msg.iot_uuid, msg.control_action)
 
     def __del__(self):
         self.sock.close()
