@@ -10,6 +10,7 @@ import com.ssafy.petpal.object.dto.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.StringTokenizer;
 
 
@@ -107,12 +108,13 @@ public class MapService {
 
 
     public MapDto saveMapData(MapDto mapDto) {
-        Map mapEntity = new Map();
+        Optional<Map> existingMapOpt = mapRepository.findByHomeId(mapDto.getHomeId());
+        Map mapEntity = existingMapOpt.orElseGet(Map::new); // 존재하지 않으면 새로운 인스턴스 생성
         mapEntity.setHomeId(mapDto.getHomeId());
         mapEntity.setData(mapDto.getData());
-        mapEntity.setPoint(MapDto.locationToPoint(mapDto.getStartGrid()));
-        mapRepository.save(mapEntity);
-        return mapDto;
+        mapEntity.setPoint(MapDto.locationToPoint(mapDto.getStartGrid())); // locationToPoint 메서드 구현 필요
+        mapRepository.save(mapEntity); // 새로운 엔티티 저장 혹은 기존 엔티티 업데이트
+        return mapDto; // 저장된 데이터를 담은 DTO 반환
     }
 
     public OriginMapDto getOriginMapData(Long homeId) {
@@ -121,10 +123,11 @@ public class MapService {
     }
 
     public OriginMapDto saveOriginMapData(OriginMapDto originMapDto) {
-        OriginMap originMapEntity = new OriginMap();
+        Optional<OriginMap> existingOriginMapOpt = originMapRepository.findByHomeId(originMapDto.getHomeId());
+        OriginMap originMapEntity = existingOriginMapOpt.orElseGet(OriginMap::new); // 존재하지 않으면 새로운 인스턴스 생성
         originMapEntity.setHomeId(originMapDto.getHomeId());
         originMapEntity.setData(originMapDto.getData());
-        originMapRepository.save(originMapEntity);
-        return originMapDto;
+        originMapRepository.save(originMapEntity); // 새로운 엔티티 저장 혹은 기존 엔티티 업데이트
+        return originMapDto; // 저장된 데이터를 담은 DTO 반환
     }
 }
