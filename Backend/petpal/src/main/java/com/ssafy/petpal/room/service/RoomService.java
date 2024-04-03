@@ -31,9 +31,7 @@ public class RoomService {
     }
 
     public List<RoomResponseDTO> fetchAllRoomById(Long homeId) {
-        log.info("33");
         List<RoomResponseDTO> allByHomeId = roomRepository.findAllByHomeId(homeId);
-        log.info("35");
         return allByHomeId;
     }
 
