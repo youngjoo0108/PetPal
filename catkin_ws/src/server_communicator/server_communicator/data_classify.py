@@ -86,7 +86,7 @@ class DataClassifyNode(Node):
                             'iot_uuid': topic_data[:slice_point],
                             'control_action': topic_data[slice_point + 1:]
                         }
-                        print
+                        
                         msg = IotCmd()
                         msg.iot_uuid = iot_control_data['iot_uuid']
                         msg.control_action = iot_control_data['control_action']
@@ -130,7 +130,6 @@ class DataClassifyNode(Node):
         dog_list = []
         human_list = []
         iot_list = []
-
         topic_data = {
             'obstacle_list': obstacle_list,
             'furniture_list': furniture_list,
