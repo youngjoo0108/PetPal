@@ -61,7 +61,7 @@ public class ControlController {
 
     @MessageMapping("ros.control.message.{homeId}")
     public void sendMessage(@Payload String rawMessage, @DestinationVariable Long homeId) throws IOException {
-        log.info("Ros Received message: {}", rawMessage);
+//        log.info("Ros Received message: {}", rawMessage);
         ControlDto controlDto = objectMapper.readValue(rawMessage, ControlDto.class);
         String type = controlDto.getType();
         switch (type) {
@@ -190,10 +190,11 @@ public class ControlController {
         }
     }
 
-    @RabbitListener(queues = CONTROL_QUEUE_NAME)
-    public void receive(ControlDto controlDto) {
-        log.info(" log : " + controlDto);
-    }
+//    @RabbitListener(queues = CONTROL_QUEUE_NAME)
+//    public void receive(ControlDto controlDto) {
+//
+////        log.info(" log : " + controlDto);
+//    }
 
 
 }

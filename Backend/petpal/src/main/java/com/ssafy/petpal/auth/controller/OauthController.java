@@ -8,6 +8,7 @@ import com.ssafy.petpal.control.dto.ControlDto;
 import com.ssafy.petpal.exception.CustomException;
 import com.ssafy.petpal.exception.ErrorCode;
 import com.ssafy.petpal.home.dto.HomeRequestDTO;
+import com.ssafy.petpal.home.entity.Home;
 import com.ssafy.petpal.home.service.HomeService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,10 +44,12 @@ public class OauthController {
 
                 oauthResponseDto.setAccessToken(arr[0]);
                 oauthResponseDto.setRefreshToken(arr[1]);
-                if(homeService.fetchAllByUserId(Long.valueOf(arr[2])).isEmpty())
+                List<Home> list = homeService.fetchAllByUserId(Long.valueOf(arr[2]));
+                if(list.isEmpty())
                     oauthResponseDto.setHomeId(homeService.createHome(new HomeRequestDTO(Long.valueOf(arr[2]))));
                 else
-                    oauthResponseDto.setHomeId(homeService.fetchAllByUserId(Long.valueOf(arr[2])).get(0).getId());
+                    oauthResponseDto.setHomeId(list.get(0).getId());
+//                oauthResponseDto.setHomeId(2);
         }
         ControlDto controlDto = new ControlDto();
         controlDto.setType("HOMEID");
