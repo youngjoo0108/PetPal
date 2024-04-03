@@ -124,44 +124,50 @@ class Tracking(Node):
 
 
     def tracking_dog(self):
+        try:
+            if self.turtlebot_to_dog_distance < 2.0 or self.dog_height > 72: # 1.2 / 120
+        
+                self.ros_log_pub.publish_log('DEBUG', 'Subscription tracking: dog is too close')
+                if self.turtlebot_to_dog_distance < 0.7 or self.dog_height > 150:
 
-        if self.turtlebot_to_dog_distance < 2.0 or self.dog_height > 72: # 1.2 / 120
+                    self.tracking_err_msg.data = 4
+                    self.tracking_pub.publish(self.tracking_err_msg)
+                    
+                else:
+                    if -20 < self.dog_x_in_camera < 20:
 
-            if self.turtlebot_to_dog_distance < 0.7 or self.dog_height > 150:
+                        self.tracking_err_msg.data = 1
+                        self.tracking_pub.publish(self.tracking_err_msg)
+                        
+                    elif -160 < self.dog_x_in_camera <= -20:
 
-                self.tracking_err_msg.data = 4
-                self.tracking_pub.publish(self.tracking_err_msg)
-                
+                        self.tracking_err_msg.data = 2
+                        self.tracking_pub.publish(self.tracking_err_msg)
+                        
+
+                    elif 20 <= self.dog_x_in_camera < 160:
+
+                        self.tracking_err_msg.data = 3
+                        self.tracking_pub.publish(self.tracking_err_msg)
             else:
-                if -20 < self.dog_x_in_camera < 20:
+        
+                self.ros_log_pub.publish_log('DEBUG', 'Subscription tracking: goal pose have to publish')
+                
+                self.goal_msg.pose.position.x = self.goal_x
+                self.goal_msg.pose.position.y = self.goal_y
+                # print(f'tracing {self.goal_x} {self.goal_y} {self.turtlebot_to_dog_distance}')
+                q = Quaternion.from_euler(0, 0, self.goal_yaw)
 
-                    self.tracking_err_msg.data = 1
-                    self.tracking_pub.publish(self.tracking_err_msg)
-                    
-                elif -160 < self.dog_x_in_camera <= -20:
+                self.goal_msg.pose.orientation.x = q.x
+                self.goal_msg.pose.orientation.y = q.y
+                self.goal_msg.pose.orientation.z = q.z
+                self.goal_msg.pose.orientation.w = q.w
 
-                    self.tracking_err_msg.data = 2
-                    self.tracking_pub.publish(self.tracking_err_msg)
-                    
-
-                elif 20 <= self.dog_x_in_camera < 160:
-
-                    self.tracking_err_msg.data = 3
-                    self.tracking_pub.publish(self.tracking_err_msg)
-        else:
+                self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
+                self.goal_pub.publish(self.goal_msg)
+        except Exception as e:
             
-            self.goal_msg.pose.position.x = self.goal_x
-            self.goal_msg.pose.position.y = self.goal_y
-            # print(f'tracing {self.goal_x} {self.goal_y} {self.turtlebot_to_dog_distance}')
-            q = Quaternion.from_euler(0, 0, self.goal_yaw)
-
-            self.goal_msg.pose.orientation.x = q.x
-            self.goal_msg.pose.orientation.y = q.y
-            self.goal_msg.pose.orientation.z = q.z
-            self.goal_msg.pose.orientation.w = q.w
-
-            self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
-            self.goal_pub.publish(self.goal_msg)
+            self.ros_log_pub.publish_log('DEBUG', f'error occurs{e}')
 
     def put_api(self):
         url = "https://j10a209.p.ssafy.io/api/v1/homes/pet/" + str(params['homeId'])

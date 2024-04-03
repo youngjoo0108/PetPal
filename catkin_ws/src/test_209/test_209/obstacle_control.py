@@ -85,7 +85,7 @@ class ObstacleControl(Node):
             self.get_logger().error('Subscription initialization error: {}'.format(e))
 
     def fsm_callback(self, msg):
-        self.fsm_msg.data = msg
+        self.fsm_msg = msg
 
     def obstacle_callback(self, msg):
         data = json.loads(msg.data)
@@ -134,7 +134,7 @@ class ObstacleControl(Node):
 
 
                     self.tracking_obstacle()
-        elif data['dog_list'] and self.fsm_msg.data == 'search':
+        if data['dog_list'] and self.fsm_msg.data == 'search':
             self.request_msg.data = "found"
             self.request_pub.publish(self.request_msg)
 
