@@ -9,7 +9,7 @@ from ssafy_msgs.msg import TurtlebotStatus
 from ros_log_package.RosLogPublisher import RosLogPublisher
 
 params = {
-    'homeId' : 1
+    'homeId' : 2
 }
 
 class Search(Node):
@@ -93,6 +93,8 @@ class Search(Node):
 
             if abs(now_grid_cell[0] - self.route[self.idx][0]) + abs(now_grid_cell[1] - self.route[self.idx][1]) <= 10:
                 self.idx += 1
+                if self.idx >= len(self.route):
+                    self.idx = 0
 
             now_goal = self.route[self.idx]
             #print(self.idx, 'th = ', now_goal)
@@ -135,7 +137,7 @@ class Search(Node):
             self.go_last_point(self.goal_x, self.goal_y)
             
         else:
-            print('Failed to get data')
+            self.search = True
     
 
     def go_last_point(self, x, y):

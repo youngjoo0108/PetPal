@@ -9,7 +9,8 @@ import time
 from ros_log_package.RosLogPublisher import RosLogPublisher
 
 
-obstacles= ['Knife', 'PenHolder', 'BookPile', 'Stapler', 'Mug']
+#obstacles= ['Knife', 'PenHolder', 'BookPile', 'Stapler', 'Mug']
+obstacles= ['Knife', 'PenHolder', 'Stapler', 'Mug']
 furnitures = ['Plant', 'Chair', 'Table', 'BoxTable', 'BackPack', 'Bed', 'Sofa', 'Washer']
 dogs = ['Dog']
 humans = ['Person']
@@ -76,7 +77,7 @@ class DataClassifyNode(Node):
                         json_str = json.dumps(topic_data)
                         msg = String()
                         msg.data = json_str
-                        print('send list:', json_str)
+                        #print('send list:', json_str)
                         self.publisher_yolo.publish(msg)
                         self.ros_log_pub.publish_log('INFO', f'Object detected message enter : {msg}')
                     elif message_data.get('type') == "IOT":
@@ -86,11 +87,11 @@ class DataClassifyNode(Node):
                             'iot_uuid': topic_data[:slice_point],
                             'control_action': topic_data[slice_point + 1:]
                         }
-                        print
+
                         msg = IotCmd()
                         msg.iot_uuid = iot_control_data['iot_uuid']
                         msg.control_action = iot_control_data['control_action']
-                        print(msg)
+                        #print(msg)
                         self.publisher_iot_control.publish(msg)
                         self.ros_log_pub.publish_log('INFO', f'IoT control message enter : {msg}')
                     elif message_data.get('type') == "SCAN":
@@ -130,6 +131,14 @@ class DataClassifyNode(Node):
         dog_list = []
         human_list = []
         iot_list = []
+
+        topic_data = {
+            'obstacle_list': obstacle_list,
+            'furniture_list': furniture_list,
+            'dog_list': dog_list,
+            'human_list': human_list,
+            'iot_list': iot_list
+        }
         
         for obj in obj_list:
             start_type = obj.find('/')
