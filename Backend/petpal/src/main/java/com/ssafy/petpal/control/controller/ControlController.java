@@ -71,27 +71,21 @@ public class ControlController {
                 Long targetUserId = homeService.findKakaoIdByHomeId(homeId);
                 LocalDateTime nowInKorea = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
                 String formattedTime = nowInKorea.format(formatter);
+                StringBuilder sb = new StringBuilder();
+                sb.append(formattedTime);
 
                 NotificationRequestDto notificationRequestDto
-                        = new NotificationRequestDto(targetUserId, type, "스캔이 완료되었습니다.",
-                        formattedTime,".");
+                        = new NotificationRequestDto(targetUserId, "스캔", "스캔이 완료되었습니다.",
+                        formattedTime,"https://i.imgur.com/UemjaFZ.png");
                 fcmService.sendMessageTo(notificationRequestDto);
                 notificationService.saveNotification(notificationRequestDto); // DB에 저장
             }
             break;
-        }
-    }
 
-    @MessageMapping("control.message.{homeId}")
-    public void sendMessage(@Payload ControlDto controlDto, @DestinationVariable Long homeId) throws IOException {
-//        log.info("Received message: {}", rawMessage);
-//        ControlDto controlDto = objectMapper.readValue(rawMessage, ControlDto.class);
-        String type = controlDto.getType();
-        switch (type){
             //COMPLETE한게 가전 On/Off를 완료한 것인지 위험물 처리 프로세스를 완료한 것인지 구분을 할 필요가 있음.
-            case "A_COMPLETE":
+            case "ACOMPLETE":
                 // ROS에서 입증한 실제 가전상태 데이터를 redis에 올린다.
 //                controlDto.getMessage() //parsing
                 MessageContainer.A_Complete aComplete = objectMapper.readValue(controlDto.getMessage(),MessageContainer.A_Complete.class);
@@ -105,24 +99,18 @@ public class ControlController {
                 Long targetUserId = homeService.findKakaoIdByHomeId(homeId);
                 LocalDateTime nowInKorea = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
                 String formattedTime = nowInKorea.format(formatter);
 
                 String downloadURL1 = imageService.generateURL(aComplete.getApplianceName()+".png", HttpMethod.GET);
                 NotificationRequestDto notificationRequestDto1
-                        = new NotificationRequestDto(targetUserId, type, aComplete.getApplianceName()+"의 상태를 변경하였습니다.",
+                        = new NotificationRequestDto(targetUserId, "제어", aComplete.getApplianceName()+"의 상태를 변경하였습니다.",
                         formattedTime,downloadURL1);
                 fcmService.sendMessageTo(notificationRequestDto1);
                 notificationService.saveNotification(notificationRequestDto1); // DB에 저장
-                break;
-            case "ON": case "OFF":
-//            case "WEATHER": case "TURTLE":
-            case "SCAN": case "IOT": case "MODE":
-            case "REGISTER_REQUEST" : // case "REGISTER_RESPONSE":
-            case "COMPLETE": //이건 스캔 완료 COMPLETE
-                rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
-                break;
-            case "O_COMPLETE":
+            break;
+
+            case "OCOMPLETE":
                 MessageContainer.O_Complete oComplete =  objectMapper.readValue(controlDto.getMessage(), MessageContainer.O_Complete.class);
                 String filename = targetService.fetchFilenameByTargetId(oComplete.getObjectId());
                 String downloadURL = imageService.generateURL(filename, HttpMethod.GET);
@@ -130,11 +118,27 @@ public class ControlController {
                 Long targetUserId2 = homeService.findKakaoIdByHomeId(homeId);
                 LocalDateTime nowInKorea2 = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 
-                DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
                 String formattedTime2 = nowInKorea2.format(formatter2);
                 NotificationRequestDto notificationRequestDto2
-                        = new NotificationRequestDto(targetUserId2, type, oComplete.getObjectType()+"를 처리하였습니다.",
+                        = new NotificationRequestDto(targetUserId2, "처리", oComplete.getObjectType()+"를 처리하였습니다.",
                         formattedTime2,downloadURL);
+            break;
+        }
+    }
+
+    @MessageMapping("control.message.{homeId}")
+    public void sendMessage(@Payload ControlDto controlDto, @DestinationVariable Long homeId) throws IOException {
+//        log.info("Received message: {}", rawMessage);
+//        ControlDto controlDto = objectMapper.readValue(rawMessage, ControlDto.class);
+        String type = controlDto.getType();
+        switch (type){
+            case "ON": case "OFF":
+//            case "WEATHER": case "TURTLE":
+            case "SCAN": case "IOT": case "MODE":
+            case "REGISTER_REQUEST" : // case "REGISTER_RESPONSE":
+            case "COMPLETE": //이건 스캔 완료 COMPLETE
+                rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
                 break;
             default:
                 break;
