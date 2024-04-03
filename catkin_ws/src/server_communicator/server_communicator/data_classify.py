@@ -76,7 +76,7 @@ class DataClassifyNode(Node):
                         json_str = json.dumps(topic_data)
                         msg = String()
                         msg.data = json_str
-                        # print('send list:', json_str)
+                        print('send list:', json_str)
                         self.publisher_yolo.publish(msg)
                         self.ros_log_pub.publish_log('INFO', f'Object detected message enter : {msg}')
                     elif message_data.get('type') == "IOT":

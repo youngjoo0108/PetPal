@@ -75,13 +75,14 @@ class resize(Node):
             'homeId': self.homeId,
             'data': data,
             'startGrid': {
-                'x': self.range[0][0],
-                'y': self.range[1][0],
+                'x': self.range[1][0],
+                'y': self.range[0][0],
             }
         }
         response = requests.post(url, json=body)
-        print(response)
-        data += '\n{0} {1}\n {2} {3}'.format(self.range[0][0], self.range[0][1], self.range[1][0], self.range[1][1])
+        # print(response)
+        data = ''
+        data += '{0} {1}\n{2} {3}'.format(self.range[1][0], self.range[0][0], self.range[1][1], self.range[0][1])
         f=open(full_path,'w')
         
         #data += '\n{0} {1}'.format(node.map_msg.info.origin.position.x, node.map_msg.info.origin.position.y)
