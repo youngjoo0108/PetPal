@@ -4,23 +4,28 @@ from rclpy.clock import Clock, ClockType
 import requests
 import threading
 import datetime
-from ssafy_msgs.msg import TurtlebotStatus, EnviromentStatus
+from ssafy_msgs.msg import TurtlebotStatus, EnviromentStatus, IotCmd
 
 class TimedTaskExecutor(Node):
     def __init__(self):
         super().__init__('timed_task_executor')
-        self.envir_sub = self.create_subscription(EnviromentStatus, '/envir_status', self.envir_callback, 10)
+        self.fetch_schedule_period = 3  # 스케줄 정보를 가져오는 주기(초)
 
+        self.envir_sub = self.create_subscription(EnviromentStatus, '/envir_status', self.envir_callback, 10)
+        self.timer = self.create_timer(self.fetch_schedule_period, self.timer_callback)
+        self.iot_cmd_pub = self.create_publisher(IotCmd, 'iot_cmd', 10)
+
+        self.iot_cmd_msg = IotCmd()
         self.envir_msg = EnviromentStatus()
         self.is_envir = False
 
         self.homeId = '2'
         #self.ros_clock = Clock(clock_type=ClockType.ROS_TIME)
         self.scheduled_tasks = {}  # 실행할 작업 목록을 저장하는 딕셔너리
-        self.fetch_schedule_period = 5  # 스케줄 정보를 가져오는 주기(초)
+        
         self.api_url = "https://j10a209.p.ssafy.io/api/v1/schedules/" + self.homeId  # API URL
-        self.init_schedule_update()
-        self.check_time_and_execute()
+        #self.init_schedule_update()
+        #self.check_time_and_execute()
 
     def fetch_and_update_schedules(self):
         try:
@@ -29,13 +34,14 @@ class TimedTaskExecutor(Node):
                 schedules = response.json()
                 # 스케줄 정보 업데이트
                 for schedule in schedules:
-                    if schedule['isActive']:
+                    if schedule['active']:
                         month = schedule['day'].split('-')[1]
                         day = schedule['day'].split('-')[2]
                         hour = schedule['time'].split(':')[0]
                         task_time = month + '-' + day + '-' + hour
+                        uid = schedule['applianceUUID']
                         task_name = schedule['taskType']  # 예: 'task1', 'task2' 등의 작업 이름
-                        self.scheduled_tasks[task_time] = task_name
+                        self.scheduled_tasks[task_time] = (uid, task_name)
             else:
                 self.get_logger().error('Failed to fetch schedules from API.')
             print(self.scheduled_tasks)
@@ -67,14 +73,23 @@ class TimedTaskExecutor(Node):
         if not self.is_envir:
             return
 
-        while rclpy.ok():
+        #while rclpy.ok():
             #now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
-            now = self.envir_msg.month + '-' + self.envir_msg.day + '-' + self.envir_msg.hour
-            if now in self.scheduled_tasks:
-                self.scheduled_tasks[now]()
-                # 실행 후 해당 작업을 목록에서 제거
-                del self.scheduled_tasks[now]
-            rclpy.spin_once(self, timeout_sec=60)  # 매 분마다 현재 시간 확인
+        now = '{:02d}-{:02d}-{:02d}'.format(self.envir_msg.month, self.envir_msg.day, self.envir_msg.hour)
+        
+        if now in self.scheduled_tasks:
+            task = self.scheduled_tasks[now]
+            print(task)
+            self.iot_cmd_msg.iot_uuid = task[0]
+            self.iot_cmd_msg.control_action = task[1]
+            self.iot_cmd_pub.publish(self.iot_cmd_msg)
+            # 실행 후 해당 작업을 목록에서 제거
+            del self.scheduled_tasks[now]
+            #rclpy.spin_once(self, timeout_sec=1)  # 매 분마다 현재 시간 확인
+    
+    def timer_callback(self):
+        self.fetch_and_update_schedules()
+        self.check_time_and_execute()
 
 def main(args=None):
     rclpy.init(args=args)
