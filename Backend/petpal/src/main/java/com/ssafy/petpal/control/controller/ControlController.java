@@ -90,11 +90,9 @@ public class ControlController {
 //                controlDto.getMessage() //parsing
 //                MessageContainer.A_Complete aComplete = objectMapper.readValue(controlDto.getMessage(),MessageContainer.A_Complete.class);
                 MessageContainer.A_Complete aComplete = (MessageContainer.A_Complete) controlDto.getMessage();
-                if(aComplete.getIsSuccess()){
-                    applianceService.updateApplianceStatus(homeId,aComplete.getApplianceId(),aComplete.getCurrentStatus());
-                }else{
-                    // 다시 발행
-                }
+
+                applianceService.updateApplianceStatus(homeId,aComplete.getApplianceUUID(),aComplete.getCurrentStatus());
+
 //              fcm 호출.
                 //가전 상태 제어 완료 알림 보내기!
                 Long targetUserId = homeService.findKakaoIdByHomeId(homeId);
@@ -103,11 +101,11 @@ public class ControlController {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
                 String formattedTime = nowInKorea.format(formatter);
 
-                String downloadURL1 = imageService.generateURL(aComplete.getApplianceName()+".png", HttpMethod.GET);
+                String downloadURL1 = imageService.generateURL("가전"+".png", HttpMethod.GET);
                 NotificationRequestDto notificationRequestDto1
-                        = new NotificationRequestDto(targetUserId, "제어", aComplete.getApplianceName()+"의 상태를 변경하였습니다.",
+                        = new NotificationRequestDto(targetUserId, "제어", "가전"+"의 상태를 변경하였습니다.",
                         formattedTime,downloadURL1);
-                fcmService.sendMessageTo(notificationRequestDto1);
+                    fcmService.sendMessageTo(notificationRequestDto1);
                 notificationService.saveNotification(notificationRequestDto1); // DB에 저장
             break;
 

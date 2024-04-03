@@ -11,10 +11,7 @@ public class MessageContainer {
     @Setter
     public static class A_Complete{
 
-        private Long applianceId;
-        private String applianceName;
-        private Boolean isSuccess;
-        private String controlType;
+        private String applianceUUID;
         private String currentStatus;
     }
 

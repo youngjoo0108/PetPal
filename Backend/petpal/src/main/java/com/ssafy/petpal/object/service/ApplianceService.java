@@ -56,7 +56,7 @@ public class ApplianceService {
 
     public ApplianceResponseDto fetchApplianceByUUID(String uuid){
         ApplianceResponseDto appliance = applianceRepository.findByApplianceUUID(uuid);
-        String applianceStatus = getApplianceStatus(appliance.getHomeId(), appliance.getApplianceId());
+        String applianceStatus = getApplianceStatus(appliance.getHomeId(), appliance.getApplianceUUID());
 
         if(applianceStatus==null){
             redisTemplate.opsForValue().set("home:"+appliance.getHomeId()+":appliance:"+appliance.getApplianceId(),"OFF");
@@ -71,7 +71,7 @@ public class ApplianceService {
     public List<ApplianceResponseDto> fetchAllApplianceByRoomId(Long roomId){
         List<ApplianceResponseDto> list = applianceRepository.findAllByRoomId(roomId);
         list.forEach(appliance -> {
-            String applianceStatus = getApplianceStatus(appliance.getHomeId(), appliance.getApplianceId());
+            String applianceStatus = getApplianceStatus(appliance.getHomeId(), appliance.getApplianceUUID());
             if(applianceStatus==null){
                 redisTemplate.opsForValue().set("home:"+appliance.getHomeId()+":appliance:"+appliance.getApplianceId(),"OFF");
                 applianceStatus="OFF";
@@ -88,7 +88,7 @@ public class ApplianceService {
     public List<ApplianceResponseDto> fetchAllApplianceByHomeId(Long homeId){
         List<ApplianceResponseDto> list = applianceRepository.findAllByHomeId(homeId);
         list.forEach(appliance -> {
-            String applianceStatus = getApplianceStatus(appliance.getHomeId(), appliance.getApplianceId());
+            String applianceStatus = getApplianceStatus(appliance.getHomeId(), appliance.getApplianceUUID());
             if(applianceStatus==null){
                 redisTemplate.opsForValue().set("home:"+appliance.getHomeId()+":appliance:"+appliance.getApplianceId(),"OFF");
                 applianceStatus="OFF";
@@ -100,24 +100,24 @@ public class ApplianceService {
         return list;
     }
 
-    public void updateApplianceStatus(Long homeId, Long applianceId, String status) {
+    public void updateApplianceStatus(Long homeId, String applianceUUID, String status) {
 
-        redisTemplate.opsForValue().set("home:" + homeId + ":appliance:" + applianceId, status);
+        redisTemplate.opsForValue().set("home:" + homeId + ":appliance:" + applianceUUID, status);
 
     }
 
-    public String getApplianceStatus(Long homeId, Long applianceId) {
-        String key = "home:" + homeId + ":appliance:" + applianceId;
+    public String getApplianceStatus(Long homeId, String applianceUUID) {
+        String key = "home:" + homeId + ":appliance:" + applianceUUID;
         String value = redisTemplate.opsForValue().get(key);
         if (value != null) {
             try {
                 return value;
             } catch (Exception e) {
-                log.error("Invalid appliance status format for appliance " + applianceId, e);
+                log.error("Invalid appliance status format for appliance " + applianceUUID, e);
                 return "NULL"; // 상태를 알 수 없는 경우, 예: 잘못된 형식
             }
         } else {
-            log.info("No status found for appliance " + applianceId + ", defaulting to NULL");
+            log.info("No status found for appliance " + applianceUUID + ", defaulting to NULL");
             return "NULL"; // Redis에서 조회된 값이 null인 경우
         }
     }
