@@ -12,6 +12,7 @@ import com.ssafy.petpal.map.service.MapService;
 import com.ssafy.petpal.notification.dto.NotificationRequestDto;
 import com.ssafy.petpal.notification.service.FcmService;
 import com.ssafy.petpal.notification.service.NotificationService;
+import com.ssafy.petpal.object.dto.ApplianceResponseDto;
 import com.ssafy.petpal.object.service.ApplianceService;
 import com.ssafy.petpal.object.service.TargetService;
 import com.ssafy.petpal.route.dto.RouteDto;
@@ -101,11 +102,13 @@ public class ControlController {
 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
                 String formattedTime = nowInKorea.format(formatter);
+                ApplianceResponseDto applianceResponseDto = applianceService.fetchApplianceByUUID(aComplete.getApplianceUUID());
 
-                String downloadURL1 = imageService.generateURL("가전"+".png", HttpMethod.GET);
+                String downloadURL1 = imageService.generateURL(applianceResponseDto.getApplianceType()+".png", HttpMethod.GET);
 //                log.info("notiDTO 생성 전");
+
                 NotificationRequestDto notificationRequestDto1
-                        = new NotificationRequestDto(targetUserId, "제어", "가전"+"의 상태를 변경하였습니다.",
+                        = new NotificationRequestDto(targetUserId, "제어", applianceResponseDto.getRoomName()+"-"+applianceResponseDto.getApplianceType()+"의 상태를 변경하였습니다.",
                         formattedTime,downloadURL1);
                     fcmService.sendMessageTo(notificationRequestDto1);
                 notificationService.saveNotification(notificationRequestDto1); // DB에 저장
