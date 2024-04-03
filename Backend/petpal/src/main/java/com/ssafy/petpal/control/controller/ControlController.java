@@ -89,10 +89,11 @@ public class ControlController {
                 // ROS에서 입증한 실제 가전상태 데이터를 redis에 올린다.
 //                controlDto.getMessage() //parsing
 //                MessageContainer.A_Complete aComplete = objectMapper.readValue(controlDto.getMessage(),MessageContainer.A_Complete.class);
+                log.info("변환 전");
                 MessageContainer.A_Complete aComplete = (MessageContainer.A_Complete) controlDto.getMessage();
-
+                log.info("변환 후: "+aComplete.toString());
                 applianceService.updateApplianceStatus(homeId,aComplete.getApplianceUUID(),aComplete.getCurrentStatus());
-
+                log.info("스테이터스 변환 완료");
 //              fcm 호출.
                 //가전 상태 제어 완료 알림 보내기!
                 Long targetUserId = homeService.findKakaoIdByHomeId(homeId);
@@ -102,11 +103,13 @@ public class ControlController {
                 String formattedTime = nowInKorea.format(formatter);
 
                 String downloadURL1 = imageService.generateURL("가전"+".png", HttpMethod.GET);
+                log.info("notiDTO 생성 전");
                 NotificationRequestDto notificationRequestDto1
                         = new NotificationRequestDto(targetUserId, "제어", "가전"+"의 상태를 변경하였습니다.",
                         formattedTime,downloadURL1);
                     fcmService.sendMessageTo(notificationRequestDto1);
                 notificationService.saveNotification(notificationRequestDto1); // DB에 저장
+                log.info("notiDTO 저장 완료");
             break;
 
             case "OCOMPLETE":

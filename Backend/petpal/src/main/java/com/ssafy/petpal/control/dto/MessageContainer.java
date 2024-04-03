@@ -2,6 +2,7 @@ package com.ssafy.petpal.control.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 public class MessageContainer {
@@ -9,6 +10,7 @@ public class MessageContainer {
     private O_Complete oComplete;
     @Getter
     @Setter
+    @ToString
     public static class A_Complete{
 
         private String applianceUUID;
