@@ -42,7 +42,7 @@ setup(
             'astarlocal=test_209.a_star_local:main',
 
             # iot control
-            'iot_con=test_209.iot_control:main',
+            'iot=test_209.iot_control:main',
             'handcontrol=test_209.hand_control:main',
             'iot_test=test_209.iot_test:main',
             'iot_room1=test_209.iot_room1:main',

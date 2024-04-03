@@ -7,10 +7,10 @@ from nav_msgs.msg import Odometry, Path
 from ssafy_msgs.msg import IotInfo, IotCmd
 from geometry_msgs.msg import PoseStamped
 
-class device(Node):
+class iotControl(Node):
 
     def __init__(self):
-        super().__init__('device')
+        super().__init__('iot_control')
 
         self.iot_sub = self.create_subscription(IotInfo, '/iot', self.iot_callback, 10)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 1)
@@ -77,16 +77,17 @@ class device(Node):
                     self.f.write('{0} {1} {2}\n'.format(self.iot_msg.uid, x, y))
                 
                 temp = {
-                    'type' : 'REGISTER_RESPONSE',
+                    'type' : 'REGISTER',
                     'message' : self.iot_msg.uid
                 }
                 data = json.dumps(temp)
                 self.data_msg.data = data
                 self.data_pub.publish(self.data_msg)
             else:
+                self.is_state_change = False
                 self.request_msg.data = "iot_on"
                 self.request_pub.publish(self.request_msg)
-                self.is_state_change = False
+                
 
 
     def timer_callback(self):
@@ -99,6 +100,15 @@ class device(Node):
                 self.iot_control.user_cmd(self.now_device, self.cmd)
                 self.is_state_change = True
                 self.now_device = None
+
+                temp = {
+                    'type' : 'ACOMPLETE',
+                    'message' : ""
+                }
+                data = json.dumps(temp)
+                self.data_msg.data = data
+                self.data_pub.publish(self.data_msg)
+
                 self.request_msg.data = "iot_off"
                 self.request_pub.publish(self.request_msg)
             else:
@@ -122,7 +132,7 @@ class device(Node):
 def main(args=None):
     rclpy.init(args=args)
     try :
-        device_control = device()
+        device_control = iotControl()
         rclpy.spin(device_control)
         device_control.destroy_node()
         rclpy.shutdown()

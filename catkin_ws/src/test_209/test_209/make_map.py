@@ -263,7 +263,7 @@ class Mapper(Node):
     def save_path(self):
         self.path_maker = makeRoute(self.map_msg.data)
         patrol_path = self.path_maker.answer
-        full_path = 'C:\\Users\\SSAFY\\Desktop\\pppp.txt'
+        full_path = 'C:\\Users\\SSAFY\\Desktop\\\S10P22A209\\catkin_ws\\src\\test_209\\route\\route.txt'
         f=open(full_path,'w')
         data=''
 

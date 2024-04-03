@@ -29,6 +29,7 @@ class resize(Node):
         # self.map_offset_y = -4 - (self.map_size_y * self.map_resolution) / 2
         
         self.range = [[0, 700], [0, 700]]
+        self.homeId = '2'
 
         grid = np.array(self.map_msg.data)
         grid = np.reshape(grid,(self.map_size_x, self.map_size_y))
@@ -71,7 +72,7 @@ class resize(Node):
 
         url = "https://j10a209.p.ssafy.io/api/v1/maps"
         body = {
-            'homeId': 1,
+            'homeId': self.homeId,
             'data': data,
             'startGrid': {
                 'x': self.range[0][0],
