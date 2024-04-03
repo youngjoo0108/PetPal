@@ -44,10 +44,10 @@ import java.time.format.DateTimeFormatter;
 public class ControlController {
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
-    private final StringRedisTemplate redisTemplate;
+//    private final StringRedisTemplate redisTemplate;
     private final ApplianceService applianceService;
-    private final MapService mapService;
-    private final RouteService routeService;
+//    private final MapService mapService;
+//    private final RouteService routeService;
     private final FcmService fcmService;
     private final HomeService homeService;
 //    private final UserService userService;
@@ -64,8 +64,22 @@ public class ControlController {
         ControlDto controlDto = objectMapper.readValue(rawMessage, ControlDto.class);
         String type = controlDto.getType();
         switch (type) {
-            case "WEATHER": case "TURTLE": case "REGISTER_RESPONSE": case "COMPLETE":
+            case "WEATHER": case "TURTLE": case "REGISTER": case "COMPLETE":
             rabbitTemplate.convertAndSend(CONTROL_EXCHANGE_NAME, "home." + homeId, controlDto);
+            if(type.equals("COMPLETE")){
+                //스캔 완료 알림 보내기
+                Long targetUserId = homeService.findKakaoIdByHomeId(homeId);
+                LocalDateTime nowInKorea = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                String formattedTime = nowInKorea.format(formatter);
+
+                NotificationRequestDto notificationRequestDto
+                        = new NotificationRequestDto(targetUserId, type, "스캔이 완료되었습니다.",
+                        formattedTime,".");
+                fcmService.sendMessageTo(notificationRequestDto);
+                notificationService.saveNotification(notificationRequestDto); // DB에 저장
+            }
             break;
         }
     }
