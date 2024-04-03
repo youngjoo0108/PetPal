@@ -87,6 +87,8 @@ class patrolRoute(Node):
 
             if abs(now_grid_cell[0] - self.route[self.idx][0]) + abs(now_grid_cell[1] - self.route[self.idx][1]) <= 10:
                 self.idx += 1
+                if self.idx >= len(self.route):
+                    self.idx = 0
 
             now_goal = self.route[self.idx]
             #print(self.idx, 'th = ', now_goal)

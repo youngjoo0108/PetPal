@@ -101,9 +101,13 @@ class iotControl(Node):
                 self.is_state_change = True
                 self.now_device = None
 
+                dt = {
+                    'applianceUUID' : self.now_device,
+                    'currentStatus' : self.cmd
+                }
                 temp = {
                     'type' : 'ACOMPLETE',
-                    'message' : ""
+                    'message' : dt
                 }
                 data = json.dumps(temp)
                 self.data_msg.data = data

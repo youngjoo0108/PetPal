@@ -8,10 +8,11 @@ import datetime
 class TimedTaskExecutor(Node):
     def __init__(self):
         super().__init__('timed_task_executor')
+        self.homeId = '2'
         self.ros_clock = Clock(clock_type=ClockType.ROS_TIME)
         self.scheduled_tasks = {}  # 실행할 작업 목록을 저장하는 딕셔너리
         self.fetch_schedule_period = 60  # 스케줄 정보를 가져오는 주기(초)
-        self.api_url = "https://j10a209.p.ssafy.io/api/v1/schedules/1"  # API URL
+        self.api_url = "https://j10a209.p.ssafy.io/api/v1/schedules/" + self.homeId  # API URL
         self.init_schedule_update()
 
     def fetch_and_update_schedules(self):

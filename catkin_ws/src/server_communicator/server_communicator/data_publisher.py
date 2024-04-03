@@ -16,7 +16,7 @@ from ros_log_package.RosLogPublisher import RosLogPublisher
 class WebSocketClientSendNode(Node):
     def __init__(self):
         super().__init__('websocket_client_send_node')
-        
+        #logging.basicConfig(level=logging.DEBUG) 
         self.ros_log_pub = None
         try:
             self.ros_log_pub = RosLogPublisher(self)
