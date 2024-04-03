@@ -22,9 +22,9 @@ public class MessageContainer {
     public static class O_Complete{
         private Long objectId;
         private String objectType;
-        private Boolean isSuccess;
-        private String controlType;
-        private String currentStatus;
+//        private Boolean isSuccess;
+//        private String controlType;
+//        private String currentStatus;
 
     }
 

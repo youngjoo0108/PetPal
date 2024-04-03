@@ -113,7 +113,8 @@ public class ControlController {
             break;
 
             case "OCOMPLETE":
-                MessageContainer.O_Complete oComplete = (MessageContainer.O_Complete) controlDto.getMessage();
+                MessageContainer.O_Complete oComplete = objectMapper.convertValue(controlDto.getMessage(), MessageContainer.O_Complete.class);
+
                 String filename = targetService.fetchFilenameByTargetId(oComplete.getObjectId());
                 String downloadURL = imageService.generateURL(filename, HttpMethod.GET);
 

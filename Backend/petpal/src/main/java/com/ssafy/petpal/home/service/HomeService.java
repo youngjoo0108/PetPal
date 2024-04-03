@@ -39,7 +39,7 @@ public class HomeService {
 
     public Location fetchPetCoordinate(Long homeId, int depth){
         if(depth==2){
-            return new Location(0.1,0.2);
+            return null;
         }
         String key = "home:" + homeId+":pet";
         try{

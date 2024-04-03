@@ -45,7 +45,11 @@ public class HomeController {
     @GetMapping("/pet/{homeId}")
     public ResponseEntity<Location> getPetCoordinate(@PathVariable Long homeId){
         try{
-            return ResponseEntity.ok(homeService.fetchPetCoordinate(homeId,0));
+            Location location = homeService.fetchPetCoordinate(homeId, 0);
+            if(location == null){
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(location);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -65,7 +69,11 @@ public class HomeController {
     @GetMapping("/turtle/{homeId}")
     public ResponseEntity<Location> getTurtleCoordinate(@PathVariable Long homeId){
         try{
-            return ResponseEntity.ok(homeService.fetchTurtleCoordinate(homeId,0));
+            Location location = homeService.fetchTurtleCoordinate(homeId, 0);
+            if(location == null){
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(location);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
