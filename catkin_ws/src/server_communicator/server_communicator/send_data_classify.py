@@ -21,6 +21,7 @@ debug_mode = True
 class SendDataClassifyNode(Node):
     def __init__(self):
         super().__init__('send_data_classify_node')
+        self.half_frame = True
         
         self.ros_log_pub = None
         try:
@@ -54,18 +55,22 @@ class SendDataClassifyNode(Node):
     
     def video_callback(self, video_image):
         try:
-            video_image_base64 = base64.b64encode(video_image.data).decode('utf-8')
-            now = time.localtime()
-            msg = {
-                "type": "video_streaming", 
-                "sender": "user_1",
-                "time": time.strftime('%X', now),
-                "message": video_image_base64
-            }
-            msg_string = String()
-            msg_string.data = 'V' + json.dumps(msg)
-            
-            self.publisher_data.publish(msg_string)
+            if self.half_frame:
+                video_image_base64 = base64.b64encode(video_image.data).decode('utf-8')
+                now = time.localtime()
+                msg = {
+                    "type": "video_streaming", 
+                    "sender": "user_1",
+                    "time": time.strftime('%X', now),
+                    "message": video_image_base64
+                }
+                msg_string = String()
+                msg_string.data = 'V' + json.dumps(msg)
+                
+                self.publisher_data.publish(msg_string)
+                self.half_frame = False
+            else:
+                self.half_frame = True
         except Exception as e:
             self.ros_log_pub.publish_log('ERROR', 'Sending video error: {}'.format(e))
     
