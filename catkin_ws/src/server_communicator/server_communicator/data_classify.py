@@ -28,7 +28,7 @@ class DataClassifyNode(Node):
             self.get_logger().error('ERROR', 'Subscription initialization error: {}'.format(e))
         
         try:
-            self.publisher_yolo = self.create_publisher(String, 'captured_object', 10)
+            self.publisher_yolo = self.create_publisher(String, 'captured_object', 10**3)
         except:
             self.ros_log_pub.publish_log('ERROR', 'init publisher yolo error: {}'.format(e))
             
