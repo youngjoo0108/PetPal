@@ -1,6 +1,5 @@
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import String
 import asyncio
 import websockets
@@ -17,14 +16,6 @@ from ros_log_package.RosLogPublisher import RosLogPublisher
 class WebSocketClientSendNode(Node):
     def __init__(self):
         super().__init__('websocket_client_send_node')
-
-        # full_path = 'C:\\Users\\SSAFY\\Desktop\\\S10P22A209\\catkin_ws\\src\\test_209\\homeId.txt'
-        # f = open(full_path, 'r')
-
-        # self.homeId = f.readlines[0]
-
-        # f.close()
-        self.homeId = '2'
         
         self.ros_log_pub = None
         try:
@@ -91,7 +82,7 @@ class WebSocketClientSendNode(Node):
         await self.ensure_websocket_connected() # 변경: 메시지 전송 전에 웹소켓 연결 상태 확인
         try:
             if(msg[0] == 'D'):
-                send = stomper.send("/pub/ros.control.message." + self.homeId, msg[1:])
+                send = stomper.send("/pub/ros.control.message.2", msg[1:])
             elif(msg[0] == 'V'):
                 send = stomper.send("/pub/images.stream.2.images", msg[1:])    
         except:
