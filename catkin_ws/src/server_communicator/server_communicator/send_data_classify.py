@@ -22,6 +22,7 @@ class SendDataClassifyNode(Node):
     def __init__(self):
         super().__init__('send_data_classify_node')
         self.half_frame = True
+        self.screenShot = False
         
         self.ros_log_pub = None
         try:
@@ -52,9 +53,33 @@ class SendDataClassifyNode(Node):
         except Exception as e:
             self.ros_log_pub.publish_log('ERROR', 'Subscription initialization error: {}'.format(e))
             
+        try:
+            self.save_camera_subscription = self.create_subscription(
+                String,
+                '/screen_shot/recall',
+                self.save_camera_callback,
+                10)
+        except Exception as e:
+            self.ros_log_pub.publish_log('ERROR', 'Subscription initialization error: {}'.format(e))
+            
+        try:
+            self.publisher_save_camera = self.create_publisher(CompressedImage, '/screen_shot/pub', 10)
+        except Exception as e:
+            self.ros_log_pub.publish_log('ERROR', 'init publisher save_camera error: {}'.format(e))
+            
+    def save_camera_callback(self):
+        self.screenShot = True
+            
     
     def video_callback(self, video_image):
         try:
+            if self.screenShot:
+                self.screenShot = False
+                try:
+                    self.publisher_save_camera.publish(video_image)
+                except Exception as e:
+                    self.ros_log_pub.publish_log('ERROR', 'Publisher save_camera error: {}'.format(e))
+            
             if self.half_frame:
                 video_image_base64 = base64.b64encode(video_image.data).decode('utf-8')
                 now = time.localtime()
