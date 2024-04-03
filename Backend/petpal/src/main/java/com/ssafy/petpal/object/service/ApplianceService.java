@@ -51,7 +51,7 @@ public class ApplianceService {
                 .room(room)
                 .build();
         Appliance appliance1  =applianceRepository.save(appliance);
-        redisTemplate.opsForValue().set("home:" + applianceRegisterDTO.getHomeId() + ":appliance:" + appliance1.getId(), "OFF");
+        redisTemplate.opsForValue().set("home:" + applianceRegisterDTO.getHomeId() + ":appliance:" + appliance1.getApplianceUUID(), "OFF");
     }
 
     public ApplianceResponseDto fetchApplianceByUUID(String uuid){
@@ -59,7 +59,7 @@ public class ApplianceService {
         String applianceStatus = getApplianceStatus(appliance.getHomeId(), appliance.getApplianceUUID());
 
         if(applianceStatus==null){
-            redisTemplate.opsForValue().set("home:"+appliance.getHomeId()+":appliance:"+appliance.getApplianceId(),"OFF");
+            redisTemplate.opsForValue().set("home:"+appliance.getHomeId()+":appliance:"+appliance.getApplianceUUID(),"OFF");
             applianceStatus="OFF";
         }
         appliance.setApplianceStatus(
@@ -73,7 +73,7 @@ public class ApplianceService {
         list.forEach(appliance -> {
             String applianceStatus = getApplianceStatus(appliance.getHomeId(), appliance.getApplianceUUID());
             if(applianceStatus==null){
-                redisTemplate.opsForValue().set("home:"+appliance.getHomeId()+":appliance:"+appliance.getApplianceId(),"OFF");
+                redisTemplate.opsForValue().set("home:"+appliance.getHomeId()+":appliance:"+appliance.getApplianceUUID(),"OFF");
                 applianceStatus="OFF";
             }
 
@@ -90,7 +90,7 @@ public class ApplianceService {
         list.forEach(appliance -> {
             String applianceStatus = getApplianceStatus(appliance.getHomeId(), appliance.getApplianceUUID());
             if(applianceStatus==null){
-                redisTemplate.opsForValue().set("home:"+appliance.getHomeId()+":appliance:"+appliance.getApplianceId(),"OFF");
+                redisTemplate.opsForValue().set("home:"+appliance.getHomeId()+":appliance:"+appliance.getApplianceUUID(),"OFF");
                 applianceStatus="OFF";
             }
             appliance.setApplianceStatus(
