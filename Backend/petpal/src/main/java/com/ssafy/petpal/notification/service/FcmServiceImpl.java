@@ -43,7 +43,7 @@ public class FcmServiceImpl implements FcmService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         headers.set("Authorization", "Bearer " + getAccessToken());
-        log.info(headers.get("Authorization").toString() + " ");
+//        log.info(headers.get("Authorization").toString() + " ");
 
         HttpEntity entity = new HttpEntity<>(message, headers);
 

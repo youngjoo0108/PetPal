@@ -47,7 +47,7 @@ public class HomeService {
             if(value!=null){
                 return value;
             } else {
-                log.info("No status found for pet. " + "Retry..."+depth);
+//                log.info("No status found for pet. " + "Retry..."+depth);
                 return fetchPetCoordinate(homeId,depth+1);
             }
         }catch (Exception e){
@@ -72,7 +72,7 @@ public class HomeService {
             if(value!=null){
                 return value;
             }else {
-                log.info("No status found for turtle. " + "Retry..."+depth);
+//                log.info("No status found for turtle. " + "Retry..."+depth);
                 return fetchTurtleCoordinate(homeId,depth+1);
             }
         }catch (Exception e){

@@ -108,18 +108,8 @@ public class ApplianceService {
 
     public String getApplianceStatus(Long homeId, String applianceUUID) {
         String key = "home:" + homeId + ":appliance:" + applianceUUID;
-        String value = redisTemplate.opsForValue().get(key);
-        if (value != null) {
-            try {
-                return value;
-            } catch (Exception e) {
-                log.error("Invalid appliance status format for appliance " + applianceUUID, e);
-                return "NULL"; // 상태를 알 수 없는 경우, 예: 잘못된 형식
-            }
-        } else {
-            log.info("No status found for appliance " + applianceUUID + ", defaulting to NULL");
-            return "NULL"; // Redis에서 조회된 값이 null인 경우
-        }
+
+        return redisTemplate.opsForValue().get(key);
     }
 
     public void deleteAppliance(Long applianceId) {

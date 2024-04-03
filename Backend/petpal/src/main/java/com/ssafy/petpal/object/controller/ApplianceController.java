@@ -6,6 +6,7 @@ import com.ssafy.petpal.object.entity.Appliance;
 import com.ssafy.petpal.object.service.ApplianceService;
 import com.ssafy.petpal.room.dto.RoomResponseDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/api/v1/appliances")
 public class ApplianceController {
     private final ApplianceService applianceService;
@@ -44,7 +46,7 @@ public class ApplianceController {
         }catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }catch (Exception e) {
-            System.out.println(e.getMessage());
+            log.info(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

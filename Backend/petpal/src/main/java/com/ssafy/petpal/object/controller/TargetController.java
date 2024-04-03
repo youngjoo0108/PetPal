@@ -18,7 +18,7 @@ public class TargetController {
     private final TargetService objectService;
     @PostMapping
     public ResponseEntity<Long> postObject(@RequestBody TargetRegisterDto targetRegisterDto){
-        log.info("Successfully parse Coordinate value if this is not null: "+targetRegisterDto.getCoordinate().getX());
+//        log.info("Successfully parse Coordinate value if this is not null: "+targetRegisterDto.getCoordinate().getX());
         Long targetId = objectService.createTarget(targetRegisterDto);
 
         return ResponseEntity.ok(targetId);
