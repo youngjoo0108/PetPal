@@ -24,6 +24,7 @@ setup(
             'log_publisher = server_communicator.log_publisher:main',
             'server_recive = server_communicator.server_recive:main',
             'data_classify = server_communicator.data_classify:main',
+            'send_data_classify = server_communicator.send_data_classify:main',
         ],
     },
 )

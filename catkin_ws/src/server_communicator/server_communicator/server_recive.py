@@ -272,14 +272,14 @@ class WebSocketClientReceiveNode(Node):
     #         elif obj_type in iots:
     #             iot_list.append(obj)
             
-            topic_data = {
-                'obstacle_list': obstacle_list,
-                'furniture_list': furniture_list,
-                'dog_list': dog_list,
-                'human_list': human_list,
-                'iot_list': iot_list
-            }
-        return topic_data
+        #     topic_data = {
+        #         'obstacle_list': obstacle_list,
+        #         'furniture_list': furniture_list,
+        #         'dog_list': dog_list,
+        #         'human_list': human_list,
+        #         'iot_list': iot_list
+        #     }
+        # return topic_data
         
 def main(args=None):
     rclpy.init(args=args)
