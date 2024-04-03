@@ -7,6 +7,7 @@ from squaternion import Quaternion
 from nav_msgs.msg import Odometry, Path, OccupancyGrid
 from geometry_msgs.msg import Twist, PoseStamped, Point32
 from ssafy_msgs.msg import TurtlebotStatus,HandControl
+from sensor_msgs.msg import LaserScan
 from ros_log_package.RosLogPublisher import RosLogPublisher
 
 
@@ -14,19 +15,21 @@ class ObstacleControl(Node):
 
     def __init__(self):
         super().__init__('obstacle_controller')
-        self.yolo_sub = self.create_subscription(String, 'captured_object', self.obstacle_callback, 10)
+        self.yolo_sub = self.create_subscription(String, 'captured_object', self.obstacle_callback, 100)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
         self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
         self.cmd_pub = self.create_publisher(Twist, 'cmd_vel', 10)
         self.timer = self.create_timer(0.5, self.timer_callback)
         self.hand_control_pub = self.create_publisher(HandControl, '/hand_control', 10)                
         self.turtlebot_status = self.create_subscription(TurtlebotStatus,'/turtlebot_status',self.turtlebot_status_cb,10)
+        self.lidar_sub = self.create_subscription(LaserScan, '/scan', self.lidar_callback, 10)
         
         self.hand_control_msg=HandControl()        
         self.turtlebot_status_msg = TurtlebotStatus()
         self.goal_msg = PoseStamped()
         self.odom_msg = Odometry()
         self.cmd_msg = Twist()
+        self.lidar_msg = LaserScan()
 
         self.goal_msg.header.frame_id = 'map'
 
@@ -36,6 +39,8 @@ class ObstacleControl(Node):
         self.is_lifted = False
         self.is_obstacle_goal = False
         self.is_goal_setting = False
+        self.camera_captured = False
+    
 
         self.robot_pose_x = 0.0
         self.robot_pose_y = 0.0
@@ -67,43 +72,49 @@ class ObstacleControl(Node):
 
 
     def obstacle_callback(self, msg):
-        obstacle = msg.data
-     
-        if obstacle and not self.turtlebot_status_msg.can_use_hand:
-            # for obstacle in data:
-            self.is_obstacle = True
+        data = json.loads(msg.data)
+        if data['obstacle_list']:
+            obstacles = data['obstacle_list']
+            for obstacle in obstacles:
+                if obstacle and not self.turtlebot_status_msg.can_use_hand:
+                    # for obstacle in data:
+                    self.is_obstacle = True
 
-            # BookPile, Mug, PenHolder, Stapler
-            obstacle_name = obstacle.split('/')[1]
-            print(obstacle_name)
-            if obstacle_name == "Mug":
-                self.obstacle_real_height = 0.3
-            elif obstacle_name == "BookPile":
-                self.obstacle_real_height = 0.7
-            elif obstacle_name == "PenHolder":
-                self.obstacle_real_height = 0.25
-            elif obstacle_name == "Stapler":
-                self.obstacle_real_height = 0.3
-        
-            left_top = obstacle.split('/')[-2]
-            right_bottom = obstacle.split('/')[-1]
-            left_top_x, left_top_y = map(float, left_top.split('-'))
-            right_bottom_x, right_bottom_y = map(float, right_bottom.split('-'))
+                    # BookPile, Mug, PenHolder, Stapler
+                    obstacle_name = obstacle.split('/')[1]
+                    # print(obstacle_name)
+                    # if obstacle_name == "Mug":
+                    #     self.obstacle_real_height = 0.3
+                    # elif obstacle_name == "BookPile":
+                    #     self.obstacle_real_height = 0.7
+                    # elif obstacle_name == "PenHolder":
+                    #     self.obstacle_real_height = 0.25
+                    # elif obstacle_name == "Stapler":
+                    #     self.obstacle_real_height = 0.3
+                
+                    left_top = obstacle.split('/')[-2]
+                    right_bottom = obstacle.split('/')[-1]
+                    left_top_x, left_top_y = map(float, left_top.split('-'))
+                    right_bottom_x, right_bottom_y = map(float, right_bottom.split('-'))
 
-            self.obstacle_height = right_bottom_y - left_top_y
-            self.obstacle_width = right_bottom_x - left_top_x
-            self.obstacle_x_in_camera = 160 - (left_top_x + right_bottom_x) / 2.0   # 카메라 중심으로부터의 x 거리
-            self.obstacle_y_in_camera = 240 - (left_top_y + right_bottom_y) / 2.0   # 카메라 바닥으로부터의 y 거리
-            
-            self.obstacle_distance_in_camera = np.sqrt(self.obstacle_x_in_camera ** 2 + self.obstacle_y_in_camera ** 2)
-            self.turtlebot_to_obstacle_theta = np.arctan2(self.obstacle_x_in_camera * 3, self.obstacle_y_in_camera * 4)
+                    self.obstacle_height = right_bottom_y - left_top_y
+                    self.obstacle_width = right_bottom_x - left_top_x
+                    self.obstacle_x_in_camera = 160 - (left_top_x + right_bottom_x) / 2.0   # 카메라 중심으로부터의 x 거리
+                    self.obstacle_y_in_camera = 240 - (left_top_y + right_bottom_y) / 2.0   # 카메라 바닥으로부터의 y 거리
+                    
+                    self.obstacle_distance_in_camera = np.sqrt(self.obstacle_x_in_camera ** 2 + self.obstacle_y_in_camera ** 2)
+                    self.turtlebot_to_obstacle_theta = np.arctan2(self.obstacle_x_in_camera * 3, self.obstacle_y_in_camera * 4)
+                    
 
-            self.turtlebot_to_obstacle_distance = self.obstacle_distance_in_camera * self.obstacle_real_height / (self.obstacle_width * np.cos(self.turtlebot_to_obstacle_theta))
-            self.goal_x = self.robot_pose_x + (self.turtlebot_to_obstacle_distance - 0.3) * np.cos(self.robot_yaw + self.turtlebot_to_obstacle_theta)
-            self.goal_y = self.robot_pose_y + (self.turtlebot_to_obstacle_distance - 0.3) * np.sin(self.robot_yaw + self.turtlebot_to_obstacle_theta)
-            self.goal_yaw = self.turtlebot_to_obstacle_theta + self.robot_yaw
-        
-            self.tracking_obstacle()
+                    # self.turtlebot_to_obstacle_distance = self.obstacle_distance_in_camera * self.obstacle_real_height / (self.obstacle_width * np.cos(self.turtlebot_to_obstacle_theta))
+                    self.turtlebot_to_obstacle_distance = self.lidar_msg.ranges[(int(self.turtlebot_to_obstacle_theta + 360)) % 360]
+
+                    self.goal_x = self.robot_pose_x + (self.turtlebot_to_obstacle_distance) * np.cos(self.robot_yaw + self.turtlebot_to_obstacle_theta)
+                    self.goal_y = self.robot_pose_y + (self.turtlebot_to_obstacle_distance) * np.sin(self.robot_yaw + self.turtlebot_to_obstacle_theta)
+                    self.goal_yaw = self.turtlebot_to_obstacle_theta + self.robot_yaw
+
+
+                    self.tracking_obstacle()
 
 
     def odom_callback(self, msg):
@@ -119,6 +130,10 @@ class ObstacleControl(Node):
             self.is_obstacle_goal = True
         else:
             self.is_obstacle_goal = False
+
+
+    def lidar_callback(self, msg):
+        self.lidar_msg = msg
 
 
     def tracking_obstacle(self):
@@ -185,9 +200,16 @@ class ObstacleControl(Node):
                         self.is_lifted = False
                         self.is_obstacle = False
                         self.is_goal_setting = False
+                        self.camera_captured = False
 
             else:
                 if self.is_obstacle and not self.is_obstacle_goal:
+
+                    if not self.camera_captured:
+                        self.camera_captured = True
+                        # publish 사진
+                        pass
+
                     # 들어야함
                     self.hand_control_pick_up()
                    

@@ -130,6 +130,14 @@ class DataClassifyNode(Node):
         dog_list = []
         human_list = []
         iot_list = []
+
+        topic_data = {
+            'obstacle_list': obstacle_list,
+            'furniture_list': furniture_list,
+            'dog_list': dog_list,
+            'human_list': human_list,
+            'iot_list': iot_list
+        }
         
         for obj in obj_list:
             start_type = obj.find('/')
