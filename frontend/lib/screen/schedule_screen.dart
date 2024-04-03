@@ -230,7 +230,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     }
 
     message +=
-        '후에\n${reservation.roomName}-${reservation.applianceType} 을(를) 동작시킵니다.';
+        '후에\n${reservation.roomName}-${reservation.applianceType} 을(를)\n 동작시킵니다.';
     return message;
   }
 }

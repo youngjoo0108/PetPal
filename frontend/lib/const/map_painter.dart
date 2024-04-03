@@ -36,7 +36,7 @@ class MapPainter extends CustomPainter {
         );
       }
     }
-    // logger.e("Recalling Map_Painter");
+    logger.e("Recalling Map_Painter");
 
     // 렌더링 종료 시간 로깅
     final endTime = DateTime.now();

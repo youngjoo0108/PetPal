@@ -13,6 +13,8 @@ class SocketController extends GetxController {
   final Logger logger = Logger();
   final String? wsUrl = dotenv.env['WS_URL'];
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+  dynamic unsubscribeFn;
+  final isInitialized = false.obs; // StompClient 초기화 상태 추적
 
   @override
   void onInit() {
@@ -43,7 +45,7 @@ class SocketController extends GetxController {
 
   void subscribeToDestination(
       String destination, Function(StompFrame) onMessageReceived) {
-    stompClient.subscribe(
+    unsubscribeFn = stompClient.subscribe(
       destination: destination,
       callback: onMessageReceived,
     );

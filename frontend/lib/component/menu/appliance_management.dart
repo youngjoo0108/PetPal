@@ -140,7 +140,8 @@ class ApplianceManagementState extends State<ApplianceManagement> {
 
   void _getApplianceUUID(StompFrame frame) {
     final data = json.decode(frame.body ?? '{}');
-    if (data['type'] == 'REGISTER_RESPONSE') {
+    logger.d("SUCCEED TO GET WEBSOCKET MESSAGE: ${frame.body}");
+    if (data['type'] == 'REGISTER') {
       logger.d("Succeed to register IOT");
       setState(() {
         _isRegistering = false; // 로딩 종료

@@ -79,7 +79,7 @@ class NotiScreenState extends State<NotiScreen> {
                         DateTime.parse(convertToIso8601(notification.time));
                     // DateFormat을 사용해 원하는 형식의 문자열로 변환
                     final formattedTime =
-                        DateFormat('MM월 dd일 HH:mm').format(dateTime);
+                        DateFormat('MM/dd HH:mm').format(dateTime);
 
                     return Dismissible(
                       key: Key(notification.hashCode
@@ -142,7 +142,7 @@ class NotiScreenState extends State<NotiScreen> {
                             ],
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Expanded(child: Text(notification.category)),
                               Expanded(child: Text(notification.content)),
