@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frontend/component/menu/appliance_management.dart';
+import 'package:frontend/component/menu/help_screen.dart';
 import 'package:frontend/component/menu/room_management.dart';
 import 'package:frontend/const/global_alert_dialog.dart';
 import 'package:frontend/controller/map_data_controller.dart';
@@ -45,6 +46,7 @@ class _MenuScreenState extends State<MenuScreen> {
     menuTabController = MenuTabController(
       onHomeScan: () async {
         final String? homeId = await secureStorage.read(key: "homeId");
+        logger.e("$homeId");
         socketController.subscribeToDestination(
           "/exchange/control.exchange/home.$homeId",
           _getHomeScanResponse,
@@ -66,6 +68,11 @@ class _MenuScreenState extends State<MenuScreen> {
         ));
       },
       onManageAppliance: () => _handleApplianceManagementTap(),
+      onHelp: () {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const HelpScreen(), // '방 관리' 페이지로 이동
+        ));
+      },
       onLogout: () {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => const LoginScreen(), // 로그아웃 후 로그인 화면으로 전환
@@ -99,7 +106,6 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
           child: Column(
             children: [
-              // 첫 번째 그룹: 기기 등록, 홈 스캔, 모드 변경
               Container(
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
@@ -126,7 +132,6 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              // 세 번째 그룹: 로그아웃
               Container(
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
@@ -140,7 +145,13 @@ class _MenuScreenState extends State<MenuScreen> {
                     ),
                   ],
                 ),
-                child: _buildMenuItem(Icons.exit_to_app, "로그아웃"),
+                child: Column(
+                  children: [
+                    _buildMenuItem(Icons.help_outline_outlined, "도움말"),
+                    _buildDivider(),
+                    _buildMenuItem(Icons.exit_to_app, "로그아웃"),
+                  ],
+                ),
               ),
             ],
           ),

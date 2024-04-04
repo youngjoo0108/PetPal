@@ -62,6 +62,7 @@ class _AutoControlScreenState extends State<AutoControlScreen> {
         .toList();
     const int itemsPerPage = 4;
     final int pageCount = (currentRoomAppliances.length / itemsPerPage).ceil();
+    bool hasAppliances = currentRoomAppliances.isNotEmpty;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,34 +89,47 @@ class _AutoControlScreenState extends State<AutoControlScreen> {
           ),
         ),
         Expanded(
-          child: PageView.builder(
-            itemCount: pageCount,
-            itemBuilder: (context, pageIndex) {
-              // 현재 페이지에 표시할 가전제품의 시작 인덱스
-              final int pageStartIndex = pageIndex * itemsPerPage;
+          child: hasAppliances
+              ? PageView.builder(
+                  itemCount: pageCount,
+                  itemBuilder: (context, pageIndex) {
+                    final int pageStartIndex = pageIndex * itemsPerPage;
+                    final int pageEndIndex = min(pageStartIndex + itemsPerPage,
+                        currentRoomAppliances.length);
 
-              // 현재 페이지에 표시할 가전제품의 종료 인덱스
-              final int pageEndIndex = min(
-                  pageStartIndex + itemsPerPage, currentRoomAppliances.length);
-
-              return GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // 한 줄에 2개씩
+                    return GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // 한 줄에 2개씩
+                      ),
+                      itemCount: pageEndIndex - pageStartIndex,
+                      itemBuilder: (context, itemIndex) {
+                        final appliance =
+                            currentRoomAppliances[pageStartIndex + itemIndex];
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: buildApplianceCard(appliance),
+                        );
+                      },
+                    );
+                  },
+                )
+              : const Center(
+                  // 가전제품이 없을 때의 표시
+                  child: SizedBox(
+                    height: 500,
+                    child: Center(
+                      child: Text(
+                        '등록된 가전이 없습니다.',
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          color: black,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                itemCount: pageEndIndex - pageStartIndex,
-                itemBuilder: (context, itemIndex) {
-                  // 페이지별 인덱스를 전체 목록의 인덱스로 변환
-                  final appliance =
-                      currentRoomAppliances[pageStartIndex + itemIndex];
-
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: buildApplianceCard(appliance),
-                  );
-                },
-              );
-            },
-          ),
         ),
       ],
     );

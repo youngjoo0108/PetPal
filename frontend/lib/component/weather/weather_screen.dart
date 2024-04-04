@@ -45,9 +45,9 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
   @override
   void dispose() {
-    if (weatherController.unsubscribeFn != null) {
-      weatherController.unsubscribeFn();
-    }
+    // if (weatherController.unsubscribeFn != null) {
+    //   weatherController.unsubscribeFn();
+    // }
     super.dispose();
   }
 }

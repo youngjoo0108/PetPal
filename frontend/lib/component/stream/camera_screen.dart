@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:frontend/const/colors.dart';
 import 'package:get/get.dart';
 import 'package:frontend/controller/camera_controller.dart'; // 경로 확인 필요
 
@@ -25,25 +26,48 @@ class CameraScreenState extends State<CameraScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: white,
       body: Center(
         child: Obx(() {
           Uint8List? currentImage = cameraController.currentImage.value;
           Uint8List? prevImage = cameraController.prevImage.value;
-          return Stack(
-            children: [
-              if (prevImage != null)
-                Positioned.fill(
-                  child: Image.memory(prevImage),
-                ),
-              if (currentImage != null)
-                Positioned.fill(
-                  child: Image.memory(currentImage),
-                ),
-              if (prevImage == null && currentImage == null)
-                const Positioned.fill(
-                  child: Text("Data Loading . . ."),
-                ),
-            ],
+          return Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Stack(
+              children: [
+                if (prevImage != null)
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20), // 모서리 둥글게
+                      child: Image.memory(
+                        prevImage,
+                        fit: BoxFit.fill, // 이미지를 화면에 꽉 채우도록 설정
+                      ),
+                    ),
+                  ),
+                if (currentImage != null)
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20), // 모서리 둥글게
+                      child: Image.memory(
+                        currentImage,
+                        fit: BoxFit.fill, // 이미지를 화면에 꽉 채우도록 설정
+                      ),
+                    ),
+                  ),
+                if (prevImage != null && currentImage != null)
+                  Positioned(
+                    left: -30,
+                    top: -50,
+                    child: Image.asset('asset/img/live.png',
+                        width: 150, height: 150), // 이미지 크기 조절
+                  ),
+                if (prevImage == null && currentImage == null)
+                  const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+              ],
+            ),
           );
         }),
       ),

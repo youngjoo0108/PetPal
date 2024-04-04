@@ -61,6 +61,9 @@ class UserService {
       // 사용자 정보를 성공적으로 가져온 경우
       final Map<String, dynamic> userInfo = json.decode(response.body);
       // final String userName = userInfo['properties']['nickname'];
+      logger.e(userInfo['id'].toString());
+      // const int kakaoId = 3405940553;
+      // await secureStorage.write(key: "userId", value: kakaoId.toString());
       await secureStorage.write(
           key: "userId", value: userInfo['id'].toString());
       await secureStorage.write(
@@ -104,6 +107,7 @@ class UserService {
             responseData.containsKey('refreshToken')) {
           final String serverAccessToken = responseData['accessToken'];
           final String serverRefreshToken = responseData['refreshToken'];
+          // const int homeId = 2; // -------------------------------- homeId 고정
           final int homeId = responseData['homeId'];
           // Token들을 FlutterSecureStorage에 저장
           await secureStorage.write(

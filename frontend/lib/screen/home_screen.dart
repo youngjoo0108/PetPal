@@ -27,6 +27,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final deviceController = Get.put(DeviceController());
   // 드롭다운 메뉴의 선택 가능한 항목 목록
   final List<String> screenOptions = ['맵', '카메라'];
+  // int _currentPageIndex = 0;
+  // PageController 인스턴스
+  final PageController _pageController = PageController(initialPage: 0);
 
   @override
   void initState() {
@@ -50,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     GestureDetector(
                       onTap: () async {
+                        if (deviceController.isOn.value) return;
                         final String? homeId =
                             await secureStorage.read(key: "homeId");
                         if (homeId != null) {
@@ -94,6 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     GestureDetector(
                       onTap: () async {
+                        if (!deviceController.isOn.value) return;
                         final String? homeId =
                             await secureStorage.read(key: "homeId");
                         if (homeId != null) {
@@ -182,12 +187,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: Text(
                         deviceController.isPatrollingMode.value
-                            ? '트래킹 모드'
-                            : '순찰 모드',
+                            ? '순찰 모드'
+                            : '트래킹 모드',
                         style: const TextStyle(
                           color: black,
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 15.0,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
@@ -218,39 +223,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   ? _buildOffMessage()
                   : Column(
                       children: [
-                        Row(
-                          children: [
-                            const Spacer(), // 남은 공간을 차지하여 드롭다운을 우측으로 밀어냄
-                            DropdownButton<String>(
-                              value: currentScreen,
-                              icon: const Icon(Icons.arrow_downward),
-                              elevation: 16,
-                              style: const TextStyle(color: lightYellow),
-                              underline: Container(
-                                height: 2,
-                                color: lightYellow,
-                              ),
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  currentScreen = newValue!;
-                                });
-                              },
-                              items: screenOptions
-                                  .map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                            ),
-                          ],
-                        ),
                         Expanded(
-                          // 현재 선택된 화면에 따라 MapScreen 또는 CameraScreen을 렌더링
-                          child: currentScreen == '맵'
-                              ? const MapScreen()
-                              : const CameraScreen(),
+                          child: PageView(
+                            controller: _pageController,
+                            children: const [
+                              MapScreen(),
+                              CameraScreen(),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -275,5 +255,11 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 }

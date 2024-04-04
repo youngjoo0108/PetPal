@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:frontend/const/secure_storage.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:frontend/model/room.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -10,11 +10,11 @@ Logger logger = Logger();
 
 class RoomService {
   final _baseUrl = dotenv.env['BASE_URL'];
-  final _storage = SecureStorage();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   // 서버로부터 전체 방 목록을 불러오는 메서드
   Future<List<Room>> getRooms() async {
-    final String? homeIdString = await _storage.getHomeId("homeId");
+    final String? homeIdString = await _storage.read(key: "homeId");
     // String을 int로 안전하게 변환
     final int? homeId = int.tryParse(homeIdString ?? '');
 
@@ -51,7 +51,7 @@ class RoomService {
 
   // 방 등록
   Future<int> registerRoom(BuildContext context, String roomName) async {
-    final String? homeIdString = await _storage.getHomeId('homeId');
+    final String? homeIdString = await _storage.read(key: "homeId");
     final int? homeId =
         homeIdString != null ? int.tryParse(homeIdString) : null;
 

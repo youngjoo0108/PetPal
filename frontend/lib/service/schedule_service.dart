@@ -88,4 +88,25 @@ class ScheduleService {
 
     return response.statusCode == 200;
   }
+
+  Future<bool> updateScheduleIsActive(
+      int applianceId, int scheduleId, bool isActive) async {
+    final uri = Uri.parse('$_baseUrl/schedules');
+    final response = await http.put(uri,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          'applianceId': applianceId,
+          'scheduleId': scheduleId,
+          'isActive': isActive,
+        }));
+
+    if (response.statusCode == 200) {
+      logger.d('Schedule Updated successfully');
+      return true;
+    } else {
+      // 에러 로그를 남깁니다. 실제 구현에서는 에러 처리 방법을 더 세분화할 수 있습니다.
+      logger.e('Failed to update schedule. StatusCode: ${response.statusCode}');
+      return false;
+    }
+  }
 }

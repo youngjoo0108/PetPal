@@ -19,6 +19,7 @@ class SocketController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    isInitialized.value = false;
     initializeWebSocketConnection();
   }
 
@@ -29,6 +30,8 @@ class SocketController extends GetxController {
       config: StompConfig(
         url: wsUrl!,
         onConnect: (StompFrame frame) {
+          isInitialized.value = true;
+
           logger.d('Connected to WebSocket');
           if (destination != null && onMessageReceived != null) {
             subscribeToDestination(destination, onMessageReceived);

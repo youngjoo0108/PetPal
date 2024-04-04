@@ -7,12 +7,14 @@ class MenuTabController {
   final Function? onManageRoom; // '방 관리'에 대한 콜백 함수
   final Function? onManageAppliance; // '가전 관리'에 대한 콜백 함수
   final Function? onHomeScan;
+  final Function? onHelp;
 
   MenuTabController({
     this.onLogout,
     this.onManageRoom,
     this.onManageAppliance,
     this.onHomeScan,
+    this.onHelp,
   });
 
   UserService userService = UserService();
@@ -30,9 +32,8 @@ class MenuTabController {
       case "가전 관리":
         onManageAppliance?.call(); // '가전 관리' 콜백 함수 호출
         break;
-      case "사물 등록":
-        break;
-      case "사물 제어":
+      case "도움말":
+        onHelp?.call();
         break;
       case "로그아웃":
         userService.logout().then((_) => onLogout?.call());

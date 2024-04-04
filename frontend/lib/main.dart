@@ -4,7 +4,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:frontend/const/secure_storage.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:frontend/const/global_alert_dialog.dart';
 import 'package:frontend/screen/login_screen.dart';
 import 'package:frontend/screen/main_screen.dart';
 import 'package:frontend/socket/socket.dart';
@@ -16,7 +17,7 @@ import 'package:logger/logger.dart';
 import 'firebase_options.dart';
 
 final Logger logger = Logger();
-
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
   'high_importance_channel',
   'High Importance Notifications',
@@ -36,7 +37,7 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   setFCM();
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 Future<void> setFCM() async {
@@ -65,6 +66,13 @@ Future<void> setFCM() async {
   logger.d('User granted permission: ${settings.authorizationStatus}');
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    if (navigatorKey.currentContext != null) {
+      await GlobalAlertDialog.show(
+        navigatorKey.currentContext!,
+        title: '알림',
+        message: '알림이 도착했습니다.',
+      );
+    }
     const AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(
             'high_importance_channel', 'High Importance Notifications',
@@ -130,16 +138,17 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class MyApp extends StatelessWidget {
-  final SecureStorage secureStorage = SecureStorage();
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
-  MyApp({super.key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     Get.put(SocketController());
     return MaterialApp(
+      navigatorKey: navigatorKey,
       home: FutureBuilder(
-        future: secureStorage.getLoginStatus("isLoggedIn"),
+        future: secureStorage.read(key: "isLoggedIn"),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.data == null) {

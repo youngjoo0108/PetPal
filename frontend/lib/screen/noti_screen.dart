@@ -33,6 +33,7 @@ class NotiScreenState extends State<NotiScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // displayImageUrl = "";
     return Scaffold(
       body: Container(
         color: white, // 전체 배경색 설정
@@ -56,7 +57,8 @@ class NotiScreenState extends State<NotiScreen> {
           ),
           child: Column(
             children: [
-              if (displayImageUrl != null)
+              if (displayImageUrl != null &&
+                  displayImageUrl!.isNotEmpty) // displayImageUrl 값 검사
                 Container(
                   height: 240,
                   width: 320,
@@ -68,6 +70,25 @@ class NotiScreenState extends State<NotiScreen> {
                     borderRadius: BorderRadius.circular(12), // 이미지 테두리 둥글게
                   ),
                   margin: const EdgeInsets.only(top: 20, bottom: 20),
+                )
+              else if (displayImageUrl ==
+                  "noImage") // displayImageUrl이 비어 있을 경우
+                Container(
+                  height: 240,
+                  width: 320,
+                  alignment: Alignment.center, // 텍스트를 컨테이너 중앙에 위치
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300], // 배경색 설정
+                    borderRadius: BorderRadius.circular(12), // 테두리 둥글게
+                  ),
+                  margin: const EdgeInsets.only(top: 20, bottom: 20),
+                  child: const Text(
+                    "첨부된 이미지가 없습니다.",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black54,
+                    ),
+                  ),
                 ),
               Expanded(
                 child: ListView.builder(
@@ -80,7 +101,20 @@ class NotiScreenState extends State<NotiScreen> {
                     // DateFormat을 사용해 원하는 형식의 문자열로 변환
                     final formattedTime =
                         DateFormat('MM/dd HH:mm').format(dateTime);
-
+                    Color categoryColor;
+                    switch (notification.category) {
+                      case '스캔':
+                        categoryColor = Colors.red.withOpacity(0.7);
+                        break;
+                      case '제어':
+                        categoryColor = Colors.green.withOpacity(0.8);
+                        break;
+                      case '처리':
+                        categoryColor = Colors.blue.withOpacity(0.8);
+                        break;
+                      default:
+                        categoryColor = Colors.grey; // 기본 색상
+                    }
                     return Dismissible(
                       key: Key(notification.hashCode
                           .toString()), // 알림을 구별할 수 있는 고유 키
@@ -130,7 +164,7 @@ class NotiScreenState extends State<NotiScreen> {
                           padding: const EdgeInsets.all(10),
                           margin: const EdgeInsets.symmetric(vertical: 5),
                           decoration: BoxDecoration(
-                            color: lightYellow,
+                            color: Colors.grey[100],
                             borderRadius: BorderRadius.circular(10),
                             boxShadow: [
                               BoxShadow(
@@ -142,11 +176,45 @@ class NotiScreenState extends State<NotiScreen> {
                             ],
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              Expanded(child: Text(notification.category)),
-                              Expanded(child: Text(notification.content)),
-                              Expanded(child: Text(formattedTime)),
+                              Container(
+                                width: 50, // 너비를 80으로 설정
+                                height: 30, // 높이를 30으로 설정
+                                padding: const EdgeInsets.all(5), // 내부 패딩
+                                decoration: BoxDecoration(
+                                  color: categoryColor, // 카테고리에 따른 배경색
+                                  borderRadius:
+                                      BorderRadius.circular(5), // 둥근 모서리
+                                ),
+                                child: Text(
+                                  notification.category,
+                                  style: const TextStyle(
+                                      color: Colors.white), // 텍스트 색상
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 20), // 왼쪽에 패딩 추가
+                                  child: Text(notification.content),
+                                ),
+                              ),
+                              Container(
+                                width: 100, // 너비를 80으로 설정
+                                height: 30, // 높이를 30으로 설정
+                                padding: const EdgeInsets.only(
+                                  top: 10,
+                                  left: 20,
+                                ), // 내부 패딩
+                                child: Text(
+                                  formattedTime,
+                                  style: const TextStyle(
+                                      color: black, fontSize: 12), // 텍스트 색상
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
                             ],
                           ),
                         ),

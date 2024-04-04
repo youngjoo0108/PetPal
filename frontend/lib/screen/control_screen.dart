@@ -27,9 +27,9 @@ class _ControlScreenState extends State<ControlScreen> {
                 // "자동" 버튼
                 GestureDetector(
                   onTap: () {
-                    setState(() {
-                      isAuto = true;
-                    });
+                    // setState(() {
+                    //   isAuto = true;
+                    // });
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -54,9 +54,9 @@ class _ControlScreenState extends State<ControlScreen> {
                 // "수동" 버튼
                 GestureDetector(
                   onTap: () {
-                    setState(() {
-                      isAuto = false;
-                    });
+                    // setState(() {
+                    //   isAuto = false;
+                    // });
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(

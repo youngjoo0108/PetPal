@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:frontend/const/secure_storage.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:frontend/model/appliance.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -9,10 +9,10 @@ final Logger logger = Logger();
 
 class ApplianceService {
   final _baseUrl = dotenv.env['BASE_URL'];
-  final _storage = SecureStorage();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   Future<List<Appliance>> fetchAppliances() async {
-    final String? homeIdString = await _storage.getHomeId('homeId');
+    final String? homeIdString = await _storage.read(key: 'homeId');
     final int? homeId =
         homeIdString != null ? int.tryParse(homeIdString) : null;
 
@@ -57,7 +57,7 @@ class ApplianceService {
 
   Future<int> registerAppliance(
       int roomId, String applianceType, String applianceUUID) async {
-    final String? homeIdString = await _storage.getHomeId('homeId');
+    final String? homeIdString = await _storage.read(key: 'homeId');
     final int? homeId =
         homeIdString != null ? int.tryParse(homeIdString) : null;
 

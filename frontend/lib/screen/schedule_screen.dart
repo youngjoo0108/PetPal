@@ -21,6 +21,7 @@ class ScheduleScreen extends StatefulWidget {
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
   List<Schedule> schedules = [];
+  ScheduleService scheduleService = ScheduleService();
   @override
   void initState() {
     fetchSchedules();
@@ -163,11 +164,39 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                           ),
                           trailing: Switch(
                             value: schedule.isActive,
-                            onChanged: (bool value) {
-                              setState(() {
-                                schedule.isActive = value;
-                                // 스케줄 활성/비활성화 상태 업데이트 로직 추가
-                              });
+                            onChanged: (bool value) async {
+                              // 서버에 업데이트를 시도하고 결과를 받음
+                              bool updateSuccess = await ScheduleService()
+                                  .updateScheduleIsActive(
+                                schedule.applianceId, // applianceId 추가
+                                schedule.scheduleId, // 이미 있음
+                                value, // isActive 상태, 이전 코드와 동일
+                              );
+
+                              if (updateSuccess) {
+                                // 업데이트 성공
+                                setState(() {
+                                  schedule.isActive = !schedule
+                                      .isActive; // schedule 상태 업데이트, 서버에 보낸 값의 반대로 설정
+                                });
+                                // 상태 업데이트에 성공한 후 메시지
+                                String message = schedule.isActive
+                                    ? "예약이 활성화되었습니다."
+                                    : "예약이 비활성화되었습니다.";
+                                GlobalAlertDialog.show(
+                                  context,
+                                  title: "알림",
+                                  message: message,
+                                );
+                              } else {
+                                // 업데이트 실패 (서버 에러)
+                                GlobalAlertDialog.show(
+                                  context,
+                                  title: "서버 에러",
+                                  message: "상태 업데이트에 실패했습니다.",
+                                );
+                                // UI 상태 변경 없음
+                              }
                             },
                           ),
                         ),
