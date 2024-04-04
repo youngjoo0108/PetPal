@@ -59,6 +59,7 @@ public class ApplianceController {
             applianceService.deleteAppliance(applianceId);
             return ResponseEntity.ok(null);
         }catch (Exception e){
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

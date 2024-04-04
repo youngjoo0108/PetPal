@@ -3,6 +3,7 @@ package com.ssafy.petpal.schedule.repository;
 import com.ssafy.petpal.schedule.dto.ScheduleTemporalDto;
 import com.ssafy.petpal.schedule.entity.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -16,7 +17,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
 //            "from Schedules as s " +
 //            "where s.home.id = :homeId")
     List<Schedule> findAllByHomeId(@Param("homeId") Long homeId);
-
+    @Modifying
     @Query("delete from Schedules s " +
             "where s.appliance.id = :applianceId")
     void deleteAllByApplianceId(@Param("applianceId") Long applianceId);
