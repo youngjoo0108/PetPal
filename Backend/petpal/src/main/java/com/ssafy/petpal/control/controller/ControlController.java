@@ -87,10 +87,11 @@ public class ControlController {
 
             //COMPLETE한게 가전 On/Off를 완료한 것인지 위험물 처리 프로세스를 완료한 것인지 구분을 할 필요가 있음.
             case "ACOMPLETE":
+                log.info("Ros Received message: {}", rawMessage);
                 // ROS에서 입증한 실제 가전상태 데이터를 redis에 올린다.
 //                controlDto.getMessage() //parsing
 //                MessageContainer.A_Complete aComplete = objectMapper.readValue(controlDto.getMessage(),MessageContainer.A_Complete.class);
-//                log.info("변환 전");
+                log.info("변환 전");
                 MessageContainer.A_Complete aComplete = objectMapper.convertValue(controlDto.getMessage(), MessageContainer.A_Complete.class);
                 log.info("변환 후: "+aComplete.toString());
                 applianceService.updateApplianceStatus(homeId,aComplete.getApplianceUUID(),aComplete.getCurrentStatus());
