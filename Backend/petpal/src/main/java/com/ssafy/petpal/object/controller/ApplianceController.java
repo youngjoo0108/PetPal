@@ -101,9 +101,11 @@ public class ApplianceController {
 
     // 테스트용
     @GetMapping("/status/{applianceUUID}")
-    public ResponseEntity<String> putApplianceStatus(Long homeId, @PathVariable String applianceUUID,String status){
+//    public ResponseEntity<String> putApplianceStatus(@PathVariable String applianceUUID, @RequestParam Long homeId, @RequestParam String status){
+    public ResponseEntity<String> putApplianceStatus(@PathVariable String applianceUUID, @RequestParam Long homeId){
         try{
-            applianceService.updateApplianceStatus(homeId, applianceUUID, status);
+//            System.out.println(homeId+", "+ status);
+//            applianceService.updateApplianceStatus(homeId, applianceUUID, status);
             return ResponseEntity.ok(applianceService.getApplianceStatus(homeId,applianceUUID));
         }catch (Exception e){
             System.out.println(e.getMessage());

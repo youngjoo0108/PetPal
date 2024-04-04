@@ -92,9 +92,9 @@ public class ControlController {
 //                MessageContainer.A_Complete aComplete = objectMapper.readValue(controlDto.getMessage(),MessageContainer.A_Complete.class);
 //                log.info("변환 전");
                 MessageContainer.A_Complete aComplete = objectMapper.convertValue(controlDto.getMessage(), MessageContainer.A_Complete.class);
-//                log.info("변환 후: "+aComplete.toString());
+                log.info("변환 후: "+aComplete.toString());
                 applianceService.updateApplianceStatus(homeId,aComplete.getApplianceUUID(),aComplete.getCurrentStatus());
-//                log.info("스테이터스 변환 완료");
+                log.info("스테이터스 변환 완료");
 //              fcm 호출.
                 //가전 상태 제어 완료 알림 보내기!
                 Long targetUserId = homeService.findKakaoIdByHomeId(homeId);
