@@ -99,7 +99,7 @@ class TimedTaskExecutor(Node):
             }
             data = json.dumps(temp)
             data_msg.data = data
-            self.data_pub.publish(self.data_msg)
+            self.data_pub.publish(data_msg)
             del self.scheduled_tasks[now]
             #rclpy.spin_once(self, timeout_sec=1)  # 매 분마다 현재 시간 확인
     
