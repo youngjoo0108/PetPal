@@ -57,12 +57,12 @@ public class Schedule extends BaseEntity {
 
     }
 
-    public void update(Home home, Appliance appliance, LocalDate day, LocalTime time, String taskType, boolean isActive) {
-        this.home = home;
-        this.appliance = appliance;
-        this.scheduleDay = day;
-        this.scheduleTime = time;
-        this.taskType = taskType;
+    public void update(boolean isActive) {
+//        this.home = home;
+//        this.appliance = appliance;
+//        this.scheduleDay = day;
+//        this.scheduleTime = time;
+//        this.taskType = taskType;
         this.isActive = isActive;
     }
 

@@ -77,19 +77,13 @@ public class ScheduleService {
     }
 
 
-    public void updateSchedule(Long scheduleId, ScheduleUpdateDto scheduleUpdateDto) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
+    public void updateSchedule(ScheduleUpdateDto scheduleUpdateDto) {
+        Schedule schedule = scheduleRepository.findById(scheduleUpdateDto.getScheduleId())
                 .orElseThrow(IllegalArgumentException::new);
 // Home 엔티티 조회
-        Home home = homeRepository.findById(scheduleUpdateDto.getRoomId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid home ID: " + scheduleUpdateDto.getRoomId()));
-
-        // Appliance 엔티티 조회
-        Appliance appliance = applianceRepository.findById(scheduleUpdateDto.getApplianceId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid appliance ID: " + scheduleUpdateDto.getApplianceId()));
 
         // Schedule 엔티티의 속성 갱신
-        schedule.update(home, appliance, scheduleUpdateDto.getDay(), scheduleUpdateDto.getTime(), scheduleUpdateDto.getTaskType(), scheduleUpdateDto.isActive());
+        schedule.update(scheduleUpdateDto.isActive());
 
     }
 }
