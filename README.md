@@ -281,3 +281,255 @@ frontend
 └── socket // Defines functions related to WebSocket.
 └── socket.dart
 ```
+## Back
+```
+ └─petpal
+    ├─.gradle
+    │  ├─8.5
+    │  │  ├─checksums
+    │  │  ├─dependencies-accessors
+    │  │  ├─executionHistory
+    │  │  ├─fileChanges
+    │  │  ├─fileHashes
+    │  │  └─vcsMetadata
+    │  ├─buildOutputCleanup
+    │  └─vcs-1
+    ├─.idea
+    │  ├─dataSources
+    │  │  ├─8fc5118a-3ac1-4a01-9d98-7e8151943105
+    │  │  │  └─storage_v2
+    │  │  │      └─_src_
+    │  │  │          └─schema
+    │  │  └─cb5d76ec-0422-43f7-9d7c-21bc44c40905
+    │  │      └─storage_v2
+    │  │          └─_src_
+    │  │              └─schema
+    │  ├─modules
+    │  └─shelf
+    │      ├─Uncommitted_changes_before_Update_at_2024-03-28_오후_12_50_[Changes]
+    │      ├─Uncommitted_changes_before_Update_at_2024-03-28_오후_5_56_[Changes]
+    │      ├─Uncommitted_changes_before_Update_at_2024-03-29_오후_12_22_[Changes]
+    │      ├─Uncommitted_changes_before_Update_at_2024-03-31_오후_4_58_[Changes]
+    │      ├─Uncommitted_changes_before_Update_at_2024-04-01_오전_10_04_[Changes]
+    │      ├─Uncommitted_changes_before_Update_at_2024-04-01_오전_11_14_[Changes]
+    │      ├─Uncommitted_changes_before_Update_at_2024-04-01_오전_11_37_[Changes]
+    │      ├─Uncommitted_changes_before_Update_at_2024-04-01_오전_9_34_[Changes]
+    │      ├─Uncommitted_changes_before_Update_at_2024-04-01_오후_2_10_[Changes]
+    │      ├─Uncommitted_changes_before_Update_at_2024-04-01_오후_2_35_[Changes]
+    │      ├─Uncommitted_changes_before_Update_at_2024-04-01_오후_4_07_[Changes]
+    │      ├─Uncommitted_changes_before_Update_at_2024-04-02_오전_10_57_[Changes]
+    │      ├─Uncommitted_changes_before_Update_at_2024-04-02_오후_3_54_[Changes]
+    │      ├─Uncommitted_changes_before_Update_at_2024-04-02_오후_6_10_[Changes]
+    │      ├─Uncommitted_changes_before_Update_at_2024-04-02_오후_6_52_[Changes]
+    │      ├─Uncommitted_changes_before_Update_at_2024-04-03_오후_12_23_[Changes]
+    │      ├─Uncommitted_changes_before_Update_at_2024-04-04_오전_10_15_[Changes]
+    │      └─Uncommitted_changes_before_Update_at_2024-04-04_오전_9_57_[Changes]
+    ├─build
+    │  ├─classes
+    │  │  └─java
+    │  │      ├─main
+    │  │      │  └─com
+    │  │      │      └─ssafy
+    │  │      │          └─petpal
+    │  │      │              ├─aop
+    │  │      │              ├─auth
+    │  │      │              │  ├─controller
+    │  │      │              │  ├─dto
+    │  │      │              │  ├─enums
+    │  │      │              │  ├─filter
+    │  │      │              │  ├─models
+    │  │      │              │  ├─service
+    │  │      │              │  └─utils
+    │  │      │              ├─common
+    │  │      │              ├─config
+    │  │      │              ├─control
+    │  │      │              │  ├─controller
+    │  │      │              │  └─dto
+    │  │      │              ├─exception
+    │  │      │              ├─home
+    │  │      │              │  ├─controller
+    │  │      │              │  ├─dto
+    │  │      │              │  ├─entity
+    │  │      │              │  ├─repository
+    │  │      │              │  └─service
+    │  │      │              ├─image
+    │  │      │              │  ├─controller
+    │  │      │              │  ├─dto
+    │  │      │              │  ├─entity
+    │  │      │              │  ├─repository
+    │  │      │              │  └─service
+    │  │      │              ├─map
+    │  │      │              │  ├─controller
+    │  │      │              │  ├─dto
+    │  │      │              │  ├─entity
+    │  │      │              │  ├─repository
+    │  │      │              │  └─service
+    │  │      │              ├─notification
+    │  │      │              │  ├─controller
+    │  │      │              │  ├─dto
+    │  │      │              │  ├─entity
+    │  │      │              │  ├─repository
+    │  │      │              │  └─service
+    │  │      │              ├─object
+    │  │      │              │  ├─controller
+    │  │      │              │  ├─dto
+    │  │      │              │  ├─entity
+    │  │      │              │  ├─repository
+    │  │      │              │  └─service
+    │  │      │              ├─room
+    │  │      │              │  ├─controller
+    │  │      │              │  ├─dto
+    │  │      │              │  ├─entity
+    │  │      │              │  ├─repository
+    │  │      │              │  └─service
+    │  │      │              ├─route
+    │  │      │              │  ├─controller
+    │  │      │              │  ├─dto
+    │  │      │              │  ├─entity
+    │  │      │              │  ├─repository
+    │  │      │              │  └─service
+    │  │      │              ├─schedule
+    │  │      │              │  ├─controller
+    │  │      │              │  ├─dto
+    │  │      │              │  ├─entity
+    │  │      │              │  ├─repository
+    │  │      │              │  └─service
+    │  │      │              ├─user
+    │  │      │              │  ├─controller
+    │  │      │              │  ├─dto
+    │  │      │              │  ├─entity
+    │  │      │              │  ├─repository
+    │  │      │              │  └─service
+    │  │      │              └─web
+    │  │      │                  └─controller
+    │  │      └─test
+    │  │          └─com
+    │  │              └─ssafy
+    │  │                  └─petpal
+    │  │                      └─control
+    │  ├─generated
+    │  │  └─sources
+    │  │      ├─annotationProcessor
+    │  │      │  └─java
+    │  │      │      ├─main
+    │  │      │      └─test
+    │  │      └─headers
+    │  │          └─java
+    │  │              ├─main
+    │  │              └─test
+    │  ├─reports
+    │  │  └─tests
+    │  │      └─test
+    │  │          ├─classes
+    │  │          ├─css
+    │  │          ├─js
+    │  │          └─packages
+    │  ├─resources
+    │  │  └─main
+    │  │      ├─static
+    │  │      │  ├─assets
+    │  │      │  ├─css
+    │  │      │  └─js
+    │  │      └─templates
+    │  ├─test-results
+    │  │  └─test
+    │  │      └─binary
+    │  └─tmp
+    │      ├─compileJava
+    │      │  └─compileTransaction
+    │      │      ├─backup-dir
+    │      │      └─stash-dir
+    │      ├─compileTestJava
+    │      └─test
+    ├─gradle
+    │  └─wrapper
+    └─src
+        ├─main
+        │  ├─java
+        │  │  └─com
+        │  │      └─ssafy
+        │  │          └─petpal
+        │  │              ├─aop
+        │  │              ├─auth
+        │  │              │  ├─controller
+        │  │              │  ├─dto
+        │  │              │  ├─enums
+        │  │              │  ├─filter
+        │  │              │  ├─models
+        │  │              │  ├─service
+        │  │              │  └─utils
+        │  │              ├─common
+        │  │              ├─config
+        │  │              ├─control
+        │  │              │  ├─controller
+        │  │              │  └─dto
+        │  │              ├─exception
+        │  │              ├─home
+        │  │              │  ├─controller
+        │  │              │  ├─dto
+        │  │              │  ├─entity
+        │  │              │  ├─repository
+        │  │              │  └─service
+        │  │              ├─image
+        │  │              │  ├─controller
+        │  │              │  ├─dto
+        │  │              │  ├─entity
+        │  │              │  ├─repository
+        │  │              │  └─service
+        │  │              ├─map
+        │  │              │  ├─controller
+        │  │              │  ├─dto
+        │  │              │  ├─entity
+        │  │              │  ├─repository
+        │  │              │  └─service
+        │  │              ├─notification
+        │  │              │  ├─controller
+        │  │              │  ├─dto
+        │  │              │  ├─entity
+        │  │              │  ├─repository
+        │  │              │  └─service
+        │  │              ├─object
+        │  │              │  ├─controller
+        │  │              │  ├─dto
+        │  │              │  ├─entity
+        │  │              │  ├─repository
+        │  │              │  └─service
+        │  │              ├─room
+        │  │              │  ├─controller
+        │  │              │  ├─dto
+        │  │              │  ├─entity
+        │  │              │  ├─repository
+        │  │              │  └─service
+        │  │              ├─route
+        │  │              │  ├─controller
+        │  │              │  ├─dto
+        │  │              │  ├─entity
+        │  │              │  ├─repository
+        │  │              │  └─service
+        │  │              ├─schedule
+        │  │              │  ├─controller
+        │  │              │  ├─dto
+        │  │              │  ├─entity
+        │  │              │  ├─repository
+        │  │              │  └─service
+        │  │              ├─user
+        │  │              │  ├─controller
+        │  │              │  ├─dto
+        │  │              │  ├─entity
+        │  │              │  ├─repository
+        │  │              │  └─service
+        │  │              └─web
+        │  │                  └─controller
+        │  └─resources
+        │      ├─static
+        │      │  ├─assets
+        │      │  ├─css
+        │      │  └─js
+        │      └─templates
+        └─test
+            └─java
+                └─com
+                    └─ssafy
+                        └─petpal
+                            └─control
+```
