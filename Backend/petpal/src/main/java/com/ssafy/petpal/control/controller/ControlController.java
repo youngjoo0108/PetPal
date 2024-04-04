@@ -117,12 +117,12 @@ public class ControlController {
                 // ROS에서 입증한 실제 가전상태 데이터를 redis에 올린다.
 //                controlDto.getMessage() //parsing
 //                MessageContainer.A_Complete aComplete = objectMapper.readValue(controlDto.getMessage(),MessageContainer.A_Complete.class);
-                log.info("변환 전");
+//                log.info("변환 전");
                 MessageContainer.A_Complete aComplete = objectMapper.convertValue(controlDto.getMessage(), MessageContainer.A_Complete.class);
-                log.info("변환 후: "+aComplete.toString());
+//                log.info("변환 후: "+aComplete.toString());
                 applianceService.updateApplianceStatus(homeId,aComplete.getApplianceUUID(),aComplete.getCurrentStatus());
 
-                log.info("스테이터스 변환 완료");
+//                log.info("스테이터스 변환 완료");
 //              fcm 호출.
                 //가전 상태 제어 완료 알림 보내기!
                 Long targetUserId2 = homeService.findKakaoIdByHomeId(homeId);
@@ -131,7 +131,7 @@ public class ControlController {
                 DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
                 String formattedTime2 = nowInKorea2.format(formatter2);
                 ApplianceResponseDto applianceResponseDto2 = applianceService.fetchApplianceByUUID(aComplete.getApplianceUUID());
-                log.info(">>>>>><<<<<>>>>>"+applianceResponseDto2.getApplianceType());
+//                log.info(">>>>>><<<<<>>>>>"+applianceResponseDto2.getApplianceType());
 //                String downloadURL2 = imageService.generateURL("default/"+applianceResponseDto2.getApplianceType()+".png", HttpMethod.GET);
                 String downloadURL2 = imageService.generateURL("noImage", HttpMethod.GET);
 //                log.info("notiDTO 생성 전");
