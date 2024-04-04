@@ -30,9 +30,14 @@ def generate_launch_description():
             node_executable = 'iot',
             node_name = 'iot',
         ),
-        # Node(
-        #     package = 'test_209',
-        #     node_executable = 'obscontrol',
-        #     node_name = 'obscontrol',
-        # ),
+        Node(
+            package = 'test_209',
+            node_executable = 'obscontrol',
+            node_name = 'obscontrol',
+        ),
+        Node(
+            package = 'test_209',
+            node_executable = 'scheduler',
+            node_name = 'scheduler',
+        ),
     ])

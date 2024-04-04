@@ -98,8 +98,6 @@ class iotControl(Node):
                 msg.control_action = self.cmd
                 self.iot_user_pub.publish(msg)
                 # self.iot_control.user_cmd(self.now_device, self.cmd)
-                self.is_state_change = True
-                self.now_device = None
 
                 dt = {
                     'applianceUUID' : self.now_device,
@@ -112,6 +110,9 @@ class iotControl(Node):
                 data = json.dumps(temp)
                 self.data_msg.data = data
                 self.data_pub.publish(self.data_msg)
+
+                self.is_state_change = True
+                self.now_device = None
 
                 self.request_msg.data = "iot_off"
                 self.request_pub.publish(self.request_msg)

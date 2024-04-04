@@ -37,6 +37,7 @@ class A_star(Node):
         self.map_size_x=700
         self.map_size_y=700
         self.map_resolution=0.05
+        self.save_path = []
     
         self.GRIDSIZE=700
  
@@ -111,12 +112,17 @@ class A_star(Node):
     def goal_callback(self,msg):
         start_time = time.time()
         if msg.header.frame_id=='map':
-            goal_x=msg.pose.position.x
-            goal_y=msg.pose.position.y
-            goal_cell_x, goal_cell_y =self.pose_to_grid_cell(goal_x, goal_y)
-            self.goal = (goal_cell_x, goal_cell_y)            
+            # goal_x=msg.pose.position.x
+            # goal_y=msg.pose.position.y
+            # goal_cell_x, goal_cell_y =self.pose_to_grid_cell(goal_x, goal_y)
+            # self.goal = (goal_cell_x, goal_cell_y)            
 
             if self.is_map ==True and self.is_odom==True and self.is_param==True:
+                goal_x=msg.pose.position.x
+                goal_y=msg.pose.position.y
+                goal_cell_x, goal_cell_y =self.pose_to_grid_cell(goal_x, goal_y)
+                self.goal = (goal_cell_x, goal_cell_y)
+                
                 if self.is_grid_update==False :
                     self.grid_update()
 
