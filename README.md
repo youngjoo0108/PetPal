@@ -207,7 +207,7 @@ c. 알림 메세지 클릭 - 알림 메세지 관련 이미지 확인<br />
 ![ERD.png](asset/ERD.png)
 
 # App Download Page
-![image.png](asset/web.png)
+![image.png](asset/web2.png)
 
 # 로깅 시스템
 ![로깅 시스템.png](asset/로깅 시스템.png)
@@ -374,3 +374,6 @@ frontend
                         └─petpal
                             └─control
 ```
+
+## Webhook 활용 알림
+![image.png](asset/webhook.png)
