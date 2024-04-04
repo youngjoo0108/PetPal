@@ -101,7 +101,8 @@ public class ControlController {
                 String formattedTime = nowInKorea.format(formatter);
                 ApplianceResponseDto applianceResponseDto = applianceService.fetchApplianceByUUID(sComplete.getApplianceUUID());
                 log.info(">>>>>><<<<<>>>>>"+applianceResponseDto.getApplianceType());
-                String downloadURL1 = imageService.generateURL(applianceResponseDto.getApplianceType()+".png", HttpMethod.GET);
+                String downloadURL1 = imageService.generateURL("default/"+applianceResponseDto.getApplianceType()+".png", HttpMethod.GET);
+//                String downloadURL1 = imageService.generateURL("noimage", HttpMethod.GET);
 //                log.info("notiDTO 생성 전");
 
                 NotificationRequestDto notificationRequestDto1
@@ -131,7 +132,8 @@ public class ControlController {
                 String formattedTime2 = nowInKorea2.format(formatter2);
                 ApplianceResponseDto applianceResponseDto2 = applianceService.fetchApplianceByUUID(aComplete.getApplianceUUID());
                 log.info(">>>>>><<<<<>>>>>"+applianceResponseDto2.getApplianceType());
-                String downloadURL2 = imageService.generateURL(applianceResponseDto2.getApplianceType()+".png", HttpMethod.GET);
+                String downloadURL2 = imageService.generateURL("default/"+applianceResponseDto2.getApplianceType()+".png", HttpMethod.GET);
+//                String downloadURL2 = imageService.generateURL("noimage", HttpMethod.GET);
 //                log.info("notiDTO 생성 전");
 
                 NotificationRequestDto notificationRequestDto2
