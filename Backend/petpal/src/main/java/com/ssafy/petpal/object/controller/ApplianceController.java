@@ -5,6 +5,7 @@ import com.ssafy.petpal.object.dto.ApplianceResponseDto;
 import com.ssafy.petpal.object.entity.Appliance;
 import com.ssafy.petpal.object.service.ApplianceService;
 import com.ssafy.petpal.room.dto.RoomResponseDTO;
+import com.ssafy.petpal.schedule.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ import java.util.List;
 @RequestMapping("/api/v1/appliances")
 public class ApplianceController {
     private final ApplianceService applianceService;
-
+    private final ScheduleService scheduleService;
     static String[] STR_ARR = {"TV","에어컨","전등","커튼","공기청정기"};
     @PostMapping
     public ResponseEntity<Void> postAppliance(@RequestBody ApplianceRegisterDTO applianceRegisterDTO){
@@ -54,6 +55,7 @@ public class ApplianceController {
     @DeleteMapping("/{applianceId}")
     public ResponseEntity<Void> deleteAppliance(@PathVariable Long applianceId){
         try{
+            scheduleService.deleteAllScheduleByApplianceId(applianceId);
             applianceService.deleteAppliance(applianceId);
             return ResponseEntity.ok(null);
         }catch (Exception e){
@@ -98,16 +100,16 @@ public class ApplianceController {
     }
 
     // 테스트용
-//    @GetMapping("/status/{applianceId}")
-//    public ResponseEntity<String> putApplianceStatus(Long homeId, @PathVariable Long applianceId,String status){
-//        try{
-//            applianceService.updateApplianceStatus(homeId, applianceId, status);
-//            return ResponseEntity.ok(applianceService.getApplianceStatus(homeId,applianceId));
-//        }catch (Exception e){
-//            System.out.println(e.getMessage());
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
+    @GetMapping("/status/{applianceUUID}")
+    public ResponseEntity<String> putApplianceStatus(Long homeId, @PathVariable String applianceUUID,String status){
+        try{
+            applianceService.updateApplianceStatus(homeId, applianceUUID, status);
+            return ResponseEntity.ok(applianceService.getApplianceStatus(homeId,applianceUUID));
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 
 }

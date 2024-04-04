@@ -16,4 +16,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
 //            "from Schedules as s " +
 //            "where s.home.id = :homeId")
     List<Schedule> findAllByHomeId(@Param("homeId") Long homeId);
+
+    void deleteAllByApplianceId(Long applianceId);
 }

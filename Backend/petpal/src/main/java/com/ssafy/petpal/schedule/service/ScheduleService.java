@@ -72,6 +72,11 @@ public class ScheduleService {
         scheduleRepository.delete(schedule);
     }
 
+    public void deleteAllScheduleByApplianceId(Long applianceId){
+        scheduleRepository.deleteAllByApplianceId(applianceId);
+    }
+
+
     public void updateSchedule(Long scheduleId, ScheduleUpdateDto scheduleUpdateDto) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(IllegalArgumentException::new);
