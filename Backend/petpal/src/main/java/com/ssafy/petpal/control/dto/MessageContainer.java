@@ -28,4 +28,11 @@ public class MessageContainer {
 
     }
 
+    @Getter
+    @Setter
+    public static class S_Complete {
+        private String applianceUUID;
+        private String currentStatus;
+        private Long scheduleId;
+    }
 }

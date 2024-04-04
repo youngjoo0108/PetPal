@@ -17,6 +17,8 @@ import com.ssafy.petpal.object.service.ApplianceService;
 import com.ssafy.petpal.object.service.TargetService;
 import com.ssafy.petpal.route.dto.RouteDto;
 import com.ssafy.petpal.route.service.RouteService;
+import com.ssafy.petpal.schedule.dto.ScheduleUpdateDto;
+import com.ssafy.petpal.schedule.service.ScheduleService;
 import com.ssafy.petpal.user.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +57,7 @@ public class ControlController {
     private final NotificationService notificationService;
     private final ImageService imageService;
     private final TargetService targetService;
+    private final ScheduleService scheduleService;
     private static final String CONTROL_QUEUE_NAME = "control.queue";
     private static final String CONTROL_EXCHANGE_NAME = "control.exchange";
 
@@ -84,8 +87,30 @@ public class ControlController {
                 notificationService.saveNotification(notificationRequestDto); // DB에 저장
             }
             break;
+            case "SCOMPLETE":
+                MessageContainer.S_Complete sComplete = objectMapper.convertValue(controlDto.getMessage(), MessageContainer.S_Complete.class);
+                applianceService.updateApplianceStatus(homeId,sComplete.getApplianceUUID(),sComplete.getCurrentStatus());
+                ApplianceResponseDto applianceResponseDto1 = applianceService.fetchApplianceByUUID(sComplete.getApplianceUUID());
 
-            //COMPLETE한게 가전 On/Off를 완료한 것인지 위험물 처리 프로세스를 완료한 것인지 구분을 할 필요가 있음.
+                scheduleService.updateSchedule(new ScheduleUpdateDto(applianceResponseDto1.getApplianceId(),sComplete.getScheduleId(),false));
+
+                Long targetUserId = homeService.findKakaoIdByHomeId(homeId);
+                LocalDateTime nowInKorea = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+                String formattedTime = nowInKorea.format(formatter);
+                ApplianceResponseDto applianceResponseDto = applianceService.fetchApplianceByUUID(sComplete.getApplianceUUID());
+                log.info(">>>>>><<<<<>>>>>"+applianceResponseDto.getApplianceType());
+                String downloadURL1 = imageService.generateURL(applianceResponseDto.getApplianceType()+".png", HttpMethod.GET);
+//                log.info("notiDTO 생성 전");
+
+                NotificationRequestDto notificationRequestDto1
+                        = new NotificationRequestDto(targetUserId, "제어", applianceResponseDto.getRoomName()+"-"+applianceResponseDto.getApplianceType()+"의 상태를 변경하였습니다.",
+                        formattedTime,downloadURL1);
+                fcmService.sendMessageTo(notificationRequestDto1);
+                notificationService.saveNotification(notificationRequestDto1); // DB에 저장
+//                log.info("notiDTO 저장 완료");
+                //COMPLETE한게 가전 On/Off를 완료한 것인지 위험물 처리 프로세스를 완료한 것인지 구분을 할 필요가 있음.
             case "ACOMPLETE":
                 log.info("Ros Received message: {}", rawMessage);
                 // ROS에서 입증한 실제 가전상태 데이터를 redis에 올린다.
@@ -95,24 +120,25 @@ public class ControlController {
                 MessageContainer.A_Complete aComplete = objectMapper.convertValue(controlDto.getMessage(), MessageContainer.A_Complete.class);
                 log.info("변환 후: "+aComplete.toString());
                 applianceService.updateApplianceStatus(homeId,aComplete.getApplianceUUID(),aComplete.getCurrentStatus());
+
                 log.info("스테이터스 변환 완료");
 //              fcm 호출.
                 //가전 상태 제어 완료 알림 보내기!
-                Long targetUserId = homeService.findKakaoIdByHomeId(homeId);
-                LocalDateTime nowInKorea = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+                Long targetUserId2 = homeService.findKakaoIdByHomeId(homeId);
+                LocalDateTime nowInKorea2 = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-                String formattedTime = nowInKorea.format(formatter);
-                ApplianceResponseDto applianceResponseDto = applianceService.fetchApplianceByUUID(aComplete.getApplianceUUID());
-
-                String downloadURL1 = imageService.generateURL(applianceResponseDto.getApplianceType()+".png", HttpMethod.GET);
+                DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+                String formattedTime2 = nowInKorea2.format(formatter2);
+                ApplianceResponseDto applianceResponseDto2 = applianceService.fetchApplianceByUUID(aComplete.getApplianceUUID());
+                log.info(">>>>>><<<<<>>>>>"+applianceResponseDto2.getApplianceType());
+                String downloadURL2 = imageService.generateURL(applianceResponseDto2.getApplianceType()+".png", HttpMethod.GET);
 //                log.info("notiDTO 생성 전");
 
-                NotificationRequestDto notificationRequestDto1
-                        = new NotificationRequestDto(targetUserId, "제어", applianceResponseDto.getRoomName()+"-"+applianceResponseDto.getApplianceType()+"의 상태를 변경하였습니다.",
-                        formattedTime,downloadURL1);
-                    fcmService.sendMessageTo(notificationRequestDto1);
-                notificationService.saveNotification(notificationRequestDto1); // DB에 저장
+                NotificationRequestDto notificationRequestDto2
+                        = new NotificationRequestDto(targetUserId2, "제어", applianceResponseDto2.getRoomName()+"-"+applianceResponseDto2.getApplianceType()+"의 상태를 변경하였습니다.",
+                        formattedTime2,downloadURL2);
+                    fcmService.sendMessageTo(notificationRequestDto2);
+                notificationService.saveNotification(notificationRequestDto2); // DB에 저장
 //                log.info("notiDTO 저장 완료");
             break;
 
@@ -120,18 +146,18 @@ public class ControlController {
                 MessageContainer.O_Complete oComplete = objectMapper.convertValue(controlDto.getMessage(), MessageContainer.O_Complete.class);
 
                 String filename = targetService.fetchFilenameByTargetId(oComplete.getObjectId());
-                String downloadURL = imageService.generateURL(filename, HttpMethod.GET);
+                String downloadURL3 = imageService.generateURL(filename, HttpMethod.GET);
 
-                Long targetUserId2 = homeService.findKakaoIdByHomeId(homeId);
-                LocalDateTime nowInKorea2 = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+                Long targetUserId3 = homeService.findKakaoIdByHomeId(homeId);
+                LocalDateTime nowInKorea3 = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 
-                DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-                String formattedTime2 = nowInKorea2.format(formatter2);
-                NotificationRequestDto notificationRequestDto2
-                        = new NotificationRequestDto(targetUserId2, "처리", oComplete.getObjectType()+"를 처리하였습니다.",
-                        formattedTime2,downloadURL);
-                fcmService.sendMessageTo(notificationRequestDto2);
-                notificationService.saveNotification(notificationRequestDto2);
+                DateTimeFormatter formatter3 = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+                String formattedTime3 = nowInKorea3.format(formatter3);
+                NotificationRequestDto notificationRequestDto3
+                        = new NotificationRequestDto(targetUserId3, "처리", oComplete.getObjectType()+"를 처리하였습니다.",
+                        formattedTime3,downloadURL3);
+                fcmService.sendMessageTo(notificationRequestDto3);
+                notificationService.saveNotification(notificationRequestDto3);
             break;
         }
     }

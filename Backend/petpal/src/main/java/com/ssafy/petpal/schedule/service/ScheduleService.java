@@ -44,9 +44,9 @@ public class ScheduleService {
     public List<ScheduleActualResponseDto> fetchAllSchedules(Long homeId) {
 
         List<Schedule> schedules = scheduleRepository.findAllByHomeId(homeId);
-        for (Schedule schedule : schedules){
-            System.out.println(schedule);
-        }
+//        for (Schedule schedule : schedules){
+//            System.out.println(schedule);
+//        }
         return schedules.stream().map(this::convertToScheduleActualResponseDto).collect(Collectors.toList());
     }
 

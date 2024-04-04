@@ -56,8 +56,8 @@ public class ScheduleController {
     @PutMapping
     public ResponseEntity<Void> putSchedule(@RequestBody ScheduleUpdateDto scheduleUpdateDto){
         try{
-            log.info(">>>"+scheduleUpdateDto.isActive()+","+scheduleUpdateDto.getScheduleId());
-            System.out.println(scheduleUpdateDto.isActive());
+//            log.info(">>>"+scheduleUpdateDto.isActive()+","+scheduleUpdateDto.getScheduleId());
+//            System.out.println(scheduleUpdateDto.isActive());
             scheduleService.updateSchedule(scheduleUpdateDto);
             return ResponseEntity.ok(null);
         }catch (Exception e){
