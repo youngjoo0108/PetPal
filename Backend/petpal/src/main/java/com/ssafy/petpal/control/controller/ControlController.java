@@ -101,10 +101,10 @@ public class ControlController {
                 String formattedTime = nowInKorea.format(formatter);
                 ApplianceResponseDto applianceResponseDto = applianceService.fetchApplianceByUUID(sComplete.getApplianceUUID());
                 log.info(">>>>>><<<<<>>>>>"+applianceResponseDto.getApplianceType());
-//                String downloadURL1 = imageService.generateURL("default/"+applianceResponseDto.getApplianceType()+".png", HttpMethod.GET);
-                String downloadURL1 = imageService.generateURL("noImage", HttpMethod.GET);
+//                String downloadURL1 = imageService.generateURL(applianceResponseDto.getApplianceType()+".png", HttpMethod.GET);
+//                String downloadURL1 = imageService.generateURL("noImage", HttpMethod.GET);
 //                log.info("notiDTO 생성 전");
-
+                String downloadURL1 = "noImage";
                 NotificationRequestDto notificationRequestDto1
                         = new NotificationRequestDto(targetUserId, "제어", applianceResponseDto.getRoomName()+"-"+applianceResponseDto.getApplianceType()+"의 상태를 변경하였습니다.",
                         formattedTime,downloadURL1);
@@ -132,10 +132,10 @@ public class ControlController {
                 String formattedTime2 = nowInKorea2.format(formatter2);
                 ApplianceResponseDto applianceResponseDto2 = applianceService.fetchApplianceByUUID(aComplete.getApplianceUUID());
 //                log.info(">>>>>><<<<<>>>>>"+applianceResponseDto2.getApplianceType());
-//                String downloadURL2 = imageService.generateURL("default/"+applianceResponseDto2.getApplianceType()+".png", HttpMethod.GET);
-                String downloadURL2 = imageService.generateURL("noImage", HttpMethod.GET);
+//                String downloadURL2 = imageService.generateURL(applianceResponseDto2.getApplianceType()+".png", HttpMethod.GET);
+//                String downloadURL2 = imageService.generateURL("noImage", HttpMethod.GET);
 //                log.info("notiDTO 생성 전");
-
+                String downloadURL2 = "noImage";
                 NotificationRequestDto notificationRequestDto2
                         = new NotificationRequestDto(targetUserId2, "제어", applianceResponseDto2.getRoomName()+"-"+applianceResponseDto2.getApplianceType()+"의 상태를 변경하였습니다.",
                         formattedTime2,downloadURL2);
