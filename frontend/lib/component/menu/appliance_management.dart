@@ -38,6 +38,7 @@ class ApplianceManagementState extends State<ApplianceManagement> {
 
   _fetchAppliances() async {
     try {
+      appliances.clear();
       List<Appliance> loadedAppliances =
           await _applianceService.fetchAppliances();
       setState(() {
@@ -71,6 +72,10 @@ class ApplianceManagementState extends State<ApplianceManagement> {
                       key: Key(appliance.hashCode.toString()),
                       onDismissed: (direction) async {
                         final applianceId = appliances[index].applianceId;
+                        // 삭제 성공 시 스케줄 리스트에서 해당 스케줄 제거
+                        setState(() {
+                          appliances.removeAt(index);
+                        });
                         // 서버에서 스케줄 삭제 시도
                         bool success = await ApplianceService()
                             .deleteAppliance(applianceId);
@@ -86,10 +91,7 @@ class ApplianceManagementState extends State<ApplianceManagement> {
                             appliances.insert(index, appliance);
                           });
                         } else {
-                          // 삭제 성공 시 스케줄 리스트에서 해당 스케줄 제거
-                          setState(() {
-                            appliances.removeAt(index);
-                          });
+                          _fetchAppliances();
                           GlobalAlertDialog.show(
                             context,
                             title: "알림",

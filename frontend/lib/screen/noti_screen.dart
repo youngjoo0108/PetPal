@@ -23,6 +23,7 @@ class NotiScreenState extends State<NotiScreen> {
   }
 
   void fetchNotifications() async {
+    notifications.clear();
     // 임시로 사용자 ID를 1로 설정, 실제 앱에서는 동적으로 설정할 필요가 있음
     final fetchedNotifications =
         await NotificationService().fetchNotifications();
@@ -57,22 +58,7 @@ class NotiScreenState extends State<NotiScreen> {
           ),
           child: Column(
             children: [
-              if (displayImageUrl != null &&
-                  displayImageUrl!.isNotEmpty) // displayImageUrl 값 검사
-                Container(
-                  height: 240,
-                  width: 320,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(displayImageUrl!),
-                      fit: BoxFit.cover,
-                    ),
-                    borderRadius: BorderRadius.circular(12), // 이미지 테두리 둥글게
-                  ),
-                  margin: const EdgeInsets.only(top: 20, bottom: 20),
-                )
-              else if (displayImageUrl ==
-                  "noImage") // displayImageUrl이 비어 있을 경우
+              if (displayImageUrl == "noImage") // displayImageUrl이 비어 있을 경우
                 Container(
                   height: 240,
                   width: 320,
@@ -89,6 +75,20 @@ class NotiScreenState extends State<NotiScreen> {
                       color: Colors.black54,
                     ),
                   ),
+                )
+              else if (displayImageUrl != null &&
+                  displayImageUrl!.isNotEmpty) // displayImageUrl 값 검사
+                Container(
+                  height: 240,
+                  width: 320,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(displayImageUrl!),
+                      fit: BoxFit.cover,
+                    ),
+                    borderRadius: BorderRadius.circular(12), // 이미지 테두리 둥글게
+                  ),
+                  margin: const EdgeInsets.only(top: 20, bottom: 20),
                 ),
               Expanded(
                 child: ListView.builder(
@@ -120,6 +120,9 @@ class NotiScreenState extends State<NotiScreen> {
                           .toString()), // 알림을 구별할 수 있는 고유 키
                       onDismissed: (direction) async {
                         final notificationId = notifications[index].id;
+                        setState(() {
+                          notifications.removeAt(index);
+                        });
                         bool success = await NotificationService()
                             .deleteNotification(notificationId);
                         if (!success) {
@@ -137,8 +140,8 @@ class NotiScreenState extends State<NotiScreen> {
                           // 삭제 성공 시 스케줄 리스트에서 해당 스케줄 제거
                           setState(() {
                             displayImageUrl = "";
-                            fetchNotifications();
                           });
+                          fetchNotifications();
                           GlobalAlertDialog.show(
                             context,
                             title: "알림",

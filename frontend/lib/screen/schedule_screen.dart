@@ -100,6 +100,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       key: Key(schedule.hashCode.toString()), // 고유한 키로 각 항목을 식별
                       onDismissed: (direction) async {
                         final scheduleId = schedules[index].scheduleId;
+                        setState(() {
+                          schedules.removeAt(index);
+                        });
                         // 서버에서 스케줄 삭제 시도
                         bool success =
                             await ScheduleService().deleteSchedule(scheduleId);
@@ -116,9 +119,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                           });
                         } else {
                           // 삭제 성공 시 스케줄 리스트에서 해당 스케줄 제거
-                          setState(() {
-                            schedules.removeAt(index);
-                          });
+
                           GlobalAlertDialog.show(
                             context,
                             title: "알림",
@@ -172,7 +173,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                 schedule.scheduleId, // 이미 있음
                                 value, // isActive 상태, 이전 코드와 동일
                               );
-
+                              fetchSchedules();
                               if (updateSuccess) {
                                 // 업데이트 성공
                                 setState(() {

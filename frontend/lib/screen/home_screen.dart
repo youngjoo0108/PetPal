@@ -57,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         final String? homeId =
                             await secureStorage.read(key: "homeId");
                         if (homeId != null) {
+                          deviceController.isPatrollingMode.value = true;
                           // 메시지 전송 로직
                           socketController.sendMessage(
                             destination: '/pub/control.message.$homeId',
@@ -154,8 +155,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             await secureStorage.read(key: "homeId");
                         final String message =
                             deviceController.isPatrollingMode.value
-                                ? "patrol"
-                                : "tracking";
+                                ? "tracking"
+                                : "patrol";
                         String messageInDialog =
                             message == "patrol" ? "순찰" : "트래킹";
                         if (homeId != null) {
@@ -187,8 +188,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: Text(
                         deviceController.isPatrollingMode.value
-                            ? '순찰 모드'
-                            : '트래킹 모드',
+                            ? '트래킹 모드'
+                            : '순찰 모드',
                         style: const TextStyle(
                           color: black,
                           fontSize: 15.0,

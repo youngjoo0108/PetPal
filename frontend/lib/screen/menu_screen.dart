@@ -73,7 +73,9 @@ class _MenuScreenState extends State<MenuScreen> {
           builder: (context) => const HelpScreen(), // '방 관리' 페이지로 이동
         ));
       },
-      onLogout: () {
+      onLogout: () async {
+        await secureStorage.delete(key: "isLoggedIn");
+
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => const LoginScreen(), // 로그아웃 후 로그인 화면으로 전환
         ));
