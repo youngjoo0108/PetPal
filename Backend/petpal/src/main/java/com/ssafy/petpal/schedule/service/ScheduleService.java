@@ -83,7 +83,8 @@ public class ScheduleService {
 // Home 엔티티 조회
 
         // Schedule 엔티티의 속성 갱신
-        schedule.update(scheduleUpdateDto.isActive());
+//        schedule.update(scheduleUpdateDto.isActive());
+        schedule.setActive(scheduleUpdateDto.isActive());
         scheduleRepository.save(schedule);
 
     }
