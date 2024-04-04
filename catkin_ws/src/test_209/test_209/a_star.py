@@ -37,6 +37,7 @@ class A_star(Node):
         self.map_size_x=700
         self.map_size_y=700
         self.map_resolution=0.05
+        self.save_path = []
     
         self.GRIDSIZE=700
  

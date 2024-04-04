@@ -15,7 +15,7 @@ class ObstacleControl(Node):
 
     def __init__(self):
         super().__init__('obstacle_controller')
-        self.yolo_sub = self.create_subscription(String, 'captured_object', self.obstacle_callback, 10**3)
+        self.yolo_sub = self.create_subscription(String, 'captured_object', self.obstacle_callback, 10**2)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
         self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
         # self.cmd_pub = self.create_publisher(Twist, 'cmd_vel', 10)
@@ -116,8 +116,8 @@ class ObstacleControl(Node):
                     left_top_x, left_top_y = map(float, left_top.split('-'))
                     right_bottom_x, right_bottom_y = map(float, right_bottom.split('-'))
 
-                    self.obstacle_height = right_bottom_y - left_top_y
-                    self.obstacle_width = right_bottom_x - left_top_x
+                    # self.obstacle_height = right_bottom_y - left_top_y
+                    # self.obstacle_width = right_bottom_x - left_top_x
                     self.obstacle_x_in_camera = 160 - (left_top_x + right_bottom_x) / 2.0   # 카메라 중심으로부터의 x 거리
                     self.obstacle_y_in_camera = 240 - (left_top_y + right_bottom_y) / 2.0   # 카메라 바닥으로부터의 y 거리
                     
@@ -125,16 +125,16 @@ class ObstacleControl(Node):
                     self.turtlebot_to_obstacle_theta = np.arctan2(self.obstacle_x_in_camera * 3, self.obstacle_y_in_camera * 4)
                     
 
-                    self.turtlebot_to_obstacle_distance = self.obstacle_distance_in_camera * self.obstacle_real_height / (self.obstacle_width * np.cos(self.turtlebot_to_obstacle_theta))
-                    # self.turtlebot_to_obstacle_distance = self.lidar_msg.ranges[(int(self.turtlebot_to_obstacle_theta + 360)) % 360]
+                    # self.turtlebot_to_obstacle_distance = self.obstacle_distance_in_camera * self.obstacle_real_height / (self.obstacle_width * np.cos(self.turtlebot_to_obstacle_theta))
+                    self.turtlebot_to_obstacle_distance = self.lidar_msg.ranges[(int((self.turtlebot_to_obstacle_theta * 180 / np.pi) + 360)) % 360]
 
-                    self.goal_x = self.robot_pose_x + (self.turtlebot_to_obstacle_distance) * np.cos(self.robot_yaw + self.turtlebot_to_obstacle_theta)
-                    self.goal_y = self.robot_pose_y + (self.turtlebot_to_obstacle_distance) * np.sin(self.robot_yaw + self.turtlebot_to_obstacle_theta)
+                    self.goal_x = self.robot_pose_x + (self.turtlebot_to_obstacle_distance - 0.8) * np.cos(self.robot_yaw + self.turtlebot_to_obstacle_theta)
+                    self.goal_y = self.robot_pose_y + (self.turtlebot_to_obstacle_distance - 0.8) * np.sin(self.robot_yaw + self.turtlebot_to_obstacle_theta)
                     self.goal_yaw = self.turtlebot_to_obstacle_theta + self.robot_yaw
 
 
                     self.tracking_obstacle()
-        elif data['dog_list'] and self.fsm_msg.data == 'search':
+        if data['dog_list'] and self.fsm_msg.data == 'search':
             self.request_msg.data = "found"
             self.request_pub.publish(self.request_msg)
 

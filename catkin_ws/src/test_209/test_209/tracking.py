@@ -10,17 +10,17 @@ from std_msgs.msg import Int32, String
 from ros_log_package.RosLogPublisher import RosLogPublisher
 
 params = {
-    'homeId' : 1
+    'homeId' : '2'
 }
 
 class Tracking(Node):
 
     def __init__(self):
         super().__init__('minimal_subscriber')
-        self.yolo_sub = self.create_subscription(String,'captured_object',self.listener_callback, 10**3)
+        self.yolo_sub = self.create_subscription(String,'captured_object',self.listener_callback, 10**2 )
         self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
-        self.timer = self.create_timer(0.2, self.timer_callback)
+        self.timer = self.create_timer(0.5, self.timer_callback)
         self.tracking_pub = self.create_publisher(Int32, 'tracking_err', 10)
         self.request_pub = self.create_publisher(String, 'request', 10)
 
@@ -34,7 +34,7 @@ class Tracking(Node):
         self.is_dog = False
 
         self.last_dog_seen_time = 0.0  
-        self.dog_seen_timeout = 5.0
+        self.dog_seen_timeout = 10.0
 
         self.robot_pose_x = 0.0
         self.robot_pose_y = 0.0
@@ -47,6 +47,8 @@ class Tracking(Node):
         self.dog_y_in_camera = 0.0
         self.turtlebot_to_dog_theta = 0.0
         self.turtlebot_to_dog_distance = 0.0
+
+        self.count = 0
         
         # log
         self.ros_log_pub = None
@@ -70,6 +72,7 @@ class Tracking(Node):
 
                 left_top = dog.split('/')[-2]
                 right_bottom = dog.split('/')[-1]
+                
                 left_top_x, left_top_y = map(float, left_top.split('-'))
                 right_bottom_x, right_bottom_y = map(float, right_bottom.split('-'))
 
@@ -82,8 +85,8 @@ class Tracking(Node):
                 self.turtlebot_to_dog_theta = np.arctan2(self.dog_x_in_camera * 3, self.dog_y_in_camera * 4)
                 self.turtlebot_to_dog_distance = self.dog_distance_in_camera / (self.dog_height * np.cos(self.turtlebot_to_dog_theta))  
 
-                self.goal_x = self.robot_pose_x + (self.turtlebot_to_dog_distance - 2.0) * np.cos(self.robot_yaw + self.turtlebot_to_dog_theta)
-                self.goal_y = self.robot_pose_y + (self.turtlebot_to_dog_distance -2.0) * np.sin(self.robot_yaw + self.turtlebot_to_dog_theta)
+                self.goal_x = self.robot_pose_x + (self.turtlebot_to_dog_distance - 1.2) * np.cos(self.robot_yaw + self.turtlebot_to_dog_theta)
+                self.goal_y = self.robot_pose_y + (self.turtlebot_to_dog_distance -1.2) * np.sin(self.robot_yaw + self.turtlebot_to_dog_theta)
                 self.goal_yaw = self.turtlebot_to_dog_theta + self.robot_yaw
         else:
             self.is_dog = False
@@ -101,10 +104,13 @@ class Tracking(Node):
 
     def timer_callback(self):
 
-        current_time = time.time()
+        #current_time = time.time()
 
         if self.is_dog == False:
-            if (current_time - self.last_dog_seen_time) > self.dog_seen_timeout:
+            self.count += 1
+            #if (current_time - self.last_dog_seen_time) > self.dog_seen_timeout:
+            if self.count >= 10:
+                self.count = 0
                 self.ros_log_pub.publish_log('DEBUG', 'Subscription tracking: Cannot find Dog for 5 seconds')
 
                 self.put_api()
@@ -125,43 +131,47 @@ class Tracking(Node):
 
     def tracking_dog(self):
 
-        if self.turtlebot_to_dog_distance < 2.0 or self.dog_height > 72: # 1.2 / 120
+        try:
+            if self.turtlebot_to_dog_distance < 1.2 or self.dog_height > 120: # 1.2 / 120
 
-            if self.turtlebot_to_dog_distance < 0.7 or self.dog_height > 150:
+                if self.turtlebot_to_dog_distance < 0.7 or self.dog_height > 150:
 
-                self.tracking_err_msg.data = 4
-                self.tracking_pub.publish(self.tracking_err_msg)
-                
+                    self.tracking_err_msg.data = 4
+                    self.tracking_pub.publish(self.tracking_err_msg)
+                    
+                else:
+                    if -20 < self.dog_x_in_camera < 20:
+
+                        self.tracking_err_msg.data = 1
+                        self.tracking_pub.publish(self.tracking_err_msg)
+                        
+                    elif -160 < self.dog_x_in_camera <= -20:
+
+                        self.tracking_err_msg.data = 2
+                        self.tracking_pub.publish(self.tracking_err_msg)
+                        
+
+                    elif 20 <= self.dog_x_in_camera < 160:
+
+                        self.tracking_err_msg.data = 3
+                        self.tracking_pub.publish(self.tracking_err_msg)
             else:
-                if -20 < self.dog_x_in_camera < 20:
+                
+                self.goal_msg.pose.position.x = self.goal_x
+                self.goal_msg.pose.position.y = self.goal_y
 
-                    self.tracking_err_msg.data = 1
-                    self.tracking_pub.publish(self.tracking_err_msg)
-                    
-                elif -160 < self.dog_x_in_camera <= -20:
+                q = Quaternion.from_euler(0, 0, self.goal_yaw)
 
-                    self.tracking_err_msg.data = 2
-                    self.tracking_pub.publish(self.tracking_err_msg)
-                    
+                self.goal_msg.pose.orientation.x = q.x
+                self.goal_msg.pose.orientation.y = q.y
+                self.goal_msg.pose.orientation.z = q.z
+                self.goal_msg.pose.orientation.w = q.w
 
-                elif 20 <= self.dog_x_in_camera < 160:
-
-                    self.tracking_err_msg.data = 3
-                    self.tracking_pub.publish(self.tracking_err_msg)
-        else:
+                self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
+                self.goal_pub.publish(self.goal_msg)
+        except Exception as e:
             
-            self.goal_msg.pose.position.x = self.goal_x
-            self.goal_msg.pose.position.y = self.goal_y
-            # print(f'tracing {self.goal_x} {self.goal_y} {self.turtlebot_to_dog_distance}')
-            q = Quaternion.from_euler(0, 0, self.goal_yaw)
-
-            self.goal_msg.pose.orientation.x = q.x
-            self.goal_msg.pose.orientation.y = q.y
-            self.goal_msg.pose.orientation.z = q.z
-            self.goal_msg.pose.orientation.w = q.w
-
-            self.goal_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
-            self.goal_pub.publish(self.goal_msg)
+            self.ros_log_pub.publish_log('DEBUG', f'error occurs{e}')
 
     def put_api(self):
         url = "https://j10a209.p.ssafy.io/api/v1/homes/pet/" + str(params['homeId'])
