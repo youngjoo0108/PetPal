@@ -5,6 +5,7 @@ import requests
 import threading
 import datetime
 from ssafy_msgs.msg import TurtlebotStatus, EnviromentStatus, IotCmd
+from std_msgs.msg import String
 
 class TimedTaskExecutor(Node):
     def __init__(self):
@@ -14,6 +15,7 @@ class TimedTaskExecutor(Node):
         self.envir_sub = self.create_subscription(EnviromentStatus, '/envir_status', self.envir_callback, 10)
         self.timer = self.create_timer(self.fetch_schedule_period, self.timer_callback)
         self.iot_cmd_pub = self.create_publisher(IotCmd, 'iot_cmd', 10)
+        self.data_pub = self.create_publisher(String, '/to_server/data', 10)
 
         self.iot_cmd_msg = IotCmd()
         self.envir_msg = EnviromentStatus()
@@ -41,10 +43,10 @@ class TimedTaskExecutor(Node):
                         task_time = month + '-' + day + '-' + hour
                         uid = schedule['applianceUUID']
                         task_name = schedule['taskType']  # 예: 'task1', 'task2' 등의 작업 이름
-                        self.scheduled_tasks[task_time] = (uid, task_name)
+                        self.scheduled_tasks[task_time] = (uid, task_name, schedule['scheduleId'])
             else:
                 self.get_logger().error('Failed to fetch schedules from API.')
-            print(self.scheduled_tasks)
+            #print(self.scheduled_tasks)
         except Exception as e:
             self.get_logger().error(f'Exception occurred during API request: {e}')
 
@@ -79,11 +81,25 @@ class TimedTaskExecutor(Node):
         
         if now in self.scheduled_tasks:
             task = self.scheduled_tasks[now]
-            print(task)
+            
             self.iot_cmd_msg.iot_uuid = task[0]
             self.iot_cmd_msg.control_action = task[1]
             self.iot_cmd_pub.publish(self.iot_cmd_msg)
             # 실행 후 해당 작업을 목록에서 제거
+            data_msg = String()
+
+            dt = {
+                'applianceUUID' : task[0],
+                'currentStatus' : task[1],
+                'scheduleId' : task[2]
+            }
+            temp = {
+                'type' : 'SCOMPLETE',
+                'message' : dt
+            }
+            data = json.dumps(temp)
+            data_msg.data = data
+            self.data_pub.publish(self.data_msg)
             del self.scheduled_tasks[now]
             #rclpy.spin_once(self, timeout_sec=1)  # 매 분마다 현재 시간 확인
     

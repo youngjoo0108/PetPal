@@ -65,7 +65,20 @@ class odom(Node):
         self.laser_transform.transform.rotation.w = 1.0
 
     def envir_callback(self, msg):
-        self.is_envir=True
+        if not self.is_envir:
+            msg = String()
+            dt = {
+                'weather' : self.envir_msg.weather,
+                'temp' : self.envir_msg.temperature,
+            }
+            temp = {
+                'type' : 'WEATHER',
+                'message' : dt
+            }
+            data = json.dumps(temp)
+            msg.data = data
+            self.data_pub.publish(msg)
+            self.is_envir=True
         self.envir_msg=msg
 
     def imu_callback(self,msg):
