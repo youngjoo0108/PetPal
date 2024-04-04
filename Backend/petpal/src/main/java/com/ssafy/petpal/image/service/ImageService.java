@@ -56,7 +56,7 @@ public class ImageService {
     public String generateURL(String filename, HttpMethod method) {
         Calendar cal = new Calendar.Builder().build();
         cal.setTime(new Date());
-        cal.add(Calendar.MINUTE,5);
+        cal.add(Calendar.MINUTE,180);
         URL url = amazonS3Client.generatePresignedUrl(bucket,filename,cal.getTime(),method);
         return url.toString();
     }
