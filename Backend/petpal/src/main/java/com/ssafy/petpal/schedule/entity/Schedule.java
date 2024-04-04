@@ -4,10 +4,7 @@ import com.ssafy.petpal.common.BaseEntity;
 import com.ssafy.petpal.home.entity.Home;
 import com.ssafy.petpal.object.entity.Appliance;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,6 +13,7 @@ import java.time.LocalTime;
 @Entity(name = "Schedules")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class Schedule extends BaseEntity {
 
