@@ -21,7 +21,7 @@ debug_mode = True
 class DataClassifyNode(Node):
     def __init__(self):
         super().__init__('data_classify_node')
-        
+        logging.basicConfig(level=logging.DEBUG)
         self.ros_log_pub = None
         try:
             self.ros_log_pub = RosLogPublisher(self)
@@ -29,7 +29,7 @@ class DataClassifyNode(Node):
             self.get_logger().error('ERROR', 'Subscription initialization error: {}'.format(e))
         
         try:
-            self.publisher_yolo = self.create_publisher(String, 'captured_object', 10**3)
+            self.publisher_yolo = self.create_publisher(String, 'captured_object', 10**2)
         except:
             self.ros_log_pub.publish_log('ERROR', 'init publisher yolo error: {}'.format(e))
             

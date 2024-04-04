@@ -52,7 +52,7 @@ class IMGParser(Node):
             self.get_logger().error('ERROR', 'Subscription initialization error: {}'.format(e))
         
         try:
-            self.publisher_ = self.create_publisher(String, 'captured_object', 10)
+            self.publisher_ = self.create_publisher(String, 'captured_object', 100)
         except:
             print("init publisher error")
 

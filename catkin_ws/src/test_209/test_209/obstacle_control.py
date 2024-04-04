@@ -15,7 +15,7 @@ class ObstacleControl(Node):
 
     def __init__(self):
         super().__init__('obstacle_controller')
-        self.yolo_sub = self.create_subscription(String, 'captured_object', self.obstacle_callback, 10**3)
+        self.yolo_sub = self.create_subscription(String, 'captured_object', self.obstacle_callback, 10**2)
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
         self.goal_pub = self.create_publisher(PoseStamped,'goal_pose', 10)
         # self.cmd_pub = self.create_publisher(Twist, 'cmd_vel', 10)
@@ -125,11 +125,11 @@ class ObstacleControl(Node):
                     self.turtlebot_to_obstacle_theta = np.arctan2(self.obstacle_x_in_camera * 3, self.obstacle_y_in_camera * 4)
                     
 
-                    self.turtlebot_to_obstacle_distance = self.obstacle_distance_in_camera * self.obstacle_real_height / (self.obstacle_width * np.cos(self.turtlebot_to_obstacle_theta))
-                    # self.turtlebot_to_obstacle_distance = self.lidar_msg.ranges[(int(self.turtlebot_to_obstacle_theta + 360)) % 360]
+                    # self.turtlebot_to_obstacle_distance = self.obstacle_distance_in_camera * self.obstacle_real_height / (self.obstacle_width * np.cos(self.turtlebot_to_obstacle_theta))
+                    self.turtlebot_to_obstacle_distance = self.lidar_msg.ranges[(int((self.turtlebot_to_obstacle_theta * 180 / np.pi) + 360)) % 360]
 
-                    self.goal_x = self.robot_pose_x + (self.turtlebot_to_obstacle_distance) * np.cos(self.robot_yaw + self.turtlebot_to_obstacle_theta)
-                    self.goal_y = self.robot_pose_y + (self.turtlebot_to_obstacle_distance) * np.sin(self.robot_yaw + self.turtlebot_to_obstacle_theta)
+                    self.goal_x = self.robot_pose_x + (self.turtlebot_to_obstacle_distance - 0.8) * np.cos(self.robot_yaw + self.turtlebot_to_obstacle_theta)
+                    self.goal_y = self.robot_pose_y + (self.turtlebot_to_obstacle_distance - 0.8) * np.sin(self.robot_yaw + self.turtlebot_to_obstacle_theta)
                     self.goal_yaw = self.turtlebot_to_obstacle_theta + self.robot_yaw
 
 
