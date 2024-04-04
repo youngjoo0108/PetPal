@@ -19,5 +19,5 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
 
     @Query("delete from Schedules s " +
             "where s.appliance.id = :applianceId")
-    void deleteAllByApplianceId(Long applianceId);
+    void deleteAllByApplianceId(@Param("applianceId") Long applianceId);
 }
