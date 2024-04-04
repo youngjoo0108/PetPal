@@ -11,6 +11,7 @@ import com.ssafy.petpal.schedule.dto.ScheduleTemporalDto;
 import com.ssafy.petpal.schedule.dto.ScheduleUpdateDto;
 import com.ssafy.petpal.schedule.entity.Schedule;
 import com.ssafy.petpal.schedule.repository.ScheduleRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
@@ -74,7 +75,7 @@ public class ScheduleService {
                 .orElseThrow(IllegalArgumentException::new);
         scheduleRepository.delete(schedule);
     }
-
+    @Transactional
     public void deleteAllScheduleByApplianceId(Long applianceId){
         scheduleRepository.deleteAllByApplianceId(applianceId);
     }
